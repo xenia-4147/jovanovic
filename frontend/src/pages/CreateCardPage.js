@@ -83,16 +83,17 @@ const CreateCardPage = () => {
 
     setLoading(true);
     try {
-      const newCard = await mockApi.createBusinessCard(formData);
+      const newCard = await cardsApi.create(formData);
       toast({
         title: "Erfolg",
         description: "Ihre Visitenkarte wurde erfolgreich erstellt.",
       });
       navigate(`/card/${newCard.id}`);
     } catch (error) {
+      console.error('Card creation failed:', error);
       toast({
         title: "Fehler",
-        description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+        description: error.response?.data?.detail || "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
         variant: "destructive",
       });
     } finally {
