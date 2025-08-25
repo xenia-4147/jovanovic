@@ -32,7 +32,7 @@ class PrivacyService:
                     card_data["userId"] = str(card_data["userId"])
                     
                 card = BusinessCard(**card_data)
-                business_cards.append(card.dict(exclude={"user_id"}))
+                business_cards.append(card.dict(exclude={"id", "user_id"}))
             
             # Get recipients (people who received user's cards)
             card_ids = [card["_id"] for card in business_cards]
