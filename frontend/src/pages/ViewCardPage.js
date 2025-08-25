@@ -14,6 +14,7 @@ const ViewCardPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [card, setCard] = useState(null);
   const [loading, setLoading] = useState(true);
   const [qrCode, setQrCode] = useState(null);
@@ -34,14 +35,16 @@ const ViewCardPage = () => {
   const loadCard = async () => {
     try {
       setLoading(true);
-      const cardData = await mockApi.getBusinessCard(id);
+      const cardData = await cardsApi.getById(id);
       setCard(cardData);
     } catch (error) {
+      console.error('Failed to load card:', error);
       toast({
         title: "Fehler",
         description: "Visitenkarte konnte nicht geladen werden.",
         variant: "destructive",
       });
+      navigate('/');
     } finally {
       setLoading(false);
     }
