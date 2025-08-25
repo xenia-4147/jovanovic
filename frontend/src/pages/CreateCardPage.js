@@ -52,8 +52,8 @@ const CreateCardPage = () => {
   const handleSocialMediaChange = (platform, value) => {
     setFormData(prev => ({
       ...prev,
-      socialMedia: {
-        ...prev.socialMedia,
+      social_media: {
+        ...prev.social_media,
         [platform]: value
       }
     }));
