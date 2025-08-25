@@ -65,7 +65,16 @@ async def get_current_user(
     
     # Get user from database (will be implemented with actual DB)
     from server import db as database
+    from bson import ObjectId
+    
+    # Try to find user by string ID first, then by ObjectId
     user_data = await database.users.find_one({"_id": user_id})
+    if not user_data:
+        # Try with ObjectId conversion for backward compatibility
+        try:
+            user_data = await database.users.find_one({"_id": ObjectId(user_id)})
+        except:
+            pass
     
     if user_data is None:
         raise credentials_exception
