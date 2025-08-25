@@ -489,15 +489,15 @@ const CreateCardPage = () => {
                 <div 
                   className="rounded-lg p-4 min-h-[400px]"
                   style={{
-                    backgroundColor: formData.backgroundColor,
-                    color: formData.textColor,
-                    border: `2px solid ${formData.accentColor}20`
+                    backgroundColor: formData.background_color,
+                    color: formData.text_color,
+                    border: `2px solid ${formData.accent_color}20`
                   }}
                 >
                   <div className="text-center">
                     <Avatar className="w-20 h-20 mx-auto mb-4">
-                      <AvatarImage src={formData.profileImage} />
-                      <AvatarFallback style={{ backgroundColor: formData.accentColor, color: 'white' }}>
+                      <AvatarImage src={formData.profile_image} />
+                      <AvatarFallback style={{ backgroundColor: formData.accent_color, color: 'white' }}>
                         {formData.name ? formData.name.charAt(0).toUpperCase() : 'U'}
                       </AvatarFallback>
                     </Avatar>
@@ -525,7 +525,7 @@ const CreateCardPage = () => {
                 </div>
                 
                 {/* Auto-Update Preview */}
-                {formData.autoUpdateEnabled && (
+                {formData.auto_update_enabled && (
                   <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
                     <div className="flex items-center text-green-800 text-sm">
                       <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></div>
