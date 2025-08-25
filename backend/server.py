@@ -255,7 +255,9 @@ async def create_business_card(
 async def get_user_cards(current_user: User = Depends(get_current_user)):
     """Get user's business cards"""
     try:
-        cards_cursor = db.businesscards.find({"userId": current_user.id})
+        # Use string user ID for query
+        user_id_str = str(current_user.id)
+        cards_cursor = db.businesscards.find({"userId": user_id_str})
         cards = []
         
         async for card_data in cards_cursor:
@@ -276,7 +278,7 @@ async def get_user_cards(current_user: User = Depends(get_current_user)):
         
     except Exception as e:
         logger.error(f"Failed to fetch user cards: {str(e)}")
-        raise HTTPException(status_code=500, detail="Failed to fetch cards")
+        raise HTTPException(status_code=500, detail=f"Failed to fetch cards: {str(e)}")
 
 @api_router.get("/cards/{card_id}", response_model=BusinessCardResponse)
 async def get_business_card(
