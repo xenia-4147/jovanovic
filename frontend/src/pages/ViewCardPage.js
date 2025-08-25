@@ -52,17 +52,7 @@ const ViewCardPage = () => {
 
   const handleDownloadVCard = async () => {
     try {
-      const vcard = await mockApi.generateVCard(card);
-      const blob = new Blob([vcard], { type: 'text/vcard' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${card.name.replace(/\s+/g, '_')}.vcf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
+      downloadVCardFile(card);
       toast({
         title: "Download gestartet",
         description: "Die Kontaktdatei wurde heruntergeladen.",
@@ -78,7 +68,7 @@ const ViewCardPage = () => {
 
   const handleGenerateQR = async () => {
     try {
-      const qrUrl = await mockApi.generateQRCode(card.id || 'preview');
+      const qrUrl = cardsApi.generateQR(card.id || 'preview');
       setQrCode(qrUrl);
       toast({
         title: "QR Code generiert",
