@@ -4,7 +4,8 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { ArrowLeft, Download, QrCode, Share2, Phone, Mail, Globe, MapPin, Instagram, Linkedin, Twitter, Send } from 'lucide-react';
+import { Separator } from '../components/ui/separator';
+import { ArrowLeft, Download, QrCode, Share2, Phone, Mail, Globe, MapPin, Instagram, Linkedin, Twitter, Send, MessageCircle, Copy, Code, RefreshCw, Clock, Users } from 'lucide-react';
 import { mockApi, mockBusinessCards } from '../mock';
 import { useToast } from '../hooks/use-toast';
 
