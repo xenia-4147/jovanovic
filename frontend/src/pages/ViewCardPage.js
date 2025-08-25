@@ -476,7 +476,7 @@ const ViewCardPage = () => {
                 QR Code
               </Button>
               
-              {card.allowEmbedding && (
+              {(card.allow_embedding || card.allowEmbedding) && (
                 <Button
                   onClick={handleGetEmbedCode}
                   variant="outline"
@@ -490,7 +490,7 @@ const ViewCardPage = () => {
               <Button
                 onClick={handleShare}
                 className="w-full text-white"
-                style={{ backgroundColor: card.accentColor }}
+                style={{ backgroundColor: card.accent_color || card.accentColor }}
               >
                 <Share2 className="mr-2 h-4 w-4" />
                 Teilen
@@ -498,7 +498,7 @@ const ViewCardPage = () => {
             </div>
 
             {/* Auto-Update Info */}
-            {card.autoUpdateEnabled && card.lastUpdated && (
+            {(card.auto_update_enabled || card.autoUpdateEnabled) && (card.last_updated || card.lastUpdated) && (
               <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center text-green-800">
@@ -506,13 +506,13 @@ const ViewCardPage = () => {
                     <div>
                       <p className="font-medium">Automatische Updates aktiv</p>
                       <p className="text-sm text-green-600">
-                        Letzte Aktualisierung: {new Date(card.lastUpdated).toLocaleDateString('de-DE')}
+                        Letzte Aktualisierung: {new Date(card.last_updated || card.lastUpdated).toLocaleDateString('de-DE')}
                       </p>
                     </div>
                   </div>
                   <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
                     <Users className="w-3 h-3 mr-1" />
-                    47 Empfänger
+                    {card.share_count || 0} Empfänger
                   </Badge>
                 </div>
               </div>
