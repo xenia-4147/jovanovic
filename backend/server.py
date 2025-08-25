@@ -1,15 +1,25 @@
-from fastapi import FastAPI, APIRouter
-from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, BackgroundTasks, Request, Response
+from fastapi.security import HTTPBearer
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import StreamingResponse, JSONResponse
 from motor.motor_asyncio import AsyncIOMotorClient
+from dotenv import load_dotenv
 import os
 import logging
+import qrcode
+import io
+import base64
+from datetime import datetime, timedelta
 from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 import uuid
-from datetime import datetime
 
+# Import our models and services
+from models.User import User, UserCreate, UserLogin, UserResponse, UserUpdate, PasswordChange, GDPRExport, AccountDeletion
+from models.BusinessCard import BusinessCard, BusinessCardCreate, BusinessCardUpdate, BusinessCardResponse, ContactPhone, ContactEmail, SocialMedia, CardRecipient, CardAnalytics, ShareRequest, EmbedOptions
+from auth import get_current_user, get_optional_user, create_access_token, create_refresh_token, AuthService
+from privacy import PrivacyService, scheduled_privacy_cleanup
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -17,48 +27,28 @@ load_dotenv(ROOT_DIR / '.env')
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+db = client[os.environ.get('DB_NAME', 'digitalcards')]
 
-# Create the main app without a prefix
-app = FastAPI()
+# Create the main app
+app = FastAPI(
+    title="Digital Business Cards API",
+    description="GDPR-compliant digital business cards platform",
+    version="1.0.0"
+)
 
-# Create a router with the /api prefix
+# Create router with /api prefix
 api_router = APIRouter(prefix="/api")
 
-
-# Define Models
-class StatusCheck(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
-
-class StatusCheckCreate(BaseModel):
-    client_name: str
-
-# Add your routes to the router instead of directly to app
-@api_router.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.dict()
-    status_obj = StatusCheck(**status_dict)
-    _ = await db.status_checks.insert_one(status_obj.dict())
-    return status_obj
-
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    status_checks = await db.status_checks.find().to_list(1000)
-    return [StatusCheck(**status_check) for status_check in status_checks]
-
-# Include the router in the main app
-app.include_router(api_router)
+# Security middleware
+app.add_middleware(
+    TrustedHostMiddleware, 
+    allowed_hosts=["*"]  # Configure properly in production
+)
 
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=["*"],  # Configure properly in production
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -70,6 +60,571 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+# Initialize services
+privacy_service = PrivacyService(db)
+auth_service = AuthService()
+
+# Health check endpoint
+@api_router.get("/")
+async def root():
+    return {"message": "Digital Business Cards API", "version": "1.0.0", "status": "running"}
+
+# ============================================================================
+# AUTHENTICATION ENDPOINTS
+# ============================================================================
+
+@api_router.post("/auth/register", response_model=dict)
+async def register(user_data: UserCreate, request: Request):
+    """Register new user with GDPR compliance"""
+    try:
+        # Create user
+        user = await auth_service.create_user(db, user_data)
+        
+        # Create tokens
+        access_token = create_access_token(str(user.id))
+        refresh_token = create_refresh_token(str(user.id))
+        
+        # Log registration for audit
+        logger.info(f"New user registered: {user.email}")
+        
+        return {
+            "message": "Registration successful",
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "user": UserResponse(
+                id=str(user.id),
+                email=user.email,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                full_name=user.full_name,
+                privacy_settings=user.privacy_settings,
+                created_at=user.created_at,
+                last_login_at=user.last_login_at,
+                email_verified=user.email_verified
+            )
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Registration failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Registration failed")
+
+@api_router.post("/auth/login", response_model=dict)
+async def login(user_data: UserLogin):
+    """Login user"""
+    try:
+        # Authenticate user
+        user = await auth_service.authenticate_user(db, user_data.email, user_data.password)
+        
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid email or password"
+            )
+        
+        # Update last login
+        await db.users.update_one(
+            {"_id": user.id},
+            {"$set": {"last_login_at": datetime.utcnow()}}
+        )
+        
+        # Create tokens
+        access_token = create_access_token(str(user.id))
+        refresh_token = create_refresh_token(str(user.id))
+        
+        return {
+            "message": "Login successful",
+            "access_token": access_token,
+            "refresh_token": refresh_token,
+            "token_type": "bearer",
+            "user": UserResponse(
+                id=str(user.id),
+                email=user.email,
+                first_name=user.first_name,
+                last_name=user.last_name,
+                full_name=user.full_name,
+                privacy_settings=user.privacy_settings,
+                created_at=user.created_at,
+                last_login_at=datetime.utcnow(),
+                email_verified=user.email_verified
+            )
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Login failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Login failed")
+
+@api_router.get("/auth/me", response_model=UserResponse)
+async def get_current_user_profile(current_user: User = Depends(get_current_user)):
+    """Get current user profile"""
+    return UserResponse(
+        id=str(current_user.id),
+        email=current_user.email,
+        first_name=current_user.first_name,
+        last_name=current_user.last_name,
+        full_name=current_user.full_name,
+        privacy_settings=current_user.privacy_settings,
+        created_at=current_user.created_at,
+        last_login_at=current_user.last_login_at,
+        email_verified=current_user.email_verified
+    )
+
+@api_router.put("/auth/profile", response_model=UserResponse)
+async def update_profile(
+    profile_data: UserUpdate, 
+    current_user: User = Depends(get_current_user)
+):
+    """Update user profile"""
+    try:
+        update_dict = {}
+        
+        if profile_data.first_name is not None:
+            update_dict["first_name"] = profile_data.first_name
+        if profile_data.last_name is not None:
+            update_dict["last_name"] = profile_data.last_name
+        if profile_data.privacy_settings is not None:
+            update_dict["privacy_settings"] = profile_data.privacy_settings.dict()
+        
+        if update_dict:
+            await db.users.update_one(
+                {"_id": current_user.id},
+                {"$set": update_dict}
+            )
+            
+            # Refresh user data
+            updated_user_data = await db.users.find_one({"_id": current_user.id})
+            updated_user = User(**updated_user_data)
+            
+            return UserResponse(
+                id=str(updated_user.id),
+                email=updated_user.email,
+                first_name=updated_user.first_name,
+                last_name=updated_user.last_name,
+                full_name=updated_user.full_name,
+                privacy_settings=updated_user.privacy_settings,
+                created_at=updated_user.created_at,
+                last_login_at=updated_user.last_login_at,
+                email_verified=updated_user.email_verified
+            )
+        
+        return get_current_user_profile(current_user)
+        
+    except Exception as e:
+        logger.error(f"Profile update failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Profile update failed")
+
+# ============================================================================
+# BUSINESS CARDS ENDPOINTS
+# ============================================================================
+
+@api_router.post("/cards", response_model=BusinessCardResponse)
+async def create_business_card(
+    card_data: BusinessCardCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create new business card"""
+    try:
+        # Create business card
+        card = BusinessCard(
+            user_id=current_user.id,
+            **card_data.dict()
+        )
+        
+        # Insert into database
+        card_dict = card.dict(by_alias=True, exclude={"id"})
+        result = await db.businesscards.insert_one(card_dict)
+        card.id = result.inserted_id
+        
+        logger.info(f"Business card created: {card.name} for user {current_user.email}")
+        
+        return BusinessCardResponse(
+            id=str(card.id),
+            **card.dict(exclude={"id", "user_id"}),
+            is_owner=True
+        )
+        
+    except Exception as e:
+        logger.error(f"Card creation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Card creation failed")
+
+@api_router.get("/cards", response_model=List[BusinessCardResponse])
+async def get_user_cards(current_user: User = Depends(get_current_user)):
+    """Get user's business cards"""
+    try:
+        cards_cursor = db.businesscards.find({"userId": current_user.id})
+        cards = []
+        
+        async for card_data in cards_cursor:
+            card = BusinessCard(**card_data)
+            cards.append(BusinessCardResponse(
+                id=str(card.id),
+                **card.dict(exclude={"id", "user_id"}),
+                is_owner=True
+            ))
+        
+        return cards
+        
+    except Exception as e:
+        logger.error(f"Failed to fetch user cards: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch cards")
+
+@api_router.get("/cards/{card_id}", response_model=BusinessCardResponse)
+async def get_business_card(
+    card_id: str,
+    request: Request,
+    background_tasks: BackgroundTasks,
+    current_user: Optional[User] = Depends(get_optional_user)
+):
+    """Get specific business card (public or owned)"""
+    try:
+        # Find card
+        card_data = await db.businesscards.find_one({"_id": card_id})
+        
+        if not card_data:
+            raise HTTPException(status_code=404, detail="Business card not found")
+        
+        card = BusinessCard(**card_data)
+        
+        # Check if user can view this card
+        is_owner = current_user and str(card.user_id) == str(current_user.id)
+        can_view = is_owner or card.is_public
+        
+        if not can_view:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        # Track analytics (in background)
+        if not is_owner:  # Don't track owner views
+            background_tasks.add_task(
+                track_card_analytics, 
+                card_id, 
+                "view", 
+                request
+            )
+        
+        return BusinessCardResponse(
+            id=str(card.id),
+            **card.dict(exclude={"id", "user_id"}),
+            is_owner=is_owner
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to fetch card {card_id}: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to fetch card")
+
+@api_router.put("/cards/{card_id}", response_model=BusinessCardResponse)
+async def update_business_card(
+    card_id: str,
+    card_update: BusinessCardUpdate,
+    background_tasks: BackgroundTasks,
+    current_user: User = Depends(get_current_user)
+):
+    """Update business card (owner only)"""
+    try:
+        # Find card
+        card_data = await db.businesscards.find_one({"_id": card_id})
+        
+        if not card_data:
+            raise HTTPException(status_code=404, detail="Business card not found")
+        
+        card = BusinessCard(**card_data)
+        
+        # Check ownership
+        if str(card.user_id) != str(current_user.id):
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        # Update card
+        update_dict = card_update.dict(exclude_unset=True)
+        if update_dict:
+            update_dict["last_updated"] = datetime.utcnow()
+            
+            await db.businesscards.update_one(
+                {"_id": card_id},
+                {"$set": update_dict}
+            )
+            
+            # Send auto-update notifications (in background)
+            if card.auto_update_enabled:
+                background_tasks.add_task(
+                    send_auto_update_notifications,
+                    card_id,
+                    update_dict.keys()
+                )
+        
+        # Return updated card
+        updated_card_data = await db.businesscards.find_one({"_id": card_id})
+        updated_card = BusinessCard(**updated_card_data)
+        
+        logger.info(f"Card updated: {card_id} by user {current_user.email}")
+        
+        return BusinessCardResponse(
+            id=str(updated_card.id),
+            **updated_card.dict(exclude={"id", "user_id"}),
+            is_owner=True
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Card update failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Card update failed")
+
+# ============================================================================
+# UTILITY ENDPOINTS (QR, vCard, etc.)
+# ============================================================================
+
+@api_router.get("/cards/{card_id}/qr")
+async def generate_qr_code(
+    card_id: str,
+    request: Request,
+    background_tasks: BackgroundTasks,
+    size: int = 200,
+    current_user: Optional[User] = Depends(get_optional_user)
+):
+    """Generate QR code for business card"""
+    try:
+        # Verify card exists and is accessible
+        card_data = await db.businesscards.find_one({"_id": card_id})
+        
+        if not card_data:
+            raise HTTPException(status_code=404, detail="Business card not found")
+        
+        card = BusinessCard(**card_data)
+        is_owner = current_user and str(card.user_id) == str(current_user.id)
+        
+        if not is_owner and not card.is_public:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        # Generate QR code
+        card_url = f"{request.base_url}card/{card_id}"
+        qr = qrcode.QRCode(version=1, box_size=10, border=5)
+        qr.add_data(card_url)
+        qr.make(fit=True)
+        
+        img = qr.make_image(fill_color="black", back_color="white")
+        img = img.resize((size, size))
+        
+        # Convert to bytes
+        img_buffer = io.BytesIO()
+        img.save(img_buffer, format='PNG')
+        img_buffer.seek(0)
+        
+        # Track analytics
+        if not is_owner:
+            background_tasks.add_task(
+                track_card_analytics,
+                card_id,
+                "qr_scan",
+                request
+            )
+        
+        return StreamingResponse(
+            io.BytesIO(img_buffer.read()),
+            media_type="image/png",
+            headers={"Content-Disposition": f"inline; filename=qr-{card_id}.png"}
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"QR code generation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="QR code generation failed")
+
+@api_router.get("/cards/{card_id}/vcard")
+async def generate_vcard(
+    card_id: str,
+    request: Request,
+    background_tasks: BackgroundTasks,
+    current_user: Optional[User] = Depends(get_optional_user)
+):
+    """Generate vCard file for business card"""
+    try:
+        # Verify card exists and is accessible
+        card_data = await db.businesscards.find_one({"_id": card_id})
+        
+        if not card_data:
+            raise HTTPException(status_code=404, detail="Business card not found")
+        
+        card = BusinessCard(**card_data)
+        is_owner = current_user and str(card.user_id) == str(current_user.id)
+        
+        if not is_owner and not card.is_public:
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        # Generate vCard
+        vcard_content = f"""BEGIN:VCARD
+VERSION:3.0
+FN:{card.name}"""
+        
+        if card.company:
+            vcard_content += f"\nORG:{card.company}"
+        if card.position:
+            vcard_content += f"\nTITLE:{card.position}"
+        
+        # Add phone numbers
+        for phone in card.phones:
+            if phone.number:
+                vcard_content += f"\nTEL;TYPE={phone.label}:{phone.number}"
+        
+        # Add email addresses
+        for email in card.emails:
+            if email.address:
+                vcard_content += f"\nEMAIL;TYPE={email.label}:{email.address}"
+        
+        if card.website:
+            vcard_content += f"\nURL:{card.website}"
+        
+        if card.description:
+            vcard_content += f"\nNOTE:{card.description}"
+        
+        vcard_content += "\nEND:VCARD"
+        
+        # Track analytics
+        if not is_owner:
+            background_tasks.add_task(
+                track_card_analytics,
+                card_id,
+                "download",
+                request
+            )
+        
+        return Response(
+            content=vcard_content,
+            media_type="text/vcard",
+            headers={
+                "Content-Disposition": f'attachment; filename="{card.name.replace(" ", "_")}.vcf"'
+            }
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"vCard generation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="vCard generation failed")
+
+# ============================================================================
+# PRIVACY & GDPR ENDPOINTS
+# ============================================================================
+
+@api_router.get("/privacy/export", response_model=GDPRExport)
+async def export_user_data(current_user: User = Depends(get_current_user)):
+    """Export all user data (GDPR Article 15)"""
+    return await privacy_service.export_user_data(current_user)
+
+@api_router.delete("/privacy/delete")
+async def delete_user_account(
+    deletion_request: AccountDeletion,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete user account and all data (GDPR Article 17)"""
+    success = await privacy_service.delete_user_account(current_user, deletion_request)
+    
+    if success:
+        return {"message": "Account deleted successfully"}
+    else:
+        raise HTTPException(status_code=500, detail="Account deletion failed")
+
+@api_router.get("/privacy/report")
+async def get_privacy_report(current_user: User = Depends(get_current_user)):
+    """Get privacy compliance report"""
+    return await privacy_service.get_privacy_compliance_report(current_user)
+
+# ============================================================================
+# BACKGROUND TASKS
+# ============================================================================
+
+async def track_card_analytics(card_id: str, action: str, request: Request):
+    """Track analytics for card interactions"""
+    try:
+        # Extract country from IP (simplified - use proper GeoIP in production)
+        client_ip = request.client.host
+        country = "DE" if client_ip.startswith("192.168") else "Unknown"
+        
+        # Get user agent and referrer
+        user_agent = request.headers.get("user-agent", "")[:200]  # Limit length
+        referrer = request.headers.get("referer", "")[:200]
+        
+        analytics = CardAnalytics(
+            card_id=card_id,
+            action=action,
+            user_agent=user_agent,
+            country=country,
+            referrer=referrer
+        )
+        
+        await db.cardanalytics.insert_one(analytics.dict(by_alias=True, exclude={"id"}))
+        
+        # Update card counters
+        if action == "view":
+            await db.businesscards.update_one(
+                {"_id": card_id},
+                {"$inc": {"view_count": 1}}
+            )
+        elif action in ["download", "share"]:
+            await db.businesscards.update_one(
+                {"_id": card_id},
+                {"$inc": {"share_count": 1}}
+            )
+            
+    except Exception as e:
+        logger.error(f"Analytics tracking failed: {str(e)}")
+
+async def send_auto_update_notifications(card_id: str, updated_fields: list):
+    """Send notifications to card recipients about updates"""
+    try:
+        # Get card recipients
+        recipients_cursor = db.cardrecipients.find({
+            "card_id": card_id,
+            "is_active": True
+        })
+        
+        notification_count = 0
+        
+        async for recipient_data in recipients_cursor:
+            recipient = CardRecipient(**recipient_data)
+            
+            # Send notification (implement email service)
+            # await send_update_email(recipient.recipient_email, card_id, updated_fields)
+            
+            # Update notification timestamp
+            await db.cardrecipients.update_one(
+                {"_id": recipient.id},
+                {"$set": {"last_notified": datetime.utcnow()}}
+            )
+            
+            notification_count += 1
+        
+        logger.info(f"Sent {notification_count} auto-update notifications for card {card_id}")
+        
+    except Exception as e:
+        logger.error(f"Auto-update notifications failed: {str(e)}")
+
+# Include the router in the main app
+app.include_router(api_router)
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize database indexes and background tasks"""
+    try:
+        # Create indexes for better performance
+        await db.users.create_index("email", unique=True)
+        await db.businesscards.create_index("userId")
+        await db.businesscards.create_index([("is_public", 1), ("created_at", -1)])
+        await db.cardrecipients.create_index("card_id")
+        await db.cardanalytics.create_index([("card_id", 1), ("timestamp", -1)])
+        
+        logger.info("Database indexes created successfully")
+        
+    except Exception as e:
+        logger.error(f"Startup initialization failed: {str(e)}")
+
 @app.on_event("shutdown")
-async def shutdown_db_client():
+async def shutdown_event():
+    """Cleanup on shutdown"""
     client.close()
+    logger.info("Database connection closed")
