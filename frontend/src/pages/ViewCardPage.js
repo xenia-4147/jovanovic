@@ -111,6 +111,44 @@ const ViewCardPage = () => {
     }
   };
 
+  const handleCall = (phone) => {
+    window.location.href = `tel:${phone.number}`;
+  };
+
+  const handleMessage = (phone) => {
+    // Check if it's a WhatsApp number or regular SMS
+    if (phone.label.toLowerCase().includes('whatsapp')) {
+      window.open(`https://wa.me/${phone.number.replace(/[^\d]/g, '')}`, '_blank');
+    } else {
+      window.location.href = `sms:${phone.number}`;
+    }
+  };
+
+  const handleEmailAction = (email) => {
+    window.location.href = `mailto:${email.address}`;
+  };
+
+  const handleGetEmbedCode = async () => {
+    try {
+      const embedCode = await mockApi.generateEmbedCode(card.id || 'preview', {
+        width: 320,
+        height: 450
+      });
+      
+      navigator.clipboard.writeText(embedCode);
+      toast({
+        title: "Embed-Code kopiert",
+        description: "Der HTML-Code wurde in die Zwischenablage kopiert.",
+      });
+    } catch (error) {
+      toast({
+        title: "Fehler",
+        description: "Embed-Code konnte nicht generiert werden.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getSocialIcon = (platform) => {
     switch (platform) {
       case 'instagram': return <Instagram className="w-4 h-4" />;
