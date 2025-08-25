@@ -126,5 +126,5 @@ class GDPRExport(BaseModel):
     
 class AccountDeletion(BaseModel):
     password: str
-    confirmation: str = Field(..., regex="DELETE_MY_ACCOUNT")
+    confirmation: str = Field(..., pattern="DELETE_MY_ACCOUNT")
     reason: Optional[str] = None
