@@ -180,6 +180,6 @@ class AuthService:
         
         # Insert into database
         result = await db.users.insert_one(user.dict(by_alias=True, exclude={"id"}))
-        user.id = result.inserted_id
+        user.id = str(result.inserted_id)
         
         return user
