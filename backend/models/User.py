@@ -1,16 +1,17 @@
-from pydantic import BaseModel, EmailStr, Field, validator
-from typing import Optional, Dict, Any
+from pydantic import BaseModel, EmailStr, Field, validator, field_validator
+from typing import Optional, Dict, Any, Annotated
 from datetime import datetime
 from bson import ObjectId
 import bcrypt
 
+# Custom ObjectId type for Pydantic v2
 class PyObjectId(ObjectId):
     @classmethod
     def __get_validators__(cls):
         yield cls.validate
 
     @classmethod
-    def validate(cls, v, handler=None):
+    def validate(cls, v):
         if not ObjectId.is_valid(v):
             raise ValueError('Invalid objectid')
         return ObjectId(v)
@@ -19,6 +20,9 @@ class PyObjectId(ObjectId):
     def __get_pydantic_json_schema__(cls, field_schema):
         field_schema.update(type='string')
         return field_schema
+
+# Use Annotated for the ObjectId type
+ObjectIdField = Annotated[PyObjectId, Field(default_factory=PyObjectId)]
 
 class GDPRConsent(BaseModel):
     consent: bool = False
