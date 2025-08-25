@@ -212,16 +212,16 @@ const ViewCardPage = () => {
         <Card 
           className="overflow-hidden shadow-2xl border-0"
           style={{ 
-            backgroundColor: card.backgroundColor,
-            color: card.textColor,
-            boxShadow: `0 25px 50px -12px ${card.accentColor}20`
+            backgroundColor: card.background_color || card.backgroundColor,
+            color: card.text_color || card.textColor,
+            boxShadow: `0 25px 50px -12px ${(card.accent_color || card.accentColor)}20`
           }}
         >
           {/* Header with gradient */}
           <div 
             className="relative p-8 text-center"
             style={{
-              background: `linear-gradient(135deg, ${card.accentColor}15 0%, ${card.accentColor}25 100%)`
+              background: `linear-gradient(135deg, ${(card.accent_color || card.accentColor)}15 0%, ${(card.accent_color || card.accentColor)}25 100%)`
             }}
           >
             {card.logo && (
@@ -233,16 +233,16 @@ const ViewCardPage = () => {
             )}
             
             <Avatar className="w-32 h-32 mx-auto mb-6 ring-4 ring-white shadow-xl">
-              <AvatarImage src={card.profileImage} />
+              <AvatarImage src={card.profile_image || card.profileImage} />
               <AvatarFallback 
                 className="text-3xl font-bold text-white"
-                style={{ backgroundColor: card.accentColor }}
+                style={{ backgroundColor: card.accent_color || card.accentColor }}
               >
                 {card.name.charAt(0).toUpperCase()}
               </AvatarFallback>
             </Avatar>
 
-            <h1 className="text-3xl font-bold mb-2" style={{ color: card.textColor }}>
+            <h1 className="text-3xl font-bold mb-2" style={{ color: card.text_color || card.textColor }}>
               {card.name}
             </h1>
             
@@ -261,22 +261,22 @@ const ViewCardPage = () => {
             )}
 
             <div className="flex items-center justify-center space-x-3">
-              {card.isPublic !== undefined && (
+              {(card.is_public !== undefined || card.isPublic !== undefined) && (
                 <Badge 
-                  variant={card.isPublic ? "default" : "secondary"}
+                  variant={(card.is_public ?? card.isPublic) ? "default" : "secondary"}
                 >
-                  {card.isPublic ? 'Öffentlich' : 'Privat'}
+                  {(card.is_public ?? card.isPublic) ? 'Öffentlich' : 'Privat'}
                 </Badge>
               )}
               
-              {card.autoUpdateEnabled && (
+              {(card.auto_update_enabled || card.autoUpdateEnabled) && (
                 <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
                   <RefreshCw className="w-3 h-3 mr-1" />
                   Auto-Update
                 </Badge>
               )}
               
-              {card.lastUpdated && (
+              {(card.last_updated || card.lastUpdated) && (
                 <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
                   <Clock className="w-3 h-3 mr-1" />
                   Aktualisiert
