@@ -124,10 +124,13 @@ const ViewCardPage = () => {
 
   const handleGetEmbedCode = async () => {
     try {
-      const embedCode = await mockApi.generateEmbedCode(card.id || 'preview', {
-        width: 320,
-        height: 450
-      });
+      const embedCode = `<iframe 
+  src="${window.location.origin}/card/${card.id}" 
+  width="320" 
+  height="450"
+  style="border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);"
+  frameborder="0">
+</iframe>`;
       
       navigator.clipboard.writeText(embedCode);
       toast({
