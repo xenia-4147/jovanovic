@@ -259,6 +259,12 @@ async def get_user_cards(current_user: User = Depends(get_current_user)):
         cards = []
         
         async for card_data in cards_cursor:
+            # Convert ObjectId to string for compatibility
+            if "_id" in card_data:
+                card_data["_id"] = str(card_data["_id"])
+            if "userId" in card_data:
+                card_data["userId"] = str(card_data["userId"])
+                
             card = BusinessCard(**card_data)
             cards.append(BusinessCardResponse(
                 id=str(card.id),
