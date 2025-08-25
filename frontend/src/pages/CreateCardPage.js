@@ -9,7 +9,7 @@ import { Textarea } from '../components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { ArrowLeft, Upload, Save, Eye, Instagram, Linkedin, Twitter, Send, Info, Globe, Palette } from 'lucide-react';
 import MultiContactInput from '../components/MultiContactInput';
-import { mockApi } from '../mock';
+import { cardsApi } from '../services/api';
 import { useToast } from '../hooks/use-toast';
 
 const CreateCardPage = () => {
