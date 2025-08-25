@@ -256,12 +256,13 @@ class PrivacyService:
     async def get_privacy_compliance_report(self, user: User) -> Dict[str, Any]:
         """Generate privacy compliance report for user"""
         try:
-            # Count user's data
-            cards_count = await self.db.businesscards.count_documents({"userId": user.id})
+            # Count user's data using string user ID
+            user_id_str = str(user.id)
+            cards_count = await self.db.businesscards.count_documents({"userId": user_id_str})
             
             card_ids = []
-            async for card in self.db.businesscards.find({"userId": user.id}, {"_id": 1}):
-                card_ids.append(card["_id"])
+            async for card in self.db.businesscards.find({"userId": user_id_str}, {"_id": 1}):
+                card_ids.append(str(card["_id"]))
             
             recipients_count = 0
             analytics_count = 0
@@ -307,7 +308,7 @@ class PrivacyService:
             
         except Exception as e:
             logger.error(f"Privacy report generation failed for user {user.email}: {str(e)}")
-            raise HTTPException(status_code=500, detail="Privacy report generation failed")
+            raise HTTPException(status_code=500, detail=f"Privacy report generation failed: {str(e)}")
 
 # Background task for periodic cleanup
 async def scheduled_privacy_cleanup():
