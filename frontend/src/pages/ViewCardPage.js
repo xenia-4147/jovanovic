@@ -257,55 +257,136 @@ const ViewCardPage = () => {
               <p className="text-base opacity-70 mb-4">{card.company}</p>
             )}
 
-            {card.isPublic !== undefined && (
-              <Badge 
-                variant={card.isPublic ? "default" : "secondary"}
-                className="mb-4"
-              >
-                {card.isPublic ? 'Öffentlich' : 'Privat'}
-              </Badge>
+            {card.description && (
+              <p className="text-sm opacity-75 mb-4 max-w-md mx-auto leading-relaxed">
+                {card.description}
+              </p>
             )}
+
+            <div className="flex items-center justify-center space-x-3">
+              {card.isPublic !== undefined && (
+                <Badge 
+                  variant={card.isPublic ? "default" : "secondary"}
+                >
+                  {card.isPublic ? 'Öffentlich' : 'Privat'}
+                </Badge>
+              )}
+              
+              {card.autoUpdateEnabled && (
+                <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+                  <RefreshCw className="w-3 h-3 mr-1" />
+                  Auto-Update
+                </Badge>
+              )}
+              
+              {card.lastUpdated && (
+                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                  <Clock className="w-3 h-3 mr-1" />
+                  Aktualisiert
+                </Badge>
+              )}
+            </div>
           </div>
 
           <CardContent className="p-8">
             {/* Contact Information */}
-            <div className="space-y-4 mb-8">
-              {card.phone && (
-                <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white"
-                    style={{ backgroundColor: card.accentColor }}
-                  >
-                    <Phone className="w-5 h-5" />
+            <div className="space-y-6 mb-8">
+              {/* Phone Numbers */}
+              {card.phones && card.phones.filter(p => p.number).length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: card.textColor }}>
+                    <Phone className="w-5 h-5 mr-2" />
+                    Telefonnummern
+                  </h3>
+                  <div className="space-y-3">
+                    {card.phones.filter(p => p.number).map((phone, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100">
+                        <div className="flex items-center space-x-3">
+                          <div 
+                            className="w-10 h-10 rounded-full flex items-center justify-center text-white"
+                            style={{ backgroundColor: card.accentColor }}
+                          >
+                            <Phone className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <p className="font-medium" style={{ color: card.textColor }}>
+                              {phone.number}
+                              {phone.isPrimary && (
+                                <Badge className="ml-2 bg-yellow-100 text-yellow-800 text-xs">Primär</Badge>
+                              )}
+                            </p>
+                            <p className="text-sm opacity-70">{phone.label}</p>
+                          </div>
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleCall(phone)}
+                            className="h-8"
+                          >
+                            <Phone className="w-4 h-4 mr-1" />
+                            Anrufen
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleMessage(phone)}
+                            className="h-8"
+                          >
+                            <MessageCircle className="w-4 h-4 mr-1" />
+                            {phone.label.toLowerCase().includes('whatsapp') ? 'WhatsApp' : 'SMS'}
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <a 
-                    href={`tel:${card.phone}`}
-                    className="text-lg hover:underline"
-                    style={{ color: card.textColor }}
-                  >
-                    {card.phone}
-                  </a>
                 </div>
               )}
 
-              {card.email && (
-                <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white"
-                    style={{ backgroundColor: card.accentColor }}
-                  >
-                    <Mail className="w-5 h-5" />
+              {/* Email Addresses */}
+              {card.emails && card.emails.filter(e => e.address).length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: card.textColor }}>
+                    <Mail className="w-5 h-5 mr-2" />
+                    E-Mail-Adressen
+                  </h3>
+                  <div className="space-y-3">
+                    {card.emails.filter(e => e.address).map((email, index) => (
+                      <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100">
+                        <div className="flex items-center space-x-3">
+                          <div 
+                            className="w-10 h-10 rounded-full flex items-center justify-center text-white"
+                            style={{ backgroundColor: card.accentColor }}
+                          >
+                            <Mail className="w-5 h-5" />
+                          </div>
+                          <div>
+                            <p className="font-medium" style={{ color: card.textColor }}>
+                              {email.address}
+                              {email.isPrimary && (
+                                <Badge className="ml-2 bg-yellow-100 text-yellow-800 text-xs">Primär</Badge>
+                              )}
+                            </p>
+                            <p className="text-sm opacity-70">{email.label}</p>
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleEmailAction(email)}
+                          className="h-8"
+                        >
+                          <Mail className="w-4 h-4 mr-1" />
+                          E-Mail
+                        </Button>
+                      </div>
+                    ))}
                   </div>
-                  <a 
-                    href={`mailto:${card.email}`}
-                    className="text-lg hover:underline"
-                    style={{ color: card.textColor }}
-                  >
-                    {card.email}
-                  </a>
                 </div>
               )}
 
+              {/* Website */}
               {card.website && (
                 <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
                   <div 
@@ -318,7 +399,7 @@ const ViewCardPage = () => {
                     href={card.website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-lg hover:underline"
+                    className="text-lg hover:underline flex-1"
                     style={{ color: card.textColor }}
                   >
                     {card.website.replace(/^https?:\/\//, '')}
@@ -327,13 +408,15 @@ const ViewCardPage = () => {
               )}
             </div>
 
+            <Separator className="my-8" />
+
             {/* Social Media */}
             {card.socialMedia && Object.values(card.socialMedia).some(val => val) && (
               <div className="mb-8">
                 <h3 className="text-xl font-semibold mb-4" style={{ color: card.textColor }}>
                   Social Media
                 </h3>
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {Object.entries(card.socialMedia).map(([platform, username]) => {
                     if (!username) return null;
                     return (
@@ -342,7 +425,7 @@ const ViewCardPage = () => {
                         href={getSocialUrl(platform, username)}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center space-x-2 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                        className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100"
                       >
                         <div 
                           className="w-8 h-8 rounded-full flex items-center justify-center text-white"
@@ -350,9 +433,12 @@ const ViewCardPage = () => {
                         >
                           {getSocialIcon(platform)}
                         </div>
-                        <span className="capitalize font-medium" style={{ color: card.textColor }}>
-                          {platform}
-                        </span>
+                        <div className="flex-1">
+                          <p className="font-medium capitalize" style={{ color: card.textColor }}>
+                            {platform}
+                          </p>
+                          <p className="text-sm opacity-70">@{username}</p>
+                        </div>
                       </a>
                     );
                   })}
@@ -366,20 +452,22 @@ const ViewCardPage = () => {
                 <h3 className="text-xl font-semibold mb-4" style={{ color: card.textColor }}>
                   QR Code
                 </h3>
-                <img src={qrCode} alt="QR Code" className="mx-auto rounded-lg shadow-lg" />
-                <p className="text-sm mt-2 opacity-70">Scannen Sie den Code, um diese Visitenkarte zu teilen</p>
+                <div className="inline-block p-4 bg-white rounded-lg shadow-inner">
+                  <img src={qrCode} alt="QR Code" className="mx-auto rounded-lg" />
+                </div>
+                <p className="text-sm mt-3 opacity-70">Scannen Sie den Code, um diese Visitenkarte zu teilen</p>
               </div>
             )}
 
             {/* Action Buttons */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <Button
                 onClick={handleDownloadVCard}
                 variant="outline"
                 className="w-full"
               >
                 <Download className="mr-2 h-4 w-4" />
-                Kontakt speichern
+                vCard
               </Button>
               
               <Button
@@ -391,6 +479,17 @@ const ViewCardPage = () => {
                 QR Code
               </Button>
               
+              {card.allowEmbedding && (
+                <Button
+                  onClick={handleGetEmbedCode}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <Code className="mr-2 h-4 w-4" />
+                  Einbetten
+                </Button>
+              )}
+              
               <Button
                 onClick={handleShare}
                 className="w-full text-white"
@@ -400,6 +499,27 @@ const ViewCardPage = () => {
                 Teilen
               </Button>
             </div>
+
+            {/* Auto-Update Info */}
+            {card.autoUpdateEnabled && card.lastUpdated && (
+              <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center text-green-800">
+                    <RefreshCw className="w-5 h-5 mr-2" />
+                    <div>
+                      <p className="font-medium">Automatische Updates aktiv</p>
+                      <p className="text-sm text-green-600">
+                        Letzte Aktualisierung: {new Date(card.lastUpdated).toLocaleDateString('de-DE')}
+                      </p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">
+                    <Users className="w-3 h-3 mr-1" />
+                    47 Empfänger
+                  </Badge>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
