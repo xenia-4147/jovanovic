@@ -1,0 +1,86 @@
+[
+  {
+    "test": "Health Check",
+    "success": false,
+    "message": "HTTP 502",
+    "timestamp": "2025-08-25T21:19:59.517176"
+  },
+  {
+    "test": "User Registration",
+    "success": false,
+    "message": "HTTP 502",
+    "timestamp": "2025-08-25T21:19:59.568868"
+  },
+  {
+    "test": "User Login",
+    "success": false,
+    "message": "Failed to register test user for login",
+    "timestamp": "2025-08-25T21:19:59.623189"
+  },
+  {
+    "test": "Protected Endpoint",
+    "success": false,
+    "message": "No access token available",
+    "timestamp": "2025-08-25T21:19:59.624415"
+  },
+  {
+    "test": "Create Business Card",
+    "success": false,
+    "message": "No access token available",
+    "timestamp": "2025-08-25T21:19:59.624454"
+  },
+  {
+    "test": "Get User Cards",
+    "success": false,
+    "message": "No access token available",
+    "timestamp": "2025-08-25T21:19:59.624463"
+  },
+  {
+    "test": "Get Specific Card",
+    "success": false,
+    "message": "No card ID available",
+    "timestamp": "2025-08-25T21:19:59.624472"
+  },
+  {
+    "test": "Update Business Card",
+    "success": false,
+    "message": "No access token or card ID available",
+    "timestamp": "2025-08-25T21:19:59.624484"
+  },
+  {
+    "test": "QR Code Generation",
+    "success": false,
+    "message": "No card ID available",
+    "timestamp": "2025-08-25T21:19:59.624494"
+  },
+  {
+    "test": "vCard Generation",
+    "success": false,
+    "message": "No card ID available",
+    "timestamp": "2025-08-25T21:19:59.624502"
+  },
+  {
+    "test": "Privacy Report",
+    "success": false,
+    "message": "No access token available",
+    "timestamp": "2025-08-25T21:19:59.624512"
+  },
+  {
+    "test": "Data Export",
+    "success": false,
+    "message": "No access token available",
+    "timestamp": "2025-08-25T21:19:59.624519"
+  },
+  {
+    "test": "Invalid Authentication",
+    "success": false,
+    "message": "Expected 401, got 502",
+    "timestamp": "2025-08-25T21:19:59.676268"
+  },
+  {
+    "test": "Non-existent Card",
+    "success": false,
+    "message": "Expected 404, got 502",
+    "timestamp": "2025-08-25T21:19:59.731448"
+  }
+]
