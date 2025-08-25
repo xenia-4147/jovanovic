@@ -289,7 +289,7 @@ const CreateCardPage = () => {
                     </Label>
                     <Input
                       id="instagram"
-                      value={formData.socialMedia.instagram}
+                      value={formData.social_media.instagram}
                       onChange={(e) => handleSocialMediaChange('instagram', e.target.value)}
                       placeholder="username"
                     />
@@ -301,7 +301,7 @@ const CreateCardPage = () => {
                     </Label>
                     <Input
                       id="linkedin"
-                      value={formData.socialMedia.linkedin}
+                      value={formData.social_media.linkedin}
                       onChange={(e) => handleSocialMediaChange('linkedin', e.target.value)}
                       placeholder="username"
                     />
@@ -313,7 +313,7 @@ const CreateCardPage = () => {
                     </Label>
                     <Input
                       id="twitter"
-                      value={formData.socialMedia.twitter}
+                      value={formData.social_media.twitter}
                       onChange={(e) => handleSocialMediaChange('twitter', e.target.value)}
                       placeholder="username"
                     />
@@ -325,7 +325,7 @@ const CreateCardPage = () => {
                     </Label>
                     <Input
                       id="tiktok"
-                      value={formData.socialMedia.tiktok}
+                      value={formData.social_media.tiktok}
                       onChange={(e) => handleSocialMediaChange('tiktok', e.target.value)}
                       placeholder="username"
                     />
@@ -337,7 +337,7 @@ const CreateCardPage = () => {
                     </Label>
                     <Input
                       id="telegram"
-                      value={formData.socialMedia.telegram}
+                      value={formData.social_media.telegram}
                       onChange={(e) => handleSocialMediaChange('telegram', e.target.value)}
                       placeholder="username"
                     />
