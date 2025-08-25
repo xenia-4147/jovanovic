@@ -76,6 +76,10 @@ async def get_current_user(
             detail="User account is deactivated"
         )
     
+    # Convert ObjectId to string for compatibility
+    if "_id" in user_data:
+        user_data["_id"] = str(user_data["_id"])
+    
     return User(**user_data)
 
 async def get_optional_user(
