@@ -3,23 +3,38 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Plus, QrCode, Share2, Edit, Eye, Globe, Lock } from 'lucide-react';
-import { mockBusinessCards, mockApi } from '../mock';
+import { Plus, QrCode, Share2, Edit, Eye, Globe, Lock, LogOut, User, Settings } from 'lucide-react';
+import { cardsApi } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
 
 const HomePage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, logout } = useAuth();
   const [businessCards, setBusinessCards] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading business cards
-    setTimeout(() => {
-      setBusinessCards(mockBusinessCards);
-      setLoading(false);
-    }, 800);
+    loadBusinessCards();
   }, []);
+
+  const loadBusinessCards = async () => {
+    try {
+      setLoading(true);
+      const cards = await cardsApi.getAll();
+      setBusinessCards(cards);
+    } catch (error) {
+      console.error('Failed to load business cards:', error);
+      toast({
+        title: "Fehler",
+        description: "Visitenkarten konnten nicht geladen werden.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleCreateNew = () => {
     navigate('/create');
@@ -35,12 +50,12 @@ const HomePage = () => {
 
   const handleGenerateQR = async (card) => {
     try {
-      const qrUrl = await mockApi.generateQRCode(card.id);
+      const qrUrl = cardsApi.generateQR(card.id);
+      window.open(qrUrl, '_blank');
       toast({
-        title: "QR Code generiert",
-        description: "Der QR Code wurde erstellt und kann geteilt werden.",
+        title: "QR Code geöffnet",
+        description: "Der QR Code wurde in einem neuen Tab geöffnet.",
       });
-      // In real app, this would show QR code modal
     } catch (error) {
       toast({
         title: "Fehler",
@@ -51,24 +66,33 @@ const HomePage = () => {
   };
 
   const handleShare = async (card) => {
+    const shareUrl = `${window.location.origin}/card/${card.id}`;
+    
     if (navigator.share) {
       try {
         await navigator.share({
           title: `${card.name} - Digitale Visitenkarte`,
           text: `Schauen Sie sich meine digitale Visitenkarte an!`,
-          url: `${window.location.origin}/card/${card.id}`,
+          url: shareUrl,
         });
       } catch (error) {
         console.log('Sharing failed:', error);
       }
     } else {
-      // Fallback for browsers that don't support Web Share API
-      navigator.clipboard.writeText(`${window.location.origin}/card/${card.id}`);
+      navigator.clipboard.writeText(shareUrl);
       toast({
         title: "Link kopiert",
         description: "Der Link zu Ihrer Visitenkarte wurde kopiert.",
       });
     }
+  };
+
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Abgemeldet",
+      description: "Sie wurden erfolgreich abgemeldet.",
+    });
   };
 
   if (loading) {
@@ -84,14 +108,33 @@ const HomePage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-6xl">
-      <header className="text-center mb-12">
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-          Digitale Visitenkarten
-        </h1>
-        <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-          Erstellen Sie professionelle digitale Visitenkarten, die auf allen Geräten funktionieren. 
-          Teilen Sie sie über QR-Codes, Links oder direkte Übertragung.
-        </p>
+      {/* Header with User Info */}
+      <header className="flex justify-between items-center mb-12">
+        <div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-2">
+            Digitale Visitenkarten
+          </h1>
+          <p className="text-gray-600">
+            Willkommen zurück, {user?.first_name || user?.email}!
+          </p>
+        </div>
+        
+        <div className="flex items-center space-x-4">
+          <Button variant="outline" size="sm">
+            <User className="w-4 h-4 mr-2" />
+            {user?.full_name || user?.email}
+          </Button>
+          
+          <Button variant="outline" size="sm">
+            <Settings className="w-4 h-4 mr-2" />
+            Einstellungen
+          </Button>
+          
+          <Button variant="outline" size="sm" onClick={handleLogout}>
+            <LogOut className="w-4 h-4 mr-2" />
+            Abmelden
+          </Button>
+        </div>
       </header>
 
       <div className="flex justify-center mb-8">
@@ -128,12 +171,12 @@ const HomePage = () => {
                 <div 
                   className="h-32 bg-gradient-to-r p-4 text-white"
                   style={{
-                    background: `linear-gradient(135deg, ${card.accentColor}15 0%, ${card.accentColor}25 100%)`
+                    background: `linear-gradient(135deg, ${card.accent_color}15 0%, ${card.accent_color}25 100%)`
                   }}
                 >
                   <div className="flex justify-between items-start">
-                    <Badge variant={card.isPublic ? "default" : "secondary"} className="mb-2">
-                      {card.isPublic ? (
+                    <Badge variant={card.is_public ? "default" : "secondary"} className="mb-2">
+                      {card.is_public ? (
                         <>
                           <Globe className="w-3 h-3 mr-1" />
                           Öffentlich
@@ -166,7 +209,7 @@ const HomePage = () => {
                   </div>
                   <div className="flex items-center space-x-3 mt-2">
                     <img
-                      src={card.profileImage}
+                      src={card.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(card.name)}&background=6366f1&color=fff`}
                       alt={card.name}
                       className="w-12 h-12 rounded-full border-2 border-white shadow-md"
                     />
@@ -180,8 +223,12 @@ const HomePage = () => {
               <CardContent className="p-4">
                 <div className="space-y-2 text-sm text-gray-600 mb-4">
                   <p className="font-medium text-gray-800">{card.company}</p>
-                  <p>{card.email}</p>
-                  <p>{card.phone}</p>
+                  {card.emails && card.emails.length > 0 && (
+                    <p>{card.emails.find(e => e.is_primary)?.address || card.emails[0].address}</p>
+                  )}
+                  {card.phones && card.phones.length > 0 && (
+                    <p>{card.phones.find(p => p.is_primary)?.number || card.phones[0].number}</p>
+                  )}
                 </div>
                 <div className="flex space-x-2">
                   <Button
