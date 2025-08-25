@@ -311,7 +311,7 @@ async def get_business_card(
         card = BusinessCard(**card_data)
         
         # Check if user can view this card
-        is_owner = current_user and str(card.user_id) == str(current_user.id)
+        is_owner = current_user is not None and str(card.user_id) == str(current_user.id)
         can_view = is_owner or card.is_public
         
         if not can_view:
