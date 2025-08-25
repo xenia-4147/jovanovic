@@ -377,8 +377,10 @@ async def update_business_card(
         if update_dict:
             update_dict["last_updated"] = datetime.utcnow()
             
+            # Use the actual stored card ID for update
+            stored_card_id = card_data["_id"] if isinstance(card_data["_id"], str) else ObjectId(card_id)
             await db.businesscards.update_one(
-                {"_id": card_id},
+                {"_id": stored_card_id},
                 {"$set": update_dict}
             )
             
@@ -386,12 +388,17 @@ async def update_business_card(
             if card.auto_update_enabled:
                 background_tasks.add_task(
                     send_auto_update_notifications,
-                    card_id,
+                    str(stored_card_id),
                     update_dict.keys()
                 )
         
         # Return updated card
-        updated_card_data = await db.businesscards.find_one({"_id": card_id})
+        updated_card_data = await db.businesscards.find_one({"_id": stored_card_id})
+        # Convert ObjectId to string for compatibility
+        if "_id" in updated_card_data:
+            updated_card_data["_id"] = str(updated_card_data["_id"])
+        if "userId" in updated_card_data:
+            updated_card_data["userId"] = str(updated_card_data["userId"])
         updated_card = BusinessCard(**updated_card_data)
         
         logger.info(f"Card updated: {card_id} by user {current_user.email}")
