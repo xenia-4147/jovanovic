@@ -3,89 +3,90 @@
     "test": "Health Check",
     "success": true,
     "message": "API is running - Digital Business Cards API",
-    "timestamp": "2025-08-25T21:24:37.834277"
+    "timestamp": "2025-08-25T21:25:10.956273"
   },
   {
     "test": "User Registration",
     "success": true,
-    "message": "User registered successfully: testuser_b0e35712@example.com",
-    "timestamp": "2025-08-25T21:24:38.136727"
+    "message": "User registered successfully: testuser_75339840@example.com",
+    "timestamp": "2025-08-25T21:25:11.262002"
   },
   {
     "test": "User Login",
     "success": true,
-    "message": "Login successful for: logintest_5d74cedb@example.com",
-    "timestamp": "2025-08-25T21:24:38.710317"
+    "message": "Login successful for: logintest_4cae7cf0@example.com",
+    "timestamp": "2025-08-25T21:25:11.837784"
   },
   {
     "test": "Protected Endpoint",
-    "success": false,
-    "message": "HTTP 401",
-    "timestamp": "2025-08-25T21:24:38.781139",
-    "response": "{\"detail\":\"Could not validate credentials\"}"
+    "success": true,
+    "message": "User profile retrieved: testuser_75339840@example.com",
+    "timestamp": "2025-08-25T21:25:11.895789"
   },
   {
     "test": "Create Business Card",
-    "success": false,
-    "message": "HTTP 401",
-    "timestamp": "2025-08-25T21:24:38.832857",
-    "response": "{\"detail\":\"Could not validate credentials\"}"
+    "success": true,
+    "message": "Card created: John Doe",
+    "timestamp": "2025-08-25T21:25:11.948154"
   },
   {
     "test": "Get User Cards",
     "success": false,
-    "message": "HTTP 401",
-    "timestamp": "2025-08-25T21:24:38.887371",
-    "response": "{\"detail\":\"Could not validate credentials\"}"
+    "message": "HTTP 500",
+    "timestamp": "2025-08-25T21:25:12.004025",
+    "response": "{\"detail\":\"Failed to fetch cards\"}"
   },
   {
     "test": "Get Specific Card",
     "success": false,
-    "message": "No card ID available",
-    "timestamp": "2025-08-25T21:24:38.888583"
+    "message": "HTTP 403",
+    "timestamp": "2025-08-25T21:25:12.055207",
+    "response": "{\"detail\":\"Not authenticated\"}"
   },
   {
     "test": "Update Business Card",
     "success": false,
-    "message": "No access token or card ID available",
-    "timestamp": "2025-08-25T21:24:38.888628"
+    "message": "HTTP 404",
+    "timestamp": "2025-08-25T21:25:12.109228",
+    "response": "{\"detail\":\"Business card not found\"}"
   },
   {
     "test": "QR Code Generation",
     "success": false,
-    "message": "No card ID available",
-    "timestamp": "2025-08-25T21:24:38.888638"
+    "message": "HTTP 403",
+    "timestamp": "2025-08-25T21:25:12.157575",
+    "response": "{\"detail\":\"Not authenticated\"}"
   },
   {
     "test": "vCard Generation",
     "success": false,
-    "message": "No card ID available",
-    "timestamp": "2025-08-25T21:24:38.888646"
+    "message": "HTTP 403",
+    "timestamp": "2025-08-25T21:25:12.208069",
+    "response": "{\"detail\":\"Not authenticated\"}"
   },
   {
     "test": "Privacy Report",
-    "success": false,
-    "message": "HTTP 401",
-    "timestamp": "2025-08-25T21:24:38.937603",
-    "response": "{\"detail\":\"Could not validate credentials\"}"
+    "success": true,
+    "message": "Privacy report generated successfully",
+    "timestamp": "2025-08-25T21:25:12.265509"
   },
   {
     "test": "Data Export",
     "success": false,
-    "message": "HTTP 401",
-    "timestamp": "2025-08-25T21:24:38.986474",
-    "response": "{\"detail\":\"Could not validate credentials\"}"
+    "message": "HTTP 500",
+    "timestamp": "2025-08-25T21:25:12.321024",
+    "response": "{\"detail\":\"Data export failed\"}"
   },
   {
     "test": "Invalid Authentication",
     "success": true,
     "message": "Properly rejected invalid token",
-    "timestamp": "2025-08-25T21:24:39.035962"
+    "timestamp": "2025-08-25T21:25:12.372144"
   },
   {
     "test": "Non-existent Card",
     "success": false,
     "message": "Expected 404, got 403",
-    "timestamp": "2025-08-25T21:24:39.085346"
+    "timestamp": "2025-08-25T21:25:12.421671"
   }
 ]
