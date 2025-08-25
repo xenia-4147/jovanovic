@@ -1,86 +1,92 @@
 [
   {
     "test": "Health Check",
-    "success": false,
-    "message": "HTTP 502",
-    "timestamp": "2025-08-25T21:19:59.517176"
+    "success": true,
+    "message": "API is running - Digital Business Cards API",
+    "timestamp": "2025-08-25T21:21:06.475528"
   },
   {
     "test": "User Registration",
-    "success": false,
-    "message": "HTTP 502",
-    "timestamp": "2025-08-25T21:19:59.568868"
+    "success": true,
+    "message": "User registered successfully: testuser_46cb11bc@example.com",
+    "timestamp": "2025-08-25T21:21:06.778324"
   },
   {
     "test": "User Login",
     "success": false,
-    "message": "Failed to register test user for login",
-    "timestamp": "2025-08-25T21:19:59.623189"
+    "message": "HTTP 500",
+    "timestamp": "2025-08-25T21:21:07.126955",
+    "response": "{\"detail\":\"Login failed\"}"
   },
   {
     "test": "Protected Endpoint",
     "success": false,
-    "message": "No access token available",
-    "timestamp": "2025-08-25T21:19:59.624415"
+    "message": "HTTP 401",
+    "timestamp": "2025-08-25T21:21:07.187307",
+    "response": "{\"detail\":\"Could not validate credentials\"}"
   },
   {
     "test": "Create Business Card",
     "success": false,
-    "message": "No access token available",
-    "timestamp": "2025-08-25T21:19:59.624454"
+    "message": "HTTP 401",
+    "timestamp": "2025-08-25T21:21:07.241158",
+    "response": "{\"detail\":\"Could not validate credentials\"}"
   },
   {
     "test": "Get User Cards",
     "success": false,
-    "message": "No access token available",
-    "timestamp": "2025-08-25T21:19:59.624463"
+    "message": "HTTP 401",
+    "timestamp": "2025-08-25T21:21:07.296375",
+    "response": "{\"detail\":\"Could not validate credentials\"}"
   },
   {
     "test": "Get Specific Card",
     "success": false,
     "message": "No card ID available",
-    "timestamp": "2025-08-25T21:19:59.624472"
+    "timestamp": "2025-08-25T21:21:07.297771"
   },
   {
     "test": "Update Business Card",
     "success": false,
     "message": "No access token or card ID available",
-    "timestamp": "2025-08-25T21:19:59.624484"
+    "timestamp": "2025-08-25T21:21:07.297813"
   },
   {
     "test": "QR Code Generation",
     "success": false,
     "message": "No card ID available",
-    "timestamp": "2025-08-25T21:19:59.624494"
+    "timestamp": "2025-08-25T21:21:07.297835"
   },
   {
     "test": "vCard Generation",
     "success": false,
     "message": "No card ID available",
-    "timestamp": "2025-08-25T21:19:59.624502"
+    "timestamp": "2025-08-25T21:21:07.297847"
   },
   {
     "test": "Privacy Report",
     "success": false,
-    "message": "No access token available",
-    "timestamp": "2025-08-25T21:19:59.624512"
+    "message": "HTTP 401",
+    "timestamp": "2025-08-25T21:21:07.352240",
+    "response": "{\"detail\":\"Could not validate credentials\"}"
   },
   {
     "test": "Data Export",
     "success": false,
-    "message": "No access token available",
-    "timestamp": "2025-08-25T21:19:59.624519"
+    "message": "HTTP 401",
+    "timestamp": "2025-08-25T21:21:07.406981",
+    "response": "{\"detail\":\"Could not validate credentials\"}"
   },
   {
     "test": "Invalid Authentication",
-    "success": false,
-    "message": "Expected 401, got 502",
-    "timestamp": "2025-08-25T21:19:59.676268"
+    "success": true,
+    "message": "Properly rejected invalid token",
+    "timestamp": "2025-08-25T21:21:07.460646"
   },
   {
     "test": "Non-existent Card",
     "success": false,
-    "message": "Expected 404, got 502",
-    "timestamp": "2025-08-25T21:19:59.731448"
+    "message": "Expected 404, got 403",
+    "timestamp": "2025-08-25T21:21:07.514645"
   }
 ]
