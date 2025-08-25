@@ -365,8 +365,8 @@ const CreateCardPage = () => {
                       </div>
                       <Switch
                         id="isPublic"
-                        checked={formData.isPublic}
-                        onCheckedChange={(checked) => handleInputChange('isPublic', checked)}
+                        checked={formData.is_public}
+                        onCheckedChange={(checked) => handleInputChange('is_public', checked)}
                       />
                     </div>
                     
@@ -380,8 +380,8 @@ const CreateCardPage = () => {
                       </div>
                       <Switch
                         id="allowEmbedding"
-                        checked={formData.allowEmbedding}
-                        onCheckedChange={(checked) => handleInputChange('allowEmbedding', checked)}
+                        checked={formData.allow_embedding}
+                        onCheckedChange={(checked) => handleInputChange('allow_embedding', checked)}
                       />
                     </div>
                     
@@ -392,8 +392,8 @@ const CreateCardPage = () => {
                       </div>
                       <Switch
                         id="autoUpdate"
-                        checked={formData.autoUpdateEnabled}
-                        onCheckedChange={(checked) => handleInputChange('autoUpdateEnabled', checked)}
+                        checked={formData.auto_update_enabled}
+                        onCheckedChange={(checked) => handleInputChange('auto_update_enabled', checked)}
                       />
                     </div>
                   </div>
