@@ -389,8 +389,11 @@ async def update_business_card(
                 background_tasks.add_task(
                     send_auto_update_notifications,
                     str(stored_card_id),
-                    update_dict.keys()
+                    list(update_dict.keys())
                 )
+        else:
+            # No updates, just get the stored card ID for retrieval
+            stored_card_id = card_data["_id"] if isinstance(card_data["_id"], str) else ObjectId(card_id)
         
         # Return updated card
         updated_card_data = await db.businesscards.find_one({"_id": stored_card_id})
