@@ -38,7 +38,7 @@ class PrivacySettings(BaseModel):
     allow_embedding: bool = True
 
 class User(BaseModel):
-    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    id: ObjectIdField = Field(default_factory=PyObjectId, alias="_id")
     email: EmailStr
     password_hash: str
     first_name: Optional[str] = None
@@ -51,7 +51,7 @@ class User(BaseModel):
     email_verified: bool = False
     
     class Config:
-        allow_population_by_field_name = True
+        validate_by_name = True
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
     
