@@ -501,14 +501,27 @@ async def generate_vcard(
 ):
     """Generate vCard file for business card"""
     try:
-        # Verify card exists and is accessible
+        # Verify card exists and is accessible - try both string and ObjectId
+        from bson import ObjectId
         card_data = await db.businesscards.find_one({"_id": card_id})
+        if not card_data:
+            # Try with ObjectId conversion for backward compatibility
+            try:
+                card_data = await db.businesscards.find_one({"_id": ObjectId(card_id)})
+            except:
+                pass
         
         if not card_data:
             raise HTTPException(status_code=404, detail="Business card not found")
         
+        # Convert ObjectId to string for compatibility
+        if "_id" in card_data:
+            card_data["_id"] = str(card_data["_id"])
+        if "userId" in card_data:
+            card_data["userId"] = str(card_data["userId"])
+        
         card = BusinessCard(**card_data)
-        is_owner = current_user and str(card.user_id) == str(current_user.id)
+        is_owner = current_user is not None and str(card.user_id) == str(current_user.id)
         
         if not is_owner and not card.is_public:
             raise HTTPException(status_code=403, detail="Access denied")
