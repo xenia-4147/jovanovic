@@ -53,6 +53,7 @@ def debug_card_access():
         "position": "Debugger",
         "phones": [{"label": "work", "number": "+1-555-DEBUG", "is_primary": True}],
         "emails": [{"label": "work", "address": "debug@example.com", "is_primary": True}],
+        "social_media": {"linkedin": "debuguser", "twitter": "debuguser"},
         "is_public": True
     }
     
