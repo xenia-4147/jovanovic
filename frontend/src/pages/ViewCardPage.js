@@ -291,7 +291,7 @@ const ViewCardPage = () => {
               {/* Phone Numbers */}
               {card.phones && card.phones.filter(p => p.number).length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: card.textColor }}>
+                  <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: card.text_color || card.textColor }}>
                     <Phone className="w-5 h-5 mr-2" />
                     Telefonnummern
                   </h3>
@@ -301,14 +301,14 @@ const ViewCardPage = () => {
                         <div className="flex items-center space-x-3">
                           <div 
                             className="w-10 h-10 rounded-full flex items-center justify-center text-white"
-                            style={{ backgroundColor: card.accentColor }}
+                            style={{ backgroundColor: card.accent_color || card.accentColor }}
                           >
                             <Phone className="w-5 h-5" />
                           </div>
                           <div>
-                            <p className="font-medium" style={{ color: card.textColor }}>
+                            <p className="font-medium" style={{ color: card.text_color || card.textColor }}>
                               {phone.number}
-                              {phone.isPrimary && (
+                              {(phone.is_primary || phone.isPrimary) && (
                                 <Badge className="ml-2 bg-yellow-100 text-yellow-800 text-xs">Primär</Badge>
                               )}
                             </p>
@@ -344,7 +344,7 @@ const ViewCardPage = () => {
               {/* Email Addresses */}
               {card.emails && card.emails.filter(e => e.address).length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: card.textColor }}>
+                  <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: card.text_color || card.textColor }}>
                     <Mail className="w-5 h-5 mr-2" />
                     E-Mail-Adressen
                   </h3>
@@ -354,14 +354,14 @@ const ViewCardPage = () => {
                         <div className="flex items-center space-x-3">
                           <div 
                             className="w-10 h-10 rounded-full flex items-center justify-center text-white"
-                            style={{ backgroundColor: card.accentColor }}
+                            style={{ backgroundColor: card.accent_color || card.accentColor }}
                           >
                             <Mail className="w-5 h-5" />
                           </div>
                           <div>
-                            <p className="font-medium" style={{ color: card.textColor }}>
+                            <p className="font-medium" style={{ color: card.text_color || card.textColor }}>
                               {email.address}
-                              {email.isPrimary && (
+                              {(email.is_primary || email.isPrimary) && (
                                 <Badge className="ml-2 bg-yellow-100 text-yellow-800 text-xs">Primär</Badge>
                               )}
                             </p>
@@ -388,7 +388,7 @@ const ViewCardPage = () => {
                 <div className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
                   <div 
                     className="w-10 h-10 rounded-full flex items-center justify-center text-white"
-                    style={{ backgroundColor: card.accentColor }}
+                    style={{ backgroundColor: card.accent_color || card.accentColor }}
                   >
                     <Globe className="w-5 h-5" />
                   </div>
@@ -397,7 +397,7 @@ const ViewCardPage = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-lg hover:underline flex-1"
-                    style={{ color: card.textColor }}
+                    style={{ color: card.text_color || card.textColor }}
                   >
                     {card.website.replace(/^https?:\/\//, '')}
                   </a>
@@ -408,13 +408,13 @@ const ViewCardPage = () => {
             <Separator className="my-8" />
 
             {/* Social Media */}
-            {card.socialMedia && Object.values(card.socialMedia).some(val => val) && (
+            {(card.social_media || card.socialMedia) && Object.values(card.social_media || card.socialMedia).some(val => val) && (
               <div className="mb-8">
-                <h3 className="text-xl font-semibold mb-4" style={{ color: card.textColor }}>
+                <h3 className="text-xl font-semibold mb-4" style={{ color: card.text_color || card.textColor }}>
                   Social Media
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {Object.entries(card.socialMedia).map(([platform, username]) => {
+                  {Object.entries(card.social_media || card.socialMedia).map(([platform, username]) => {
                     if (!username) return null;
                     return (
                       <a
@@ -426,12 +426,12 @@ const ViewCardPage = () => {
                       >
                         <div 
                           className="w-8 h-8 rounded-full flex items-center justify-center text-white"
-                          style={{ backgroundColor: card.accentColor }}
+                          style={{ backgroundColor: card.accent_color || card.accentColor }}
                         >
                           {getSocialIcon(platform)}
                         </div>
                         <div className="flex-1">
-                          <p className="font-medium capitalize" style={{ color: card.textColor }}>
+                          <p className="font-medium capitalize" style={{ color: card.text_color || card.textColor }}>
                             {platform}
                           </p>
                           <p className="text-sm opacity-70">@{username}</p>
