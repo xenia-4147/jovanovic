@@ -21,25 +21,25 @@ const CreateCardPage = () => {
     company: '',
     position: '',
     description: '',
-    phones: [{ id: 1, label: 'Geschäftlich', number: '', isPrimary: true }],
-    emails: [{ id: 1, label: 'Geschäftlich', address: '', isPrimary: true }],
+    phones: [{ id: '1', label: 'Geschäftlich', number: '', is_primary: true }],
+    emails: [{ id: '1', label: 'Geschäftlich', address: '', is_primary: true }],
     website: '',
-    profileImage: '',
+    profile_image: '',
     logo: '',
-    socialMedia: {
+    social_media: {
       instagram: '',
       linkedin: '',
       twitter: '',
       tiktok: '',
       telegram: ''
     },
-    isPublic: true,
-    backgroundColor: '#ffffff',
-    textColor: '#1f2937',
-    accentColor: '#3b82f6',
-    embedBackgroundColor: '#f8fafc',
-    allowEmbedding: true,
-    autoUpdateEnabled: true
+    is_public: true,
+    background_color: '#ffffff',
+    text_color: '#1f2937',
+    accent_color: '#3b82f6',
+    embed_background_color: '#f8fafc',
+    allow_embedding: true,
+    auto_update_enabled: true
   });
 
   const handleInputChange = (field, value) => {
