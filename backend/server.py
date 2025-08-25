@@ -315,7 +315,7 @@ async def get_business_card(
         can_view = is_owner or card.is_public
         
         if not can_view:
-            raise HTTPException(status_code=403, detail="Access denied")
+            raise HTTPException(status_code=403, detail="Card is private and you are not the owner")
         
         # Track analytics (in background)
         if not is_owner:  # Don't track owner views
