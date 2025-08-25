@@ -19,25 +19,39 @@ class PrivacyService:
     async def export_user_data(self, user: User) -> GDPRExport:
         """Export all user data for GDPR compliance"""
         try:
-            # Get user's business cards
-            cards_cursor = self.db.businesscards.find({"userId": user.id})
+            # Get user's business cards using string user ID
+            user_id_str = str(user.id)
+            cards_cursor = self.db.businesscards.find({"userId": user_id_str})
             business_cards = []
             
             async for card_data in cards_cursor:
+                # Convert ObjectId to string for consistency
+                if "_id" in card_data:
+                    card_data["_id"] = str(card_data["_id"])
+                if "userId" in card_data:
+                    card_data["userId"] = str(card_data["userId"])
+                    
                 card = BusinessCard(**card_data)
                 business_cards.append(card.dict(exclude={"user_id"}))
             
             # Get recipients (people who received user's cards)
             card_ids = [card["_id"] for card in business_cards]
-            recipients_cursor = self.db.cardrecipients.find({"card_id": {"$in": card_ids}})
             recipients = []
             
-            async for recipient_data in recipients_cursor:
-                recipient = CardRecipient(**recipient_data)
-                recipients.append(recipient.dict(exclude={"card_id"}))
+            if card_ids:
+                recipients_cursor = self.db.cardrecipients.find({"card_id": {"$in": card_ids}})
+                
+                async for recipient_data in recipients_cursor:
+                    # Convert ObjectId to string
+                    if "_id" in recipient_data:
+                        recipient_data["_id"] = str(recipient_data["_id"])
+                    if "card_id" in recipient_data:
+                        recipient_data["card_id"] = str(recipient_data["card_id"])
+                        
+                    recipient = CardRecipient(**recipient_data)
+                    recipients.append(recipient.dict(exclude={"card_id"}))
             
             # Get analytics summary (anonymized)
-            analytics_cursor = self.db.cardanalytics.find({"card_id": {"$in": card_ids}})
             analytics_summary = {
                 "total_views": 0,
                 "total_downloads": 0,
@@ -47,29 +61,38 @@ class PrivacyService:
                 "referrers": {}
             }
             
-            async for analytics_data in analytics_cursor:
-                analytics = CardAnalytics(**analytics_data)
+            if card_ids:
+                analytics_cursor = self.db.cardanalytics.find({"card_id": {"$in": card_ids}})
                 
-                # Count actions
-                if analytics.action == "view":
-                    analytics_summary["total_views"] += 1
-                elif analytics.action == "download":
-                    analytics_summary["total_downloads"] += 1
-                elif analytics.action == "share":
-                    analytics_summary["total_shares"] += 1
-                elif analytics.action == "qr_scan":
-                    analytics_summary["total_qr_scans"] += 1
-                
-                # Count countries (anonymized)
-                if analytics.country:
-                    analytics_summary["countries"][analytics.country] = \
-                        analytics_summary["countries"].get(analytics.country, 0) + 1
-                
-                # Count referrers (anonymized)
-                if analytics.referrer:
-                    domain = self._extract_domain(analytics.referrer)
-                    analytics_summary["referrers"][domain] = \
-                        analytics_summary["referrers"].get(domain, 0) + 1
+                async for analytics_data in analytics_cursor:
+                    # Convert ObjectId to string
+                    if "_id" in analytics_data:
+                        analytics_data["_id"] = str(analytics_data["_id"])
+                    if "card_id" in analytics_data:
+                        analytics_data["card_id"] = str(analytics_data["card_id"])
+                        
+                    analytics = CardAnalytics(**analytics_data)
+                    
+                    # Count actions
+                    if analytics.action == "view":
+                        analytics_summary["total_views"] += 1
+                    elif analytics.action == "download":
+                        analytics_summary["total_downloads"] += 1
+                    elif analytics.action == "share":
+                        analytics_summary["total_shares"] += 1
+                    elif analytics.action == "qr_scan":
+                        analytics_summary["total_qr_scans"] += 1
+                    
+                    # Count countries (anonymized)
+                    if analytics.country:
+                        analytics_summary["countries"][analytics.country] = \
+                            analytics_summary["countries"].get(analytics.country, 0) + 1
+                    
+                    # Count referrers (anonymized)
+                    if analytics.referrer:
+                        domain = self._extract_domain(analytics.referrer)
+                        analytics_summary["referrers"][domain] = \
+                            analytics_summary["referrers"].get(domain, 0) + 1
             
             # Create export data
             export_data = GDPRExport(
@@ -93,7 +116,7 @@ class PrivacyService:
             
         except Exception as e:
             logger.error(f"Data export failed for user {user.email}: {str(e)}")
-            raise HTTPException(status_code=500, detail="Data export failed")
+            raise HTTPException(status_code=500, detail=f"Data export failed: {str(e)}")
     
     async def delete_user_account(self, user: User, deletion_request: AccountDeletion) -> bool:
         """Permanently delete user account and all associated data"""
