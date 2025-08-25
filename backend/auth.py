@@ -132,6 +132,10 @@ class AuthService:
         
         if not user_data:
             return None
+        
+        # Convert ObjectId to string for compatibility
+        if "_id" in user_data:
+            user_data["_id"] = str(user_data["_id"])
             
         user = User(**user_data)
         
