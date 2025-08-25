@@ -1,28 +1,8 @@
-from pydantic import BaseModel, EmailStr, Field, validator, field_validator
-from typing import Optional, Dict, Any, Annotated
+from pydantic import BaseModel, EmailStr, Field, validator
+from typing import Optional, Dict, Any
 from datetime import datetime
-from bson import ObjectId
 import bcrypt
-
-# Custom ObjectId type for Pydantic v2
-class PyObjectId(ObjectId):
-    @classmethod
-    def __get_validators__(cls):
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v):
-        if not ObjectId.is_valid(v):
-            raise ValueError('Invalid objectid')
-        return ObjectId(v)
-
-    @classmethod
-    def __get_pydantic_json_schema__(cls, field_schema):
-        field_schema.update(type='string')
-        return field_schema
-
-# Use Annotated for the ObjectId type
-ObjectIdField = Annotated[PyObjectId, Field(default_factory=PyObjectId)]
+import uuid
 
 class GDPRConsent(BaseModel):
     consent: bool = False
@@ -38,7 +18,7 @@ class PrivacySettings(BaseModel):
     allow_embedding: bool = True
 
 class User(BaseModel):
-    id: ObjectIdField = Field(default_factory=PyObjectId, alias="_id")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()), alias="_id")
     email: EmailStr
     password_hash: str
     first_name: Optional[str] = None
@@ -51,9 +31,8 @@ class User(BaseModel):
     email_verified: bool = False
     
     class Config:
-        validate_by_name = True
+        populate_by_name = True
         arbitrary_types_allowed = True
-        json_encoders = {ObjectId: str}
     
     @validator('password_hash', pre=True)
     def hash_password(cls, v):
