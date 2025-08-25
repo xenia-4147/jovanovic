@@ -228,16 +228,16 @@ async def create_business_card(
 ):
     """Create new business card"""
     try:
-        # Create business card
+        # Create business card with string user ID
         card = BusinessCard(
-            user_id=current_user.id,
+            user_id=str(current_user.id),
             **card_data.dict()
         )
         
         # Insert into database
         card_dict = card.dict(by_alias=True, exclude={"id"})
         result = await db.businesscards.insert_one(card_dict)
-        card.id = result.inserted_id
+        card.id = str(result.inserted_id)
         
         logger.info(f"Business card created: {card.name} for user {current_user.email}")
         
@@ -249,7 +249,7 @@ async def create_business_card(
         
     except Exception as e:
         logger.error(f"Card creation failed: {str(e)}")
-        raise HTTPException(status_code=500, detail="Card creation failed")
+        raise HTTPException(status_code=500, detail=f"Card creation failed: {str(e)}")
 
 @api_router.get("/cards", response_model=List[BusinessCardResponse])
 async def get_user_cards(current_user: User = Depends(get_current_user)):
