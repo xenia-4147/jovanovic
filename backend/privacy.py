@@ -53,7 +53,11 @@ class PrivacyService:
                         recipient_data["card_id"] = str(recipient_data["card_id"])
                         
                     recipient = CardRecipient(**recipient_data)
-                    recipients.append(recipient.dict(exclude={"card_id"}))
+                    recipient_dict = recipient.dict(exclude={"card_id"})
+                    # Ensure all ObjectIds are converted to strings
+                    if "_id" in recipient_dict:
+                        recipient_dict["_id"] = str(recipient_dict["_id"])
+                    recipients.append(recipient_dict)
             
             # Get analytics summary (anonymized)
             analytics_summary = {
