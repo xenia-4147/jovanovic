@@ -22,22 +22,27 @@ const EditCardPage = () => {
     name: '',
     company: '',
     position: '',
-    phone: '',
-    email: '',
+    description: '',
+    phones: [{ id: '1', label: 'Geschäftlich', number: '', is_primary: true }],
+    emails: [{ id: '1', label: 'Geschäftlich', address: '', is_primary: true }],
+    addresses: [],
     website: '',
-    profileImage: '',
+    profile_image: '',
     logo: '',
-    socialMedia: {
+    social_media: {
       instagram: '',
       linkedin: '',
       twitter: '',
       tiktok: '',
       telegram: ''
     },
-    isPublic: true,
-    backgroundColor: '#ffffff',
-    textColor: '#1f2937',
-    accentColor: '#3b82f6'
+    is_public: true,
+    background_color: '#ffffff',
+    text_color: '#1f2937',
+    accent_color: '#3b82f6',
+    embed_background_color: '#f8fafc',
+    allow_embedding: true,
+    auto_update_enabled: true
   });
 
   useEffect(() => {
@@ -46,9 +51,34 @@ const EditCardPage = () => {
 
   const loadCard = async () => {
     try {
-      const card = await mockApi.getBusinessCard(id);
+      const card = await cardsApi.getById(id);
       if (card) {
-        setFormData(card);
+        setFormData({
+          name: card.name || '',
+          company: card.company || '',
+          position: card.position || '',
+          description: card.description || '',
+          phones: card.phones && card.phones.length > 0 ? card.phones : [{ id: '1', label: 'Geschäftlich', number: '', is_primary: true }],
+          emails: card.emails && card.emails.length > 0 ? card.emails : [{ id: '1', label: 'Geschäftlich', address: '', is_primary: true }],
+          addresses: card.addresses || [],
+          website: card.website || '',
+          profile_image: card.profile_image || '',
+          logo: card.logo || '',
+          social_media: card.social_media || {
+            instagram: '',
+            linkedin: '',
+            twitter: '',
+            tiktok: '',
+            telegram: ''
+          },
+          is_public: card.is_public !== undefined ? card.is_public : true,
+          background_color: card.background_color || '#ffffff',
+          text_color: card.text_color || '#1f2937',
+          accent_color: card.accent_color || '#3b82f6',
+          embed_background_color: card.embed_background_color || '#f8fafc',
+          allow_embedding: card.allow_embedding !== undefined ? card.allow_embedding : true,
+          auto_update_enabled: card.auto_update_enabled !== undefined ? card.auto_update_enabled : true
+        });
       } else {
         toast({
           title: "Fehler",
@@ -58,11 +88,13 @@ const EditCardPage = () => {
         navigate('/');
       }
     } catch (error) {
+      console.error('Failed to load card for editing:', error);
       toast({
         title: "Fehler",
         description: "Visitenkarte konnte nicht geladen werden.",
         variant: "destructive",
       });
+      navigate('/');
     }
   };
 
