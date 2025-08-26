@@ -108,8 +108,8 @@ const EditCardPage = () => {
   const handleSocialMediaChange = (platform, value) => {
     setFormData(prev => ({
       ...prev,
-      socialMedia: {
-        ...prev.socialMedia,
+      social_media: {
+        ...prev.social_media,
         [platform]: value
       }
     }));
@@ -128,10 +128,10 @@ const EditCardPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.name || !formData.email) {
+    if (!formData.name || !formData.emails.some(email => email.address)) {
       toast({
         title: "Fehler",
-        description: "Name und E-Mail sind Pflichtfelder.",
+        description: "Name und mindestens eine E-Mail sind Pflichtfelder.",
         variant: "destructive",
       });
       return;
@@ -139,16 +139,17 @@ const EditCardPage = () => {
 
     setLoading(true);
     try {
-      await mockApi.updateBusinessCard(id, formData);
+      await cardsApi.update(id, formData);
       toast({
         title: "Erfolg",
         description: "Ihre Visitenkarte wurde erfolgreich aktualisiert.",
       });
       navigate(`/card/${id}`);
     } catch (error) {
+      console.error('Card update failed:', error);
       toast({
         title: "Fehler",
-        description: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+        description: error.response?.data?.detail || "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
         variant: "destructive",
       });
     } finally {
