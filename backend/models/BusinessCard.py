@@ -159,6 +159,7 @@ class BusinessCardUpdate(BaseModel):
     description: Optional[str] = Field(None, max_length=500)
     phones: Optional[List[ContactPhone]] = None
     emails: Optional[List[ContactEmail]] = None
+    addresses: Optional[List[ContactAddress]] = None
     website: Optional[str] = None
     profile_image: Optional[str] = None
     logo: Optional[str] = None
