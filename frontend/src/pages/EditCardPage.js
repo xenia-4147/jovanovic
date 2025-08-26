@@ -5,9 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Switch } from '../components/ui/switch';
+import { Textarea } from '../components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
-import { ArrowLeft, Upload, Save, Eye, Instagram, Linkedin, Twitter, Send } from 'lucide-react';
-import { mockApi, mockBusinessCards } from '../mock';
+import { ArrowLeft, Upload, Save, Eye, Instagram, Linkedin, Twitter, Send, Info, Globe, Palette } from 'lucide-react';
+import MultiContactInput from '../components/MultiContactInput';
+import AddressInput from '../components/AddressInput';
+import { cardsApi } from '../services/api';
 import { useToast } from '../hooks/use-toast';
 
 const EditCardPage = () => {
