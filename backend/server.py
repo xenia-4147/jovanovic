@@ -379,13 +379,23 @@ async def update_business_card(
             
             # Use the actual stored card ID for update
             stored_card_id = card_data["_id"] if isinstance(card_data["_id"], str) else ObjectId(card_id)
+            
+            # Convert stored_card_id to ObjectId if it's a string for MongoDB
+            if isinstance(stored_card_id, str):
+                try:
+                    mongo_id = ObjectId(stored_card_id)
+                except:
+                    mongo_id = stored_card_id
+            else:
+                mongo_id = stored_card_id
+            
             await db.businesscards.update_one(
-                {"_id": stored_card_id},
+                {"_id": mongo_id},
                 {"$set": update_dict}
             )
             
             # Send auto-update notifications (in background)
-            if card.auto_update_enabled:
+            if hasattr(card, 'auto_update_enabled') and card.auto_update_enabled:
                 background_tasks.add_task(
                     send_auto_update_notifications,
                     str(stored_card_id),
@@ -396,7 +406,40 @@ async def update_business_card(
             stored_card_id = card_data["_id"] if isinstance(card_data["_id"], str) else ObjectId(card_id)
         
         # Return updated card
-        updated_card_data = await db.businesscards.find_one({"_id": stored_card_id})
+        if isinstance(stored_card_id, str):
+            try:
+                mongo_id = ObjectId(stored_card_id)
+            except:
+                mongo_id = stored_card_id
+        else:
+            mongo_id = stored_card_id
+            
+        updated_card_data = await db.businesscards.find_one({"_id": mongo_id})
+        
+        # Convert ObjectId to string for compatibility
+        if updated_card_data:
+            if "_id" in updated_card_data:
+                updated_card_data["_id"] = str(updated_card_data["_id"])
+            if "userId" in updated_card_data:
+                updated_card_data["userId"] = str(updated_card_data["userId"])
+                
+            updated_card = BusinessCard(**updated_card_data)
+            
+            logger.info(f"Card updated: {card_id} by user {current_user.email}")
+            
+            return BusinessCardResponse(
+                id=str(updated_card.id),
+                **updated_card.dict(exclude={"id", "user_id"}),
+                is_owner=True
+            )
+        else:
+            raise HTTPException(status_code=500, detail="Failed to retrieve updated card")
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Card update failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Card update failed: {str(e)}")
         # Convert ObjectId to string for compatibility
         if "_id" in updated_card_data:
             updated_card_data["_id"] = str(updated_card_data["_id"])
