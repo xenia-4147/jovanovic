@@ -24,6 +24,7 @@ const CreateCardPage = () => {
     description: '',
     phones: [{ id: '1', label: 'Geschäftlich', number: '', is_primary: true }],
     emails: [{ id: '1', label: 'Geschäftlich', address: '', is_primary: true }],
+    addresses: [],
     website: '',
     profile_image: '',
     logo: '',
