@@ -8,6 +8,7 @@ import ViewCardPage from './pages/ViewCardPage';
 import EditCardPage from './pages/EditCardPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import AddressBookPage from './pages/AddressBookPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import "./App.css";
 
