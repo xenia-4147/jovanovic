@@ -23,6 +23,17 @@ class ContactEmail(BaseModel):
     address: EmailStr
     is_primary: bool = False
 
+class ContactAddress(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    label: str
+    street: Optional[str] = None
+    house_number: Optional[str] = None
+    postal_code: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: str = "Deutschland"
+    is_primary: bool = False
+
 class SocialMedia(BaseModel):
     instagram: Optional[str] = None
     linkedin: Optional[str] = None
