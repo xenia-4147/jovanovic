@@ -389,7 +389,7 @@ async def update_business_card(
                 background_tasks.add_task(
                     send_auto_update_notifications,
                     str(stored_card_id),
-                    list(update_dict.keys())
+                    list(update_dict.keys()) if update_dict else []
                 )
         else:
             # No updates, just get the stored card ID for retrieval
