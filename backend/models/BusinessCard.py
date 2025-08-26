@@ -180,6 +180,7 @@ class BusinessCardResponse(BaseModel):
     description: Optional[str]
     phones: List[ContactPhone]
     emails: List[ContactEmail]
+    addresses: List[ContactAddress]
     website: Optional[str]
     profile_image: Optional[str]
     logo: Optional[str]
