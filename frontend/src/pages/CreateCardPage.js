@@ -229,7 +229,7 @@ const CreateCardPage = () => {
                     <Label>Profilbild</Label>
                     <div className="flex items-center space-x-4 mt-2">
                       <Avatar className="w-16 h-16">
-                        <AvatarImage src={formData.profileImage} />
+                        <AvatarImage src={formData.profile_image} />
                         <AvatarFallback>
                           {formData.name ? formData.name.charAt(0).toUpperCase() : 'U'}
                         </AvatarFallback>
@@ -245,7 +245,7 @@ const CreateCardPage = () => {
                         type="file"
                         accept="image/*"
                         className="hidden"
-                        onChange={(e) => handleImageUpload('profileImage', e)}
+                        onChange={(e) => handleImageUpload('profile_image', e)}
                       />
                     </div>
                   </div>
