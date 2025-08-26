@@ -22,6 +22,11 @@ function App() {
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/card/:id" element={<ViewCardPage />} />
             <Route path="/create-test" element={<CreateCardPage />} />
+            <Route path="/addressbook" element={
+              <ProtectedRoute>
+                <AddressBookPage />
+              </ProtectedRoute>
+            } />
             <Route path="/" element={
               <ProtectedRoute>
                 <HomePage />
