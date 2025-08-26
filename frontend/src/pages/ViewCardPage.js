@@ -403,6 +403,62 @@ const ViewCardPage = () => {
                   </a>
                 </div>
               )}
+
+              {/* Addresses */}
+              {card.addresses && card.addresses.filter(a => a.street || a.city).length > 0 && (
+                <div>
+                  <h3 className="text-lg font-semibold mb-4 flex items-center" style={{ color: card.text_color || card.textColor }}>
+                    <MapPin className="w-5 h-5 mr-2" />
+                    Adressen
+                  </h3>
+                  <div className="space-y-3">
+                    {card.addresses.filter(a => a.street || a.city).map((address, index) => {
+                      const fullAddress = [
+                        address.street && address.house_number ? `${address.street} ${address.house_number}` : address.street,
+                        address.postal_code && address.city ? `${address.postal_code} ${address.city}` : address.city,
+                        address.state,
+                        address.country
+                      ].filter(Boolean).join(', ');
+                      
+                      return (
+                        <div key={index} className="flex items-start justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100">
+                          <div className="flex items-start space-x-3 flex-1">
+                            <div 
+                              className="w-10 h-10 rounded-full flex items-center justify-center text-white mt-1"
+                              style={{ backgroundColor: card.accent_color || card.accentColor }}
+                            >
+                              <MapPin className="w-5 h-5" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2">
+                                <p className="font-medium" style={{ color: card.text_color || card.textColor }}>
+                                  {address.label}
+                                </p>
+                                {(address.is_primary || address.isPrimary) && (
+                                  <Badge className="bg-yellow-100 text-yellow-800 text-xs">Primär</Badge>
+                                )}
+                              </div>
+                              <p className="text-sm opacity-70 mt-1">{fullAddress}</p>
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              const encodedAddress = encodeURIComponent(fullAddress);
+                              window.open(`https://www.google.com/maps/search/?api=1&query=${encodedAddress}`, '_blank');
+                            }}
+                            className="h-8 text-xs px-2 ml-2"
+                          >
+                            <Navigation className="w-3 h-3 mr-1" />
+                            Navigieren
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
             <Separator className="my-8" />
