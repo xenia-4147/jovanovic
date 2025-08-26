@@ -139,6 +139,7 @@ class BusinessCardCreate(BaseModel):
     description: Optional[str] = Field(None, max_length=500)
     phones: List[ContactPhone] = []
     emails: List[ContactEmail] = []
+    addresses: List[ContactAddress] = []
     website: Optional[str] = None
     profile_image: Optional[str] = None
     logo: Optional[str] = None
