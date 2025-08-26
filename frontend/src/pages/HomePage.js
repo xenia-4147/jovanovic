@@ -120,6 +120,15 @@ const HomePage = () => {
         </div>
         
         <div className="flex items-center space-x-4">
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => navigate('/addressbook')}
+          >
+            <BookOpen className="w-4 h-4 mr-2" />
+            Adressbuch
+          </Button>
+          
           <Button variant="outline" size="sm">
             <User className="w-4 h-4 mr-2" />
             {user?.full_name || user?.email}
