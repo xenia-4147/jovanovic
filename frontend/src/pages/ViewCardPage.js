@@ -372,9 +372,9 @@ const ViewCardPage = () => {
                           size="sm"
                           variant="outline"
                           onClick={() => handleEmailAction(email)}
-                          className="h-8"
+                          className="h-8 text-xs px-2"
                         >
-                          <Mail className="w-4 h-4 mr-1" />
+                          <Mail className="w-3 h-3 mr-1" />
                           E-Mail
                         </Button>
                       </div>
