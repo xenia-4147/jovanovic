@@ -110,6 +110,22 @@ class BusinessCard(BaseModel):
             
         return v
     
+    @validator('addresses')
+    def validate_addresses(cls, v):
+        if not v:
+            return v
+            
+        primary_count = sum(1 for address in v if address.is_primary)
+        if primary_count > 1:
+            # Auto-fix: make first one primary, others not
+            for i, address in enumerate(v):
+                address.is_primary = (i == 0)
+        elif primary_count == 0 and v:
+            # Auto-fix: make first one primary
+            v[0].is_primary = True
+            
+        return v
+    
     @validator('website')
     def validate_website(cls, v):
         if v and not v.startswith(('http://', 'https://')):
