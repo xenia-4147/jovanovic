@@ -198,7 +198,7 @@ const CreateCardPage = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Kontaktinformationen</CardTitle>
-                <CardDescription>Telefonnummern und E-Mail-Adressen (mehrere möglich)</CardDescription>
+                <CardDescription>Telefonnummern, E-Mail-Adressen und Adressen (mehrere möglich)</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 <MultiContactInput
@@ -215,6 +215,11 @@ const CreateCardPage = () => {
                   placeholder="name@example.com"
                   items={formData.emails}
                   onChange={(emails) => handleInputChange('emails', emails)}
+                />
+                
+                <AddressInput
+                  items={formData.addresses}
+                  onChange={(addresses) => handleInputChange('addresses', addresses)}
                 />
               </CardContent>
             </Card>
