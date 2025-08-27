@@ -1,0 +1,305 @@
+import React from 'react';
+import { Button } from './ui/button';
+import { Card, CardContent } from './ui/card';
+import { Badge } from './ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { 
+  Phone, 
+  Mail, 
+  Globe, 
+  MapPin, 
+  Navigation,
+  MessageCircle,
+  Download,
+  Share2,
+  QrCode,
+  Instagram,
+  Linkedin,
+  Twitter,
+  Send,
+  Building2,
+  User
+} from 'lucide-react';
+
+const CompactBusinessCard = ({ card, onCall, onMessage, onEmail, onNavigate, onDownloadVCard, onShare, onGenerateQR }) => {
+  const getSocialIcon = (platform) => {
+    switch (platform) {
+      case 'instagram': return <Instagram className="w-4 h-4" />;
+      case 'linkedin': return <Linkedin className="w-4 h-4" />;
+      case 'twitter': return <Twitter className="w-4 h-4" />;
+      case 'telegram': return <Send className="w-4 h-4" />;
+      case 'tiktok': return <div className="w-4 h-4 bg-current rounded-sm"></div>;
+      default: return null;
+    }
+  };
+
+  const getSocialUrl = (platform, username) => {
+    const urls = {
+      instagram: `https://instagram.com/${username}`,
+      linkedin: `https://linkedin.com/in/${username}`,
+      twitter: `https://twitter.com/${username}`,
+      telegram: `https://t.me/${username}`,
+      tiktok: `https://tiktok.com/@${username}`
+    };
+    return urls[platform] || '#';
+  };
+
+  const primaryPhone = card.phones?.find(p => p.is_primary) || card.phones?.[0];
+  const primaryEmail = card.emails?.find(e => e.is_primary) || card.emails?.[0];
+  const primaryAddress = card.addresses?.find(a => a.is_primary) || card.addresses?.[0];
+
+  return (
+    <div className="max-w-md mx-auto">
+      {/* Main Contact Card - Smartphone Style */}
+      <Card className="mb-4 shadow-lg border-0 bg-white">
+        <CardContent className="p-4">
+          {/* Header Row - Like Phone Contact List */}
+          <div className="flex items-center space-x-4 mb-4">
+            {/* Profile Picture */}
+            <Avatar className="w-16 h-16 ring-2 ring-gray-200">
+              <AvatarImage 
+                src={card.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(card.name)}&background=6366f1&color=fff`} 
+              />
+              <AvatarFallback className="bg-blue-600 text-white text-lg font-bold">
+                {card.name.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            
+            {/* Name and Company Info */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center space-x-2 mb-1">
+                <h2 className="text-xl font-bold text-gray-900 truncate">{card.name}</h2>
+                {card.logo && (
+                  <img 
+                    src={card.logo} 
+                    alt="Logo" 
+                    className="w-8 h-8 object-contain flex-shrink-0"
+                  />
+                )}
+              </div>
+              
+              {card.company && (
+                <div className="flex items-center text-gray-600 mb-1">
+                  <Building2 className="w-4 h-4 mr-1 flex-shrink-0" />
+                  <span className="text-sm truncate">{card.company}</span>
+                </div>
+              )}
+              
+              {card.position && (
+                <p className="text-sm text-gray-500 truncate">{card.position}</p>
+              )}
+            </div>
+          </div>
+
+          {/* Description */}
+          {card.description && (
+            <p className="text-sm text-gray-600 mb-4 leading-relaxed">{card.description}</p>
+          )}
+
+          {/* Quick Actions Row */}
+          <div className="grid grid-cols-4 gap-2 mb-4">
+            {primaryPhone && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onCall(primaryPhone)}
+                className="flex flex-col items-center h-16 p-2"
+              >
+                <Phone className="w-5 h-5 mb-1" />
+                <span className="text-xs">Anrufen</span>
+              </Button>
+            )}
+            
+            {primaryPhone && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onMessage(primaryPhone)}
+                className="flex flex-col items-center h-16 p-2"
+              >
+                <MessageCircle className="w-5 h-5 mb-1" />
+                <span className="text-xs">
+                  {primaryPhone.label?.toLowerCase().includes('whatsapp') ? 'WhatsApp' : 'SMS'}
+                </span>
+              </Button>
+            )}
+            
+            {primaryEmail && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => onEmail(primaryEmail)}
+                className="flex flex-col items-center h-16 p-2"
+              >
+                <Mail className="w-5 h-5 mb-1" />
+                <span className="text-xs">E-Mail</span>
+              </Button>
+            )}
+            
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={onShare}
+              className="flex flex-col items-center h-16 p-2"
+            >
+              <Share2 className="w-5 h-5 mb-1" />
+              <span className="text-xs">Teilen</span>
+            </Button>
+          </div>
+
+          {/* Contact Details */}
+          <div className="space-y-3">
+            {/* Phone Numbers */}
+            {card.phones && card.phones.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-2">Telefon</h4>
+                {card.phones.map((phone, idx) => (
+                  <div key={idx} className="flex items-center justify-between py-1">
+                    <div className="flex items-center space-x-2">
+                      <Phone className="w-4 h-4 text-gray-500" />
+                      <div>
+                        <p className="text-sm font-medium">{phone.number}</p>
+                        <p className="text-xs text-gray-500">{phone.label}</p>
+                      </div>
+                    </div>
+                    {phone.is_primary && (
+                      <Badge variant="secondary" className="text-xs">Primär</Badge>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Email Addresses */}
+            {card.emails && card.emails.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-2">E-Mail</h4>
+                {card.emails.map((email, idx) => (
+                  <div key={idx} className="flex items-center justify-between py-1">
+                    <div className="flex items-center space-x-2">
+                      <Mail className="w-4 h-4 text-gray-500" />
+                      <div>
+                        <p className="text-sm font-medium">{email.address}</p>
+                        <p className="text-xs text-gray-500">{email.label}</p>
+                      </div>
+                    </div>
+                    {email.is_primary && (
+                      <Badge variant="secondary" className="text-xs">Primär</Badge>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Addresses */}
+            {card.addresses && card.addresses.length > 0 && (
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-2">Adresse</h4>
+                {card.addresses.map((address, idx) => {
+                  const fullAddress = [
+                    address.street && address.house_number ? `${address.street} ${address.house_number}` : address.street,
+                    address.postal_code && address.city ? `${address.postal_code} ${address.city}` : address.city,
+                    address.state,
+                    address.country
+                  ].filter(Boolean).join(', ');
+                  
+                  return (
+                    <div key={idx} className="flex items-start justify-between py-1">
+                      <div className="flex items-start space-x-2">
+                        <MapPin className="w-4 h-4 text-gray-500 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{address.label}</p>
+                          <p className="text-xs text-gray-600">{fullAddress}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        {address.is_primary && (
+                          <Badge variant="secondary" className="text-xs">Primär</Badge>
+                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onNavigate(address)}
+                          className="h-6 w-6 p-0"
+                        >
+                          <Navigation className="w-3 h-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Website */}
+            {card.website && (
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-2">Website</h4>
+                <div className="flex items-center justify-between py-1">
+                  <div className="flex items-center space-x-2">
+                    <Globe className="w-4 h-4 text-gray-500" />
+                    <a 
+                      href={card.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-blue-600 hover:underline"
+                    >
+                      {card.website.replace(/^https?:\/\//, '')}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Social Media */}
+            {card.social_media && Object.values(card.social_media || {}).some(val => val) && (
+              <div>
+                <h4 className="text-sm font-semibold text-gray-900 mb-2">Social Media</h4>
+                <div className="grid grid-cols-3 gap-2">
+                  {Object.entries(card.social_media || {}).map(([platform, username]) => {
+                    if (!username) return null;
+                    return (
+                      <a
+                        key={platform}
+                        href={getSocialUrl(platform, username)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                      >
+                        {getSocialIcon(platform)}
+                        <span className="text-xs font-medium capitalize truncate">{platform}</span>
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-2 gap-3 mt-6 pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={onDownloadVCard}
+              className="w-full"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Kontakt speichern
+            </Button>
+            
+            <Button
+              variant="outline"
+              onClick={onGenerateQR}
+              className="w-full"
+            >
+              <QrCode className="w-4 h-4 mr-2" />
+              QR-Code
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default CompactBusinessCard;
