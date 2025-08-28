@@ -25,14 +25,17 @@ api.interceptors.request.use(
   }
 );
 
-// Handle auth errors
+// Handle auth errors - Let AuthContext handle redirects instead of automatic redirects
 api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
+      // Clear tokens but don't auto-redirect - let AuthContext handle it
       localStorage.removeItem('access_token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      
+      // Dispatch custom event to notify AuthContext
+      window.dispatchEvent(new CustomEvent('auth-expired'));
     }
     return Promise.reject(error);
   }
