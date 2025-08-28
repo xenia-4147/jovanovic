@@ -338,6 +338,14 @@ const CodeAccessPage = () => {
               <h3 className="font-medium text-blue-900 mb-2">💡 Wie funktioniert es?</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
+                  <h4 className="font-medium text-blue-900 mb-2">Express Codes ⚡</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• Ultra-kurze Codes (2-3 Zeichen)</li>
+                    <li>• 30 Sekunden bis 5 Minuten aktiv</li>
+                    <li>• Perfekt für spontane Begegnungen</li>
+                  </ul>
+                </div>
+                <div>
                   <h4 className="font-medium text-blue-900 mb-2">Visitenkarten-Codes</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
                     <li>• Persönliche Codes für einzelne Visitenkarten</li>
