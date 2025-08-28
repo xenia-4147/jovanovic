@@ -1236,6 +1236,9 @@ async def create_express_code(
 ):
     """Create ultra-short express code for quick sharing"""
     try:
+        # Track usage for analytics 
+        if current_user:
+            await track_feature_usage_internal(str(current_user.id), "express_code_generated")
         # Get the business card
         from bson import ObjectId
         card_data = await db.businesscards.find_one({"_id": express_data.card_id})
