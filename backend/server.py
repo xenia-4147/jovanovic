@@ -1273,8 +1273,8 @@ async def create_express_code(
             code = ExpressCode.generate_express_code(express_data.code_length, f"{user_context}_{attempts}")
             attempts += 1
         
-        if attempts >= 20:
-            raise HTTPException(status_code=500, detail="Fehler beim Generieren des Express-Codes")
+        if attempts >= 30:
+            raise HTTPException(status_code=500, detail="Fehler beim Generieren des Express-Codes - zu viele aktive Codes")
         
         # Create express code
         expires_at = datetime.utcnow() + timedelta(seconds=express_data.duration_seconds)
