@@ -1314,6 +1314,429 @@ class BusinessCardAPITester:
             self.log_result("Integration with Existing Features", False, f"Error: {str(e)}")
             return False
     
+    # ============================================================================
+    # EARLY ADOPTER BONUS SYSTEM TESTS
+    # ============================================================================
+    
+    def test_early_adopter_user_registration(self):
+        """Test user registration creates Early Adopter subscription for first 100k users"""
+        try:
+            # Generate unique test data for Early Adopter
+            test_email = f"earlyadopter_{uuid.uuid4().hex[:8]}@example.com"
+            
+            user_data = {
+                "email": test_email,
+                "password": "EarlyAdopter123!",
+                "first_name": "Early",
+                "last_name": "Adopter",
+                "gdpr_consent": True,
+                "privacy_consent": True,
+                "marketing_consent": False
+            }
+            
+            response = requests.post(f"{API_BASE}/auth/register", json=user_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Store token for subsequent tests
+                early_adopter_token = data["access_token"]
+                early_adopter_user_id = data["user"]["id"]
+                
+                # Now check subscription status to verify Early Adopter benefits
+                headers = {"Authorization": f"Bearer {early_adopter_token}"}
+                sub_response = requests.get(f"{API_BASE}/subscription/status", headers=headers)
+                
+                if sub_response.status_code == 200:
+                    sub_data = sub_response.json()
+                    
+                    # Check if this is an Early Adopter subscription
+                    plan_name = sub_data.get("plan_name", "")
+                    
+                    if "Early Adopter" in plan_name and "ALLES KOSTENLOS" in plan_name:
+                        # Extract user number from plan name
+                        import re
+                        match = re.search(r'Early Adopter #(\d+)', plan_name)
+                        if match:
+                            user_number = int(match.group(1))
+                            
+                            # Verify Early Adopter limits (unlimited everything)
+                            limits = sub_data.get("limits", {})
+                            early_adopter_checks = {
+                                "unlimited_cards": limits.get("max_business_cards") == 999999,
+                                "unlimited_codes": limits.get("max_custom_codes") == 999999,
+                                "unlimited_imports": limits.get("monthly_contact_imports") == 999999,
+                                "premium_meeting_participants": limits.get("max_meeting_participants") == 100,
+                                "premium_features_enabled": all([
+                                    limits.get("google_contacts_sync", False),
+                                    limits.get("apple_icloud_sync", False),
+                                    limits.get("detailed_analytics", False),
+                                    limits.get("custom_branding", False),
+                                    limits.get("priority_support", False)
+                                ])
+                            }
+                            
+                            if all(early_adopter_checks.values()):
+                                self.log_result("Early Adopter User Registration", True, 
+                                              f"Early Adopter #{user_number} created with unlimited premium features: {test_email}")
+                                
+                                # Store for other tests
+                                self.early_adopter_token = early_adopter_token
+                                self.early_adopter_user_id = early_adopter_user_id
+                                self.early_adopter_number = user_number
+                                return True
+                            else:
+                                failed_checks = [k for k, v in early_adopter_checks.items() if not v]
+                                self.log_result("Early Adopter User Registration", False, 
+                                              f"Early Adopter limits not unlimited: failed {failed_checks}", limits)
+                                return False
+                        else:
+                            self.log_result("Early Adopter User Registration", False, 
+                                          "Could not extract user number from Early Adopter plan name", plan_name)
+                            return False
+                    else:
+                        # This might be a regular user if we're past 100k limit
+                        if "Free Plan" in plan_name:
+                            self.log_result("Early Adopter User Registration", True, 
+                                          f"Regular free user created (past 100k limit): {test_email}")
+                            return True
+                        else:
+                            self.log_result("Early Adopter User Registration", False, 
+                                          f"Unexpected plan name: {plan_name}")
+                            return False
+                else:
+                    self.log_result("Early Adopter User Registration", False, 
+                                  f"Could not get subscription status: HTTP {sub_response.status_code}")
+                    return False
+            else:
+                self.log_result("Early Adopter User Registration", False, 
+                              f"Registration failed: HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Early Adopter User Registration", False, f"Error: {str(e)}")
+            return False
+    
+    def test_early_adopter_premium_feature_access(self):
+        """Test Early Adopters get access to ALL premium features"""
+        if not hasattr(self, 'early_adopter_token'):
+            self.log_result("Early Adopter Premium Feature Access", False, "No Early Adopter token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.early_adopter_token}"}
+            
+            # Test ALL premium features should be accessible to Early Adopters
+            premium_features = [
+                "detailed_analytics",
+                "google_sync", 
+                "custom_branding",
+                "contact_insights",
+                "export_analytics",
+                "apple_icloud_sync",
+                "auto_contact_sync",
+                "custom_themes",
+                "custom_fonts",
+                "priority_support",
+                "api_access",
+                "team_management"
+            ]
+            
+            accessible_features = 0
+            
+            for feature in premium_features:
+                feature_request = {
+                    "feature_name": feature,
+                    "user_id": self.early_adopter_user_id
+                }
+                
+                response = requests.post(f"{API_BASE}/subscription/check-feature", 
+                                       json=feature_request, headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    if data.get("allowed", False):
+                        accessible_features += 1
+                    else:
+                        self.log_result("Early Adopter Premium Feature Access", False, 
+                                      f"Early Adopter denied access to {feature}", data)
+                        return False
+                else:
+                    self.log_result("Early Adopter Premium Feature Access", False, 
+                                  f"HTTP {response.status_code} for feature {feature}", response.text)
+                    return False
+            
+            if accessible_features == len(premium_features):
+                self.log_result("Early Adopter Premium Feature Access", True, 
+                              f"Early Adopter has access to ALL {accessible_features} premium features")
+                return True
+            else:
+                self.log_result("Early Adopter Premium Feature Access", False, 
+                              f"Only {accessible_features}/{len(premium_features)} features accessible")
+                return False
+                
+        except Exception as e:
+            self.log_result("Early Adopter Premium Feature Access", False, f"Error: {str(e)}")
+            return False
+    
+    def test_early_adopter_vs_regular_user_comparison(self):
+        """Test Early Adopter vs Regular Free User feature access differences"""
+        try:
+            # Create a regular user (assuming we're past 100k or simulate it)
+            regular_email = f"regularuser_{uuid.uuid4().hex[:8]}@example.com"
+            
+            regular_user_data = {
+                "email": regular_email,
+                "password": "RegularUser123!",
+                "first_name": "Regular",
+                "last_name": "User",
+                "gdpr_consent": True,
+                "privacy_consent": True,
+                "marketing_consent": False
+            }
+            
+            reg_response = requests.post(f"{API_BASE}/auth/register", json=regular_user_data)
+            
+            if reg_response.status_code == 200:
+                reg_data = reg_response.json()
+                regular_token = reg_data["access_token"]
+                regular_user_id = reg_data["user"]["id"]
+                
+                # Get subscription status for regular user
+                reg_headers = {"Authorization": f"Bearer {regular_token}"}
+                reg_sub_response = requests.get(f"{API_BASE}/subscription/status", headers=reg_headers)
+                
+                if reg_sub_response.status_code == 200:
+                    reg_sub_data = reg_sub_response.json()
+                    reg_plan_name = reg_sub_data.get("plan_name", "")
+                    
+                    # Test premium features for regular user
+                    premium_features = ["detailed_analytics", "google_sync", "custom_branding"]
+                    
+                    regular_restricted_features = 0
+                    
+                    for feature in premium_features:
+                        feature_request = {
+                            "feature_name": feature,
+                            "user_id": regular_user_id
+                        }
+                        
+                        response = requests.post(f"{API_BASE}/subscription/check-feature", 
+                                               json=feature_request, headers=reg_headers)
+                        
+                        if response.status_code == 200:
+                            data = response.json()
+                            if not data.get("allowed", True):  # Should be restricted
+                                regular_restricted_features += 1
+                    
+                    # Compare with Early Adopter (if available)
+                    if hasattr(self, 'early_adopter_token'):
+                        early_headers = {"Authorization": f"Bearer {self.early_adopter_token}"}
+                        early_sub_response = requests.get(f"{API_BASE}/subscription/status", headers=early_headers)
+                        
+                        if early_sub_response.status_code == 200:
+                            early_sub_data = early_sub_response.json()
+                            early_plan_name = early_sub_data.get("plan_name", "")
+                            
+                            # Verify the difference
+                            if ("Early Adopter" in early_plan_name and 
+                                "Free Plan" in reg_plan_name and 
+                                regular_restricted_features > 0):
+                                
+                                self.log_result("Early Adopter vs Regular User Comparison", True, 
+                                              f"Verified difference: Early Adopter '{early_plan_name}' vs Regular '{reg_plan_name}', {regular_restricted_features} features restricted for regular users")
+                                return True
+                            else:
+                                self.log_result("Early Adopter vs Regular User Comparison", False, 
+                                              f"No clear difference found between user types")
+                                return False
+                    else:
+                        # Just verify regular user has restrictions
+                        if regular_restricted_features > 0:
+                            self.log_result("Early Adopter vs Regular User Comparison", True, 
+                                          f"Regular user properly restricted from {regular_restricted_features} premium features")
+                            return True
+                        else:
+                            self.log_result("Early Adopter vs Regular User Comparison", False, 
+                                          "Regular user not properly restricted from premium features")
+                            return False
+                else:
+                    self.log_result("Early Adopter vs Regular User Comparison", False, 
+                                  "Could not get regular user subscription status")
+                    return False
+            else:
+                self.log_result("Early Adopter vs Regular User Comparison", False, 
+                              "Could not create regular user for comparison")
+                return False
+                
+        except Exception as e:
+            self.log_result("Early Adopter vs Regular User Comparison", False, f"Error: {str(e)}")
+            return False
+    
+    def test_user_count_api_logic(self):
+        """Test user counting logic for Early Adopter eligibility"""
+        try:
+            # Create multiple users and verify sequential numbering
+            created_users = []
+            
+            for i in range(3):  # Create 3 test users
+                test_email = f"usercount_{i}_{uuid.uuid4().hex[:6]}@example.com"
+                
+                user_data = {
+                    "email": test_email,
+                    "password": "UserCount123!",
+                    "first_name": f"User{i}",
+                    "last_name": "Count",
+                    "gdpr_consent": True,
+                    "privacy_consent": True,
+                    "marketing_consent": False
+                }
+                
+                response = requests.post(f"{API_BASE}/auth/register", json=user_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    token = data["access_token"]
+                    
+                    # Get subscription to check user number
+                    headers = {"Authorization": f"Bearer {token}"}
+                    sub_response = requests.get(f"{API_BASE}/subscription/status", headers=headers)
+                    
+                    if sub_response.status_code == 200:
+                        sub_data = sub_response.json()
+                        plan_name = sub_data.get("plan_name", "")
+                        
+                        # Extract user number if Early Adopter
+                        user_number = None
+                        if "Early Adopter" in plan_name:
+                            import re
+                            match = re.search(r'Early Adopter #(\d+)', plan_name)
+                            if match:
+                                user_number = int(match.group(1))
+                        
+                        created_users.append({
+                            "email": test_email,
+                            "plan_name": plan_name,
+                            "user_number": user_number,
+                            "is_early_adopter": "Early Adopter" in plan_name
+                        })
+                    else:
+                        self.log_result("User Count API Logic", False, 
+                                      f"Could not get subscription for user {i}")
+                        return False
+                else:
+                    self.log_result("User Count API Logic", False, 
+                                  f"Could not create user {i}: HTTP {response.status_code}")
+                    return False
+            
+            # Analyze the results
+            early_adopters = [u for u in created_users if u["is_early_adopter"]]
+            regular_users = [u for u in created_users if not u["is_early_adopter"]]
+            
+            if len(early_adopters) > 0:
+                # Verify sequential numbering for Early Adopters
+                user_numbers = [u["user_number"] for u in early_adopters if u["user_number"]]
+                
+                if len(user_numbers) > 1:
+                    # Check if numbers are sequential or at least increasing
+                    is_sequential = all(user_numbers[i] < user_numbers[i+1] for i in range(len(user_numbers)-1))
+                    
+                    if is_sequential:
+                        self.log_result("User Count API Logic", True, 
+                                      f"Sequential Early Adopter numbering verified: {user_numbers}")
+                        return True
+                    else:
+                        self.log_result("User Count API Logic", False, 
+                                      f"Early Adopter numbers not sequential: {user_numbers}")
+                        return False
+                else:
+                    self.log_result("User Count API Logic", True, 
+                                  f"Single Early Adopter created with number: {user_numbers[0] if user_numbers else 'N/A'}")
+                    return True
+            else:
+                # All users are regular (past 100k limit)
+                self.log_result("User Count API Logic", True, 
+                              f"All {len(created_users)} users are regular (past 100k Early Adopter limit)")
+                return True
+                
+        except Exception as e:
+            self.log_result("User Count API Logic", False, f"Error: {str(e)}")
+            return False
+    
+    def test_subscription_status_response_format(self):
+        """Test subscription status response format for frontend regex parsing"""
+        if not hasattr(self, 'early_adopter_token'):
+            # Create a new Early Adopter for this test
+            if not self.test_early_adopter_user_registration():
+                self.log_result("Subscription Status Response Format", False, "Could not create Early Adopter for testing")
+                return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.early_adopter_token}"}
+            response = requests.get(f"{API_BASE}/subscription/status", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify required fields for frontend
+                required_fields = ["user_id", "plan_type", "plan_name", "status", "limits", "usage"]
+                
+                if all(field in data for field in required_fields):
+                    plan_name = data["plan_name"]
+                    limits = data["limits"]
+                    
+                    # Verify Early Adopter plan name format for regex parsing
+                    if "Early Adopter #" in plan_name and "ALLES KOSTENLOS" in plan_name:
+                        # Extract number using regex (simulating frontend)
+                        import re
+                        match = re.search(r'Early Adopter #(\d+)', plan_name)
+                        
+                        if match:
+                            user_number = int(match.group(1))
+                            
+                            # Verify unlimited limits format
+                            unlimited_checks = {
+                                "max_business_cards": limits.get("max_business_cards") == 999999,
+                                "max_custom_codes": limits.get("max_custom_codes") == 999999,
+                                "monthly_contact_imports": limits.get("monthly_contact_imports") == 999999,
+                                "premium_features": all([
+                                    limits.get("detailed_analytics", False),
+                                    limits.get("google_contacts_sync", False),
+                                    limits.get("custom_branding", False)
+                                ])
+                            }
+                            
+                            if all(unlimited_checks.values()):
+                                self.log_result("Subscription Status Response Format", True, 
+                                              f"Early Adopter #{user_number} response format correct for frontend parsing")
+                                return True
+                            else:
+                                failed_checks = [k for k, v in unlimited_checks.items() if not v]
+                                self.log_result("Subscription Status Response Format", False, 
+                                              f"Unlimited limits not properly set: {failed_checks}")
+                                return False
+                        else:
+                            self.log_result("Subscription Status Response Format", False, 
+                                          "Could not extract user number from plan name for frontend regex")
+                            return False
+                    else:
+                        self.log_result("Subscription Status Response Format", False, 
+                                      f"Plan name format not suitable for frontend parsing: {plan_name}")
+                        return False
+                else:
+                    missing_fields = [f for f in required_fields if f not in data]
+                    self.log_result("Subscription Status Response Format", False, 
+                                  f"Missing required fields: {missing_fields}")
+                    return False
+            else:
+                self.log_result("Subscription Status Response Format", False, 
+                              f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Subscription Status Response Format", False, f"Error: {str(e)}")
+            return False
+
     def test_growth_first_validation(self):
         """Test that the system supports rapid user growth with minimal restrictions"""
         if not self.access_token:
