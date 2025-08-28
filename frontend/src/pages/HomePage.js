@@ -286,6 +286,13 @@ const HomePage = () => {
           ))}
         </div>
       )}
+
+      {/* Express Share Modal */}
+      <ExpressShareModal 
+        isOpen={showExpressModal}
+        onClose={() => setShowExpressModal(false)}
+        userCards={businessCards}
+      />
     </div>
   );
 };
