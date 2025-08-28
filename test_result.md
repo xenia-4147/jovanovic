@@ -227,7 +227,8 @@ test_plan:
     - "Meeting Room API endpoints"
     - "Meeting Room data models" 
     - "Enhanced code access API"
-  stuck_tasks: []
+  stuck_tasks: 
+    - "Enhanced code access API"
   test_all: false
   test_priority: "high_first"
 
