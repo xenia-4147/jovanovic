@@ -2537,6 +2537,16 @@ async def startup_event():
         await db.syncjobs.create_index("user_id")
         await db.syncjobs.create_index([("status", 1), ("scheduled_at", 1)])
         
+        # Subscription and monetization indexes
+        await db.usersubscriptions.create_index("user_id", unique=True)
+        await db.usersubscriptions.create_index([("plan_type", 1), ("status", 1)])
+        await db.usersubscriptions.create_index("expires_at", sparse=True)
+        await db.usageevents.create_index("user_id")
+        await db.usageevents.create_index([("user_id", 1), ("timestamp", -1)])
+        await db.usageevents.create_index("event_type")
+        await db.upgradeprompts.create_index("user_id")
+        await db.upgradeprompts.create_index([("user_id", 1), ("shown_at", -1)])
+        
         logger.info("Database indexes created successfully")
         
     except Exception as e:
