@@ -2265,27 +2265,66 @@ async def track_feature_usage(
         return {"success": False, "message": "Usage tracking failed"}
 
 async def get_user_subscription(user_id: str) -> UserSubscription:
-    """Get or create user subscription with default free plan"""
+    """Get or create user subscription with default free plan or early adopter bonus"""
     try:
         subscription_data = await db.usersubscriptions.find_one({"user_id": user_id})
         
         if not subscription_data:
-            # Create default free subscription
-            free_limits = PLAN_CONFIGS["free"]
+            # Check if user qualifies for Early Adopter Program (first 100,000 users)
+            total_users = await db.users.count_documents({})
             
-            subscription = UserSubscription(
-                user_id=user_id,
-                plan_type=PlanType.FREE,
-                plan_name="Free Plan - Fast alles kostenlos! 🚀",
-                plan_limits=free_limits,
-                status=SubscriptionStatus.ACTIVE
-            )
+            if total_users <= 100000:
+                # Early Adopter gets EVERYTHING for free! 🚀
+                early_adopter_limits = PlanLimits(
+                    max_business_cards=999999,  # Unlimited
+                    max_custom_codes=999999,    # Unlimited  
+                    express_share_enabled=True,
+                    meeting_rooms_enabled=True,
+                    max_meeting_participants=100,  # Premium limit
+                    meeting_room_duration_minutes=120,  # 2 hours
+                    monthly_contact_imports=999999,  # Unlimited
+                    google_contacts_sync=True,   # Premium feature FREE
+                    apple_icloud_sync=True,      # Premium feature FREE
+                    auto_contact_sync=True,      # Premium feature FREE
+                    detailed_analytics=True,     # Premium feature FREE
+                    contact_insights=True,       # Premium feature FREE
+                    export_analytics=True,       # Premium feature FREE
+                    custom_branding=True,        # Premium feature FREE
+                    custom_themes=999,          # Unlimited
+                    custom_fonts=True,          # Premium feature FREE
+                    priority_support=True,      # Premium feature FREE
+                    api_access=True,            # Premium feature FREE
+                    team_management=True        # Premium feature FREE
+                )
+                
+                subscription = UserSubscription(
+                    user_id=user_id,
+                    plan_type=PlanType.FREE,  # Still "free" but with premium benefits
+                    plan_name=f"🎉 Early Adopter #{total_users} - ALLES KOSTENLOS!",
+                    plan_limits=early_adopter_limits,
+                    status=SubscriptionStatus.ACTIVE
+                )
+                
+                logger.info(f"Created Early Adopter subscription for user {user_id} - #{total_users}/100,000")
+                
+            else:
+                # Regular free subscription with normal limits
+                free_limits = PLAN_CONFIGS["free"]
+                
+                subscription = UserSubscription(
+                    user_id=user_id,
+                    plan_type=PlanType.FREE,
+                    plan_name="Free Plan - Fast alles kostenlos! 🚀",
+                    plan_limits=free_limits,
+                    status=SubscriptionStatus.ACTIVE
+                )
+                
+                logger.info(f"Created regular free subscription for user {user_id} (after 100k limit)")
             
             sub_dict = subscription.dict(by_alias=True, exclude={"id"})
             result = await db.usersubscriptions.insert_one(sub_dict)
             subscription.id = str(result.inserted_id)
             
-            logger.info(f"Created default free subscription for user {user_id}")
             return subscription
         else:
             if "_id" in subscription_data:
