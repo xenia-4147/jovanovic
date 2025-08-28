@@ -3,177 +3,177 @@
     "test": "Health Check",
     "success": true,
     "message": "API is running - Digital Business Cards API",
-    "timestamp": "2025-08-28T10:48:47.839938"
+    "timestamp": "2025-08-28T10:52:14.525978"
   },
   {
     "test": "User Registration",
     "success": true,
-    "message": "User registered successfully: testuser_afcf4bcb@example.com",
-    "timestamp": "2025-08-28T10:48:48.137777"
+    "message": "User registered successfully: testuser_35d49bd3@example.com",
+    "timestamp": "2025-08-28T10:52:14.820770"
   },
   {
     "test": "User Login",
     "success": true,
-    "message": "Login successful for: logintest_5aa86309@example.com",
-    "timestamp": "2025-08-28T10:48:48.712230"
+    "message": "Login successful for: logintest_3ea0ba29@example.com",
+    "timestamp": "2025-08-28T10:52:15.477290"
   },
   {
     "test": "Protected Endpoint",
     "success": true,
-    "message": "User profile retrieved: testuser_afcf4bcb@example.com",
-    "timestamp": "2025-08-28T10:48:48.771902"
+    "message": "User profile retrieved: testuser_35d49bd3@example.com",
+    "timestamp": "2025-08-28T10:52:15.541593"
   },
   {
     "test": "Create Business Card",
     "success": false,
     "message": "HTTP 500",
-    "timestamp": "2025-08-28T10:48:48.833190",
+    "timestamp": "2025-08-28T10:52:15.597574",
     "response": "{\"detail\":\"Card creation failed: E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: null }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: null }', 'keyPattern': {'custom_code': 1}, 'keyValue': {'custom_code': None}}\"}"
   },
   {
     "test": "Get User Cards",
     "success": true,
     "message": "No cards found (empty list)",
-    "timestamp": "2025-08-28T10:48:48.888504"
+    "timestamp": "2025-08-28T10:52:15.655180"
   },
   {
     "test": "Get Specific Card",
     "success": false,
     "message": "No card ID available",
-    "timestamp": "2025-08-28T10:48:48.889781"
+    "timestamp": "2025-08-28T10:52:15.656429"
   },
   {
     "test": "Update Business Card",
     "success": false,
     "message": "No access token or card ID available",
-    "timestamp": "2025-08-28T10:48:48.889839"
+    "timestamp": "2025-08-28T10:52:15.656482"
   },
   {
     "test": "Create Card with Custom Code",
     "success": true,
-    "message": "Card created with custom code: TESTDE32FB",
-    "timestamp": "2025-08-28T10:48:48.943357"
+    "message": "Card created with custom code: TEST0F7030",
+    "timestamp": "2025-08-28T10:52:15.711411"
   },
   {
     "test": "Check Code Availability - Available",
     "success": true,
-    "message": "Code AVAIL60A6 is available",
-    "timestamp": "2025-08-28T10:48:48.996481"
+    "message": "Code AVAILBCAE is available",
+    "timestamp": "2025-08-28T10:52:15.759803"
   },
   {
     "test": "Check Code Availability - Taken",
     "success": true,
-    "message": "Code TESTDE32FB is correctly marked as taken",
-    "timestamp": "2025-08-28T10:48:49.050786"
+    "message": "Code TEST0F7030 is correctly marked as taken",
+    "timestamp": "2025-08-28T10:52:15.810895"
   },
   {
     "test": "Access Card by Code",
     "success": false,
     "message": "HTTP 500",
-    "timestamp": "2025-08-28T10:48:49.101904",
+    "timestamp": "2025-08-28T10:52:15.861425",
     "response": "{\"detail\":\"Code-Zugriff fehlgeschlagen\"}"
   },
   {
     "test": "Code Uniqueness Validation",
     "success": false,
     "message": "Expected validation error, got HTTP 500",
-    "timestamp": "2025-08-28T10:48:49.164296",
-    "response": "{\"detail\":\"Card creation failed: E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TESTDE32FB\\\" }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TESTDE32FB\\\" }', 'keyPattern': {'custom_code': 1}, 'keyValue': {'custom_code': 'TESTDE32FB'}}\"}"
+    "timestamp": "2025-08-28T10:52:15.917759",
+    "response": "{\"detail\":\"Card creation failed: E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TEST0F7030\\\" }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TEST0F7030\\\" }', 'keyPattern': {'custom_code': 1}, 'keyValue': {'custom_code': 'TEST0F7030'}}\"}"
   },
   {
     "test": "Social Media Fix with Custom Code - Missing Field",
     "success": true,
-    "message": "Card created with custom code SOCIAL76266E, social_media properly initialized",
-    "timestamp": "2025-08-28T10:48:49.217918"
+    "message": "Card created with custom code SOCIAL930F67, social_media properly initialized",
+    "timestamp": "2025-08-28T10:52:15.981971"
   },
   {
     "test": "Social Media Fix with Custom Code - Null Field",
     "success": true,
-    "message": "Card created with custom code SOCIAL500CB8, null social_media properly handled",
-    "timestamp": "2025-08-28T10:48:49.270182"
+    "message": "Card created with custom code SOCIAL6DB283, null social_media properly handled",
+    "timestamp": "2025-08-28T10:52:16.033441"
   },
   {
     "test": "Create Meeting Room",
     "success": false,
     "message": "No access token or card ID available",
-    "timestamp": "2025-08-28T10:48:49.271348"
+    "timestamp": "2025-08-28T10:52:16.034635"
   },
   {
     "test": "Get Meeting Room",
     "success": false,
     "message": "No meeting room code available",
-    "timestamp": "2025-08-28T10:48:49.271387"
+    "timestamp": "2025-08-28T10:52:16.034672"
   },
   {
     "test": "Join Meeting Room",
     "success": false,
     "message": "No meeting room code or second card available",
-    "timestamp": "2025-08-28T10:48:49.271397"
+    "timestamp": "2025-08-28T10:52:16.034683"
   },
   {
     "test": "List User Meeting Rooms",
     "success": true,
     "message": "No meeting rooms found (empty list)",
-    "timestamp": "2025-08-28T10:48:49.323994"
+    "timestamp": "2025-08-28T10:52:16.089842"
   },
   {
     "test": "Enhanced Code Access - Meeting Room",
     "success": false,
     "message": "No meeting room code available",
-    "timestamp": "2025-08-28T10:48:49.325260"
+    "timestamp": "2025-08-28T10:52:16.091222"
   },
   {
     "test": "Close Meeting Room",
     "success": false,
     "message": "No access token or meeting room code available",
-    "timestamp": "2025-08-28T10:48:49.325297"
+    "timestamp": "2025-08-28T10:52:16.091261"
   },
   {
     "test": "QR Code Generation",
     "success": false,
     "message": "No card ID available",
-    "timestamp": "2025-08-28T10:48:49.325307"
+    "timestamp": "2025-08-28T10:52:16.091270"
   },
   {
     "test": "vCard Generation",
     "success": false,
     "message": "No card ID available",
-    "timestamp": "2025-08-28T10:48:49.325315"
+    "timestamp": "2025-08-28T10:52:16.091278"
   },
   {
     "test": "Privacy Report",
     "success": true,
     "message": "Privacy report generated successfully",
-    "timestamp": "2025-08-28T10:48:49.376529"
+    "timestamp": "2025-08-28T10:52:16.140280"
   },
   {
     "test": "Data Export",
     "success": true,
     "message": "GDPR data export completed successfully",
-    "timestamp": "2025-08-28T10:48:49.427218"
+    "timestamp": "2025-08-28T10:52:16.192837"
   },
   {
     "test": "Invalid Authentication",
     "success": true,
     "message": "Properly rejected invalid token",
-    "timestamp": "2025-08-28T10:48:49.476234"
+    "timestamp": "2025-08-28T10:52:16.244809"
   },
   {
     "test": "Non-existent Card",
     "success": true,
     "message": "Properly returned 404 for non-existent card",
-    "timestamp": "2025-08-28T10:48:49.526427"
+    "timestamp": "2025-08-28T10:52:16.298389"
   },
   {
     "test": "Invalid Meeting Room Operations - Non-existent",
     "success": true,
     "message": "Non-existent meeting room properly rejected",
-    "timestamp": "2025-08-28T10:48:49.577213"
+    "timestamp": "2025-08-28T10:52:16.355140"
   },
   {
     "test": "Invalid Meeting Room Operations - Get Non-existent",
     "success": true,
     "message": "Non-existent meeting room get properly rejected",
-    "timestamp": "2025-08-28T10:48:49.626417"
+    "timestamp": "2025-08-28T10:52:16.409734"
   }
 ]
