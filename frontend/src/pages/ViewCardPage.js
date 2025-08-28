@@ -530,6 +530,41 @@ const ViewCardPage = () => {
                 </div>
               )}
 
+              {/* Custom Code Display for Owner */}
+              {isOwner && (card.custom_code || card.customCode) && (
+                <div className="mb-8">
+                  <h3 className="text-xl font-semibold mb-4" style={{ color: card.text_color || card.textColor }}>
+                    📋 Ihr Persönlicher Code
+                  </h3>
+                  <div className="bg-white/10 backdrop-blur rounded-lg p-6 border border-white/20">
+                    <div className="flex items-center justify-between mb-3">
+                      <div>
+                        <code className="text-2xl font-mono font-bold bg-white/20 px-4 py-2 rounded-lg" style={{ color: card.accent_color || card.accentColor }}>
+                          {card.custom_code || card.customCode}
+                        </code>
+                      </div>
+                      <Button
+                        onClick={() => {
+                          navigator.clipboard.writeText(card.custom_code || card.customCode);
+                          toast({ title: "Code kopiert!", description: "Ihr persönlicher Code wurde kopiert." });
+                        }}
+                        variant="outline"
+                        size="sm"
+                        className="ml-4"
+                      >
+                        <Copy className="w-4 h-4 mr-2" />
+                        Kopieren
+                      </Button>
+                    </div>
+                    <div className="text-sm opacity-70">
+                      <p className="mb-2">✅ <strong>Dauerhaft aktiv</strong> - bis Sie ihn ändern</p>
+                      <p className="mb-2">💬 Andere können "{card.custom_code || card.customCode}" eingeben, um Ihre Karte zu erhalten</p>
+                      <p>📱 Einfach zu teilen per Telefon, WhatsApp oder E-Mail</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* QR Code */}
               {qrCode && (
                 <div className="mb-8 text-center">
