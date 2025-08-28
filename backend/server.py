@@ -1250,31 +1250,22 @@ async def create_express_code(
         if not current_user and not card.is_public:
             raise HTTPException(status_code=403, detail="Diese Visitenkarte ist nicht öffentlich")
         
-        # Generate unique express code with user context for better uniqueness
-        user_context = str(current_user.id) if current_user else str(card.id)
-        code = ExpressCode.generate_express_code(express_data.code_length, user_context)
+        # Generate simple express code
+        code = ExpressCode.generate_express_code(express_data.code_length)
         attempts = 0
-        while attempts < 30:  # Increased attempts for better collision handling
-            # Check for global uniqueness across all active express codes
+        while attempts < 5:  # Simple collision handling
             existing = await db.expresscodes.find_one({
                 "code": code,
                 "is_active": True,
                 "expires_at": {"$gt": datetime.utcnow()}
             })
-            # Also check express rooms to prevent cross-contamination
-            existing_room = await db.expressrooms.find_one({
-                "code": code,
-                "is_active": True,
-                "expires_at": {"$gt": datetime.utcnow()}
-            })
-            
-            if not existing and not existing_room:
+            if not existing:
                 break
-            code = ExpressCode.generate_express_code(express_data.code_length, f"{user_context}_{attempts}")
+            code = ExpressCode.generate_express_code(express_data.code_length)
             attempts += 1
         
-        if attempts >= 30:
-            raise HTTPException(status_code=500, detail="Fehler beim Generieren des Express-Codes - zu viele aktive Codes")
+        if attempts >= 5:
+            raise HTTPException(status_code=500, detail="Fehler beim Generieren des Express-Codes")
         
         # Create express code
         expires_at = datetime.utcnow() + timedelta(seconds=express_data.duration_seconds)
