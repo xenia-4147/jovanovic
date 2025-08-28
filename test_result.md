@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the new All-in-One Contact Import & Management system that enables importing contacts from multiple sources including Contact Picker API, VCF files, CSV files, and integration with Google Contacts and Apple iCloud."
+user_problem_statement: "Test the new Monetization Infrastructure for the growth-first strategy with 95% free features including Subscription Management, Feature Access Control, Usage Tracking System, Intelligent Upgrade Prompts, and Integration with Existing Features."
 
 frontend:
   - task: "Express Share Modal Frontend"
