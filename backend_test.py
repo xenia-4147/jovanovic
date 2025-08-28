@@ -1044,6 +1044,493 @@ class BusinessCardAPITester:
             return False
     
     # ============================================================================
+    # MESSAGING APPS ENHANCEMENT TESTS
+    # ============================================================================
+    
+    def test_messaging_apps_default_configuration(self):
+        """Test that phone numbers include default messaging apps (WhatsApp, SMS)"""
+        if not self.access_token:
+            self.log_result("Messaging Apps Default Configuration", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create business card with phone number (no explicit messaging_apps)
+            card_data = {
+                "name": "Sarah Johnson",
+                "company": "Digital Communications Ltd",
+                "position": "Communications Manager",
+                "phones": [
+                    {
+                        "label": "work",
+                        "number": "+44-20-7946-0958",
+                        "is_primary": True
+                        # No messaging_apps specified - should get defaults
+                    }
+                ],
+                "emails": [
+                    {
+                        "label": "work",
+                        "address": "sarah.johnson@digitalcomms.co.uk",
+                        "is_primary": True
+                    }
+                ],
+                "is_public": True
+            }
+            
+            response = requests.post(f"{API_BASE}/cards", json=card_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Check if phone has messaging_apps field
+                if "phones" in data and len(data["phones"]) > 0:
+                    phone = data["phones"][0]
+                    
+                    if "messaging_apps" in phone:
+                        messaging_apps = phone["messaging_apps"]
+                        
+                        # Should have default WhatsApp and SMS
+                        app_names = [app["name"] for app in messaging_apps]
+                        
+                        if "whatsapp" in app_names and "sms" in app_names:
+                            # Check that both are enabled by default
+                            whatsapp_enabled = next((app["enabled"] for app in messaging_apps if app["name"] == "whatsapp"), False)
+                            sms_enabled = next((app["enabled"] for app in messaging_apps if app["name"] == "sms"), False)
+                            
+                            if whatsapp_enabled and sms_enabled:
+                                self.messaging_apps_card_id = data["id"]
+                                self.log_result("Messaging Apps Default Configuration", True, f"Default messaging apps configured: WhatsApp and SMS both enabled")
+                                return True
+                            else:
+                                self.log_result("Messaging Apps Default Configuration", False, f"Default apps not enabled: WhatsApp={whatsapp_enabled}, SMS={sms_enabled}")
+                                return False
+                        else:
+                            self.log_result("Messaging Apps Default Configuration", False, f"Missing default apps. Found: {app_names}")
+                            return False
+                    else:
+                        self.log_result("Messaging Apps Default Configuration", False, "messaging_apps field missing from phone")
+                        return False
+                else:
+                    self.log_result("Messaging Apps Default Configuration", False, "No phones in response")
+                    return False
+            else:
+                self.log_result("Messaging Apps Default Configuration", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Messaging Apps Default Configuration", False, f"Error: {str(e)}")
+            return False
+    
+    def test_messaging_apps_custom_configuration(self):
+        """Test creating business card with custom messaging apps configuration"""
+        if not self.access_token:
+            self.log_result("Messaging Apps Custom Configuration", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create business card with custom messaging apps
+            card_data = {
+                "name": "Alex Chen",
+                "company": "Tech Innovations Inc",
+                "position": "Senior Developer",
+                "phones": [
+                    {
+                        "label": "work",
+                        "number": "+1-555-987-6543",
+                        "is_primary": True,
+                        "messaging_apps": [
+                            {"name": "whatsapp", "enabled": True},
+                            {"name": "sms", "enabled": False},  # Disabled SMS
+                            {"name": "telegram", "enabled": True},  # Custom app
+                            {"name": "signal", "enabled": True},   # Custom app
+                            {"name": "viber", "enabled": False}    # Custom app disabled
+                        ]
+                    },
+                    {
+                        "label": "personal",
+                        "number": "+1-555-123-7890",
+                        "is_primary": False,
+                        "messaging_apps": [
+                            {"name": "whatsapp", "enabled": True},
+                            {"name": "sms", "enabled": True},
+                            {"name": "discord", "enabled": True}  # Another custom app
+                        ]
+                    }
+                ],
+                "emails": [
+                    {
+                        "label": "work",
+                        "address": "alex.chen@techinnovations.com",
+                        "is_primary": True
+                    }
+                ],
+                "is_public": True
+            }
+            
+            response = requests.post(f"{API_BASE}/cards", json=card_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify both phones have correct messaging apps
+                if "phones" in data and len(data["phones"]) == 2:
+                    # Check first phone (work)
+                    work_phone = data["phones"][0]
+                    if "messaging_apps" in work_phone:
+                        work_apps = {app["name"]: app["enabled"] for app in work_phone["messaging_apps"]}
+                        
+                        expected_work_apps = {
+                            "whatsapp": True,
+                            "sms": False,
+                            "telegram": True,
+                            "signal": True,
+                            "viber": False
+                        }
+                        
+                        work_apps_correct = all(
+                            work_apps.get(name) == enabled 
+                            for name, enabled in expected_work_apps.items()
+                        )
+                        
+                        if not work_apps_correct:
+                            self.log_result("Messaging Apps Custom Configuration", False, f"Work phone apps incorrect: {work_apps}")
+                            return False
+                    else:
+                        self.log_result("Messaging Apps Custom Configuration", False, "Work phone missing messaging_apps")
+                        return False
+                    
+                    # Check second phone (personal)
+                    personal_phone = data["phones"][1]
+                    if "messaging_apps" in personal_phone:
+                        personal_apps = {app["name"]: app["enabled"] for app in personal_phone["messaging_apps"]}
+                        
+                        expected_personal_apps = {
+                            "whatsapp": True,
+                            "sms": True,
+                            "discord": True
+                        }
+                        
+                        personal_apps_correct = all(
+                            personal_apps.get(name) == enabled 
+                            for name, enabled in expected_personal_apps.items()
+                        )
+                        
+                        if personal_apps_correct:
+                            self.custom_messaging_card_id = data["id"]
+                            self.log_result("Messaging Apps Custom Configuration", True, f"Custom messaging apps configured correctly")
+                            return True
+                        else:
+                            self.log_result("Messaging Apps Custom Configuration", False, f"Personal phone apps incorrect: {personal_apps}")
+                            return False
+                    else:
+                        self.log_result("Messaging Apps Custom Configuration", False, "Personal phone missing messaging_apps")
+                        return False
+                else:
+                    self.log_result("Messaging Apps Custom Configuration", False, f"Expected 2 phones, got {len(data.get('phones', []))}")
+                    return False
+            else:
+                self.log_result("Messaging Apps Custom Configuration", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Messaging Apps Custom Configuration", False, f"Error: {str(e)}")
+            return False
+    
+    def test_messaging_apps_update_configuration(self):
+        """Test updating existing business card to modify messaging apps"""
+        if not self.access_token or not hasattr(self, 'messaging_apps_card_id'):
+            self.log_result("Messaging Apps Update Configuration", False, "No access token or messaging apps card available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Update the card to modify messaging apps
+            update_data = {
+                "phones": [
+                    {
+                        "label": "work",
+                        "number": "+44-20-7946-0958",
+                        "is_primary": True,
+                        "messaging_apps": [
+                            {"name": "whatsapp", "enabled": True},
+                            {"name": "sms", "enabled": False},  # Disable SMS
+                            {"name": "telegram", "enabled": True},  # Add Telegram
+                            {"name": "viber", "enabled": True},    # Add Viber
+                            {"name": "signal", "enabled": False}   # Add Signal but disabled
+                        ]
+                    }
+                ]
+            }
+            
+            response = requests.put(f"{API_BASE}/cards/{self.messaging_apps_card_id}", json=update_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify messaging apps were updated
+                if "phones" in data and len(data["phones"]) > 0:
+                    phone = data["phones"][0]
+                    
+                    if "messaging_apps" in phone:
+                        apps = {app["name"]: app["enabled"] for app in phone["messaging_apps"]}
+                        
+                        expected_apps = {
+                            "whatsapp": True,
+                            "sms": False,
+                            "telegram": True,
+                            "viber": True,
+                            "signal": False
+                        }
+                        
+                        apps_correct = all(
+                            apps.get(name) == enabled 
+                            for name, enabled in expected_apps.items()
+                        )
+                        
+                        if apps_correct:
+                            self.log_result("Messaging Apps Update Configuration", True, f"Messaging apps updated successfully: {apps}")
+                            return True
+                        else:
+                            self.log_result("Messaging Apps Update Configuration", False, f"Apps not updated correctly: {apps}")
+                            return False
+                    else:
+                        self.log_result("Messaging Apps Update Configuration", False, "messaging_apps field missing after update")
+                        return False
+                else:
+                    self.log_result("Messaging Apps Update Configuration", False, "No phones in updated response")
+                    return False
+            else:
+                self.log_result("Messaging Apps Update Configuration", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Messaging Apps Update Configuration", False, f"Error: {str(e)}")
+            return False
+    
+    def test_messaging_apps_api_response_validation(self):
+        """Test that API responses include messaging_apps field in correct format"""
+        if not hasattr(self, 'custom_messaging_card_id'):
+            self.log_result("Messaging Apps API Response Validation", False, "No custom messaging card available")
+            return False
+            
+        try:
+            # Test GET /api/cards/{id} endpoint
+            response = requests.get(f"{API_BASE}/cards/{self.custom_messaging_card_id}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Validate messaging_apps structure in response
+                if "phones" in data and len(data["phones"]) > 0:
+                    validation_passed = True
+                    validation_errors = []
+                    
+                    for i, phone in enumerate(data["phones"]):
+                        if "messaging_apps" not in phone:
+                            validation_errors.append(f"Phone {i} missing messaging_apps field")
+                            validation_passed = False
+                            continue
+                        
+                        messaging_apps = phone["messaging_apps"]
+                        
+                        if not isinstance(messaging_apps, list):
+                            validation_errors.append(f"Phone {i} messaging_apps is not a list")
+                            validation_passed = False
+                            continue
+                        
+                        for j, app in enumerate(messaging_apps):
+                            if not isinstance(app, dict):
+                                validation_errors.append(f"Phone {i} app {j} is not a dict")
+                                validation_passed = False
+                                continue
+                            
+                            if "name" not in app or "enabled" not in app:
+                                validation_errors.append(f"Phone {i} app {j} missing name or enabled field")
+                                validation_passed = False
+                                continue
+                            
+                            if not isinstance(app["name"], str) or not isinstance(app["enabled"], bool):
+                                validation_errors.append(f"Phone {i} app {j} has wrong field types")
+                                validation_passed = False
+                                continue
+                    
+                    if validation_passed:
+                        self.log_result("Messaging Apps API Response Validation", True, "All messaging_apps fields properly formatted in API response")
+                        return True
+                    else:
+                        self.log_result("Messaging Apps API Response Validation", False, f"Validation errors: {validation_errors}")
+                        return False
+                else:
+                    self.log_result("Messaging Apps API Response Validation", False, "No phones in API response")
+                    return False
+            else:
+                self.log_result("Messaging Apps API Response Validation", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Messaging Apps API Response Validation", False, f"Error: {str(e)}")
+            return False
+    
+    def test_messaging_apps_persistence(self):
+        """Test that messaging apps configurations persist correctly in database"""
+        if not self.access_token or not hasattr(self, 'custom_messaging_card_id'):
+            self.log_result("Messaging Apps Persistence", False, "No access token or custom messaging card available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Get the card multiple times to ensure persistence
+            responses = []
+            for i in range(3):
+                response = requests.get(f"{API_BASE}/cards/{self.custom_messaging_card_id}", headers=headers)
+                if response.status_code == 200:
+                    responses.append(response.json())
+                else:
+                    self.log_result("Messaging Apps Persistence", False, f"Failed to get card on attempt {i+1}")
+                    return False
+            
+            # Compare messaging apps across all responses
+            if len(responses) == 3:
+                # Extract messaging apps from first phone of each response
+                messaging_apps_sets = []
+                for response_data in responses:
+                    if "phones" in response_data and len(response_data["phones"]) > 0:
+                        phone = response_data["phones"][0]
+                        if "messaging_apps" in phone:
+                            # Convert to comparable format
+                            apps = {app["name"]: app["enabled"] for app in phone["messaging_apps"]}
+                            messaging_apps_sets.append(apps)
+                        else:
+                            self.log_result("Messaging Apps Persistence", False, "messaging_apps missing in one response")
+                            return False
+                    else:
+                        self.log_result("Messaging Apps Persistence", False, "phones missing in one response")
+                        return False
+                
+                # Check if all responses have identical messaging apps
+                if len(messaging_apps_sets) == 3 and all(apps == messaging_apps_sets[0] for apps in messaging_apps_sets):
+                    self.log_result("Messaging Apps Persistence", True, f"Messaging apps persist correctly across requests: {messaging_apps_sets[0]}")
+                    return True
+                else:
+                    self.log_result("Messaging Apps Persistence", False, f"Messaging apps differ across requests: {messaging_apps_sets}")
+                    return False
+            else:
+                self.log_result("Messaging Apps Persistence", False, "Failed to get all 3 responses")
+                return False
+                
+        except Exception as e:
+            self.log_result("Messaging Apps Persistence", False, f"Error: {str(e)}")
+            return False
+    
+    def test_messaging_apps_multiple_phones_independence(self):
+        """Test that different phones can have independent messaging app configurations"""
+        if not self.access_token:
+            self.log_result("Messaging Apps Multiple Phones Independence", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create card with multiple phones having different messaging app configs
+            card_data = {
+                "name": "Maria Rodriguez",
+                "company": "Global Communications",
+                "position": "International Relations Manager",
+                "phones": [
+                    {
+                        "label": "work",
+                        "number": "+34-91-123-4567",
+                        "is_primary": True,
+                        "messaging_apps": [
+                            {"name": "whatsapp", "enabled": True},
+                            {"name": "sms", "enabled": True},
+                            {"name": "telegram", "enabled": False}
+                        ]
+                    },
+                    {
+                        "label": "personal",
+                        "number": "+34-91-987-6543",
+                        "is_primary": False,
+                        "messaging_apps": [
+                            {"name": "whatsapp", "enabled": False},  # Different config
+                            {"name": "sms", "enabled": True},
+                            {"name": "signal", "enabled": True},     # Different apps
+                            {"name": "viber", "enabled": True}
+                        ]
+                    },
+                    {
+                        "label": "emergency",
+                        "number": "+34-91-555-0000",
+                        "is_primary": False,
+                        "messaging_apps": [
+                            {"name": "sms", "enabled": True}  # SMS only
+                        ]
+                    }
+                ],
+                "emails": [
+                    {
+                        "label": "work",
+                        "address": "maria.rodriguez@globalcomms.es",
+                        "is_primary": True
+                    }
+                ],
+                "is_public": True
+            }
+            
+            response = requests.post(f"{API_BASE}/cards", json=card_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if "phones" in data and len(data["phones"]) == 3:
+                    # Verify each phone has its independent configuration
+                    
+                    # Work phone
+                    work_phone = data["phones"][0]
+                    work_apps = {app["name"]: app["enabled"] for app in work_phone["messaging_apps"]}
+                    expected_work = {"whatsapp": True, "sms": True, "telegram": False}
+                    
+                    # Personal phone
+                    personal_phone = data["phones"][1]
+                    personal_apps = {app["name"]: app["enabled"] for app in personal_phone["messaging_apps"]}
+                    expected_personal = {"whatsapp": False, "sms": True, "signal": True, "viber": True}
+                    
+                    # Emergency phone
+                    emergency_phone = data["phones"][2]
+                    emergency_apps = {app["name"]: app["enabled"] for app in emergency_phone["messaging_apps"]}
+                    expected_emergency = {"sms": True}
+                    
+                    # Check all configurations
+                    work_correct = all(work_apps.get(name) == enabled for name, enabled in expected_work.items())
+                    personal_correct = all(personal_apps.get(name) == enabled for name, enabled in expected_personal.items())
+                    emergency_correct = all(emergency_apps.get(name) == enabled for name, enabled in expected_emergency.items())
+                    
+                    if work_correct and personal_correct and emergency_correct:
+                        self.log_result("Messaging Apps Multiple Phones Independence", True, 
+                                      f"Independent configs: Work={work_apps}, Personal={personal_apps}, Emergency={emergency_apps}")
+                        return True
+                    else:
+                        self.log_result("Messaging Apps Multiple Phones Independence", False, 
+                                      f"Config mismatch: Work={work_correct}, Personal={personal_correct}, Emergency={emergency_correct}")
+                        return False
+                else:
+                    self.log_result("Messaging Apps Multiple Phones Independence", False, f"Expected 3 phones, got {len(data.get('phones', []))}")
+                    return False
+            else:
+                self.log_result("Messaging Apps Multiple Phones Independence", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Messaging Apps Multiple Phones Independence", False, f"Error: {str(e)}")
+            return False
+    
+    # ============================================================================
     # EXPRESS SHARE COLLISION PREVENTION TESTS
     # ============================================================================
     
