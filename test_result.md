@@ -224,7 +224,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Express Share Collision Prevention System"
+    - "Express Share Frontend System Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
