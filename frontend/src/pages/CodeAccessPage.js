@@ -125,6 +125,20 @@ const CodeAccessPage = () => {
     }
   };
 
+  // Check if code looks like express room code (2 digits)
+  const isExpressRoomCode = (code) => {
+    return /^\d{2}$/.test(code.trim());
+  };
+
+  const handleExpressRoomJoin = async () => {
+    // Implement express room join logic
+    // For now, just show a message that user needs to select a card
+    toast({
+      title: "Express Room Beitritt",
+      description: "Wählen Sie eine Ihrer Visitenkarten aus, um dem Express Room beizutreten.",
+    });
+  };
+
   const handleClearResults = () => {
     setResult(null);
     setError('');
