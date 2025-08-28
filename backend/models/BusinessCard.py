@@ -21,11 +21,19 @@ class PyObjectId(ObjectId):
         field_schema.update(type='string')
         return field_schema
 
+class MessagingApp(BaseModel):
+    name: str  # whatsapp, viber, telegram, signal, etc.
+    enabled: bool = True
+    
 class ContactPhone(BaseModel):
     id: str = Field(default_factory=lambda: str(ObjectId()))
     label: str
     number: str
     is_primary: bool = False
+    messaging_apps: List[MessagingApp] = [
+        MessagingApp(name="whatsapp", enabled=True),
+        MessagingApp(name="sms", enabled=True)
+    ]  # Default: WhatsApp and SMS enabled
     
     @field_validator('number')
     @classmethod
