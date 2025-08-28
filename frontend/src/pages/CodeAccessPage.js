@@ -29,17 +29,51 @@ const CodeAccessPage = () => {
     setResult(null);
 
     try {
-      const response = await api.post('/cards/access-by-code', { code: code.trim() });
+      const cleanCode = code.trim().toUpperCase();
       
-      if (response.data.success) {
-        setResult(response.data);
-        toast({
-          title: "Code gefunden!",
-          description: `Visitenkarte von ${response.data.card.name} gefunden.`,
-        });
-      } else {
-        setError(response.data.message || 'Code nicht gefunden.');
+      // First try as business card code
+      try {
+        const response = await api.post('/cards/access-by-code', { code: cleanCode });
+        
+        if (response.data.success) {
+          setResult({
+            ...response.data,
+            type: 'business_card'
+          });
+          toast({
+            title: "Visitenkarte gefunden!",
+            description: `Visitenkarte von ${response.data.card.name} gefunden.`,
+          });
+          return;
+        }
+      } catch (cardError) {
+        // If business card code fails, try as meeting room code
+        if (cardError.response?.status === 404) {
+          try {
+            const roomResponse = await api.get(`/meeting-rooms/${cleanCode}`);
+            
+            if (roomResponse.data) {
+              setResult({
+                success: true,
+                type: 'meeting_room',
+                room: roomResponse.data,
+                message: `Meeting Room "${roomResponse.data.code}" gefunden`
+              });
+              toast({
+                title: "Meeting Room gefunden!",
+                description: `Meeting Room "${roomResponse.data.code}" mit ${roomResponse.data.participants.length} Teilnehmern gefunden.`,
+              });
+              return;
+            }
+          } catch (roomError) {
+            // Both failed, show generic error
+          }
+        }
       }
+      
+      // If both methods failed
+      setError('Code nicht gefunden oder ungültig.');
+      
     } catch (err) {
       console.error('Code access failed:', err);
       setError(
