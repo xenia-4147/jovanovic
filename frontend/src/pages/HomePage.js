@@ -129,6 +129,15 @@ const HomePage = () => {
             Adressbuch
           </Button>
           
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => navigate('/meeting-rooms')}
+          >
+            <Users className="w-4 h-4 mr-2" />
+            Meeting Rooms
+          </Button>
+          
           <Button variant="outline" size="sm">
             <User className="w-4 h-4 mr-2" />
             {user?.full_name || user?.email}
