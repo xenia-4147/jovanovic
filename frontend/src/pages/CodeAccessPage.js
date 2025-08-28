@@ -290,13 +290,14 @@ const CodeAccessPage = () => {
                   )}
                 </Button>
 
-                {result && result.success && result.type === 'business_card' && (
+                {result && result.success && (result.type === 'express_code' || result.type === 'business_card') && (
                   <div className="grid grid-cols-2 gap-3">
                     <Button 
                       variant="outline" 
                       onClick={handleViewCard}
                       className="w-full"
                     >
+                      <Eye className="w-4 h-4 mr-1" />
                       Visitenkarte anzeigen
                     </Button>
                     
