@@ -137,7 +137,8 @@ class BusinessCard(BaseModel):
         
         return v
     
-    @validator('emails')
+    @field_validator('emails')
+    @classmethod
     def validate_emails(cls, v):
         if not v:
             return v
