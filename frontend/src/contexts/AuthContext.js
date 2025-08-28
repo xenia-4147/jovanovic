@@ -35,10 +35,27 @@ export const AuthProvider = ({ children }) => {
   const initializeAuth = async () => {
     try {
       const token = localStorage.getItem('access_token');
-      if (token) {
-        const userData = await authApi.getProfile();
-        setUser(userData);
-        setIsAuthenticated(true);
+      const storedUser = localStorage.getItem('user');
+      
+      if (token && storedUser) {
+        try {
+          // Try to validate token with backend
+          const userData = await authApi.getProfile();
+          setUser(userData);
+          setIsAuthenticated(true);
+        } catch (error) {
+          // If token validation fails, try to use stored user data
+          console.warn('Token validation failed, using stored user data');
+          try {
+            const parsedUser = JSON.parse(storedUser);
+            setUser(parsedUser);
+            setIsAuthenticated(true);
+          } catch (parseError) {
+            console.error('Failed to parse stored user data:', parseError);
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user');
+          }
+        }
       }
     } catch (error) {
       console.error('Auth initialization failed:', error);
