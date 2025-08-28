@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the complete digital business cards frontend application that has been fully integrated with the backend API. The app now has real authentication and database integration."
+user_problem_statement: "Complete the implementation of custom sharing code features for business cards. This includes both personal permanent codes and Meeting Room codes for group networking."
 
 frontend:
   - task: "User Registration with GDPR Compliance"
