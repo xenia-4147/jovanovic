@@ -27,7 +27,8 @@ class ContactPhone(BaseModel):
     number: str
     is_primary: bool = False
     
-    @validator('number')
+    @field_validator('number')
+    @classmethod
     def validate_phone_number(cls, v):
         # Basic phone validation - remove spaces and check if it's reasonable
         cleaned = v.replace(' ', '').replace('-', '').replace('(', '').replace(')', '')
