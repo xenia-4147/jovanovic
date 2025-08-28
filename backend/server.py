@@ -1826,13 +1826,18 @@ async def startup_event():
         await db.meetingrooms.create_index("created_by_card_id")
         await db.meetingrooms.create_index([("is_active", 1), ("expires_at", 1)])
         
-        # Express share indexes
+        # Express share indexes with compound uniqueness
         await db.expresscodes.create_index("code")
         await db.expresscodes.create_index("card_id")
         await db.expresscodes.create_index([("is_active", 1), ("expires_at", 1)])
+        # Compound unique index to prevent duplicate active codes
+        await db.expresscodes.create_index([("code", 1), ("is_active", 1), ("expires_at", 1)], sparse=True)
+        
         await db.expressrooms.create_index("code")
         await db.expressrooms.create_index("created_by_card_id")
         await db.expressrooms.create_index([("is_active", 1), ("expires_at", 1)])
+        # Compound unique index to prevent duplicate active room codes
+        await db.expressrooms.create_index([("code", 1), ("is_active", 1), ("expires_at", 1)], sparse=True)
         
         logger.info("Database indexes created successfully")
         
