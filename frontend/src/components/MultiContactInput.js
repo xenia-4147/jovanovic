@@ -72,6 +72,95 @@ const MultiContactInput = ({
   const fieldName = type === 'phone' ? 'number' : 'address';
   const fieldType = type === 'phone' ? 'tel' : 'email';
 
+  const availableMessagingApps = [
+    { name: 'whatsapp', label: 'WhatsApp', icon: '💬' },
+    { name: 'sms', label: 'SMS', icon: '📱' },
+    { name: 'telegram', label: 'Telegram', icon: '✈️' },
+    { name: 'viber', label: 'Viber', icon: '📞' },
+    { name: 'signal', label: 'Signal', icon: '🔒' },
+    { name: 'discord', label: 'Discord', icon: '🎮' }
+  ];
+
+  const updateMessagingApps = (itemId, updatedApps) => {
+    const updatedItems = items.map(item => 
+      item.id === itemId 
+        ? { ...item, messaging_apps: updatedApps }
+        : item
+    );
+    onChange(updatedItems);
+  };
+
+  const MessagingAppsDialog = ({ item }) => {
+    const [isOpen, setIsOpen] = useState(false);
+    const currentApps = item.messaging_apps || [
+      { name: 'whatsapp', enabled: true },
+      { name: 'sms', enabled: true }
+    ];
+
+    const handleAppToggle = (appName, enabled) => {
+      const updatedApps = currentApps.map(app => 
+        app.name === appName ? { ...app, enabled } : app
+      );
+      
+      // Add new app if it doesn't exist and is being enabled
+      if (enabled && !currentApps.find(app => app.name === appName)) {
+        updatedApps.push({ name: appName, enabled: true });
+      }
+      
+      updateMessagingApps(item.id, updatedApps);
+    };
+
+    return (
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="h-8 w-8 p-0"
+            title="Messaging-Apps konfigurieren"
+          >
+            <Settings className="w-4 h-4" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Messaging-Apps für {item.number}</DialogTitle>
+            <DialogDescription>
+              Wählen Sie, welche Messaging-Apps für diese Nummer verfügbar sein sollen
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {availableMessagingApps.map(app => {
+              const currentApp = currentApps.find(a => a.name === app.name);
+              const isEnabled = currentApp?.enabled || false;
+              
+              return (
+                <div key={app.name} className="flex items-center space-x-3">
+                  <Checkbox
+                    checked={isEnabled}
+                    onCheckedChange={(checked) => handleAppToggle(app.name, checked)}
+                  />
+                  <span className="text-lg">{app.icon}</span>
+                  <Label className="flex-1 cursor-pointer">
+                    {app.label}
+                  </Label>
+                </div>
+              );
+            })}
+          </div>
+          
+          <div className="flex justify-end pt-4">
+            <Button onClick={() => setIsOpen(false)}>
+              Fertig
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
