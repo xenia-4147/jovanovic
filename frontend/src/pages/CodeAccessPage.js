@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Alert, AlertDescription } from '../components/ui/alert';
-import { ArrowLeft, Search, Key, CheckCircle, AlertCircle, Users, Zap } from 'lucide-react';
+import { ArrowLeft, Search, Key, CheckCircle, AlertCircle, Users, Zap, Eye } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import api from '../services/api';
 
