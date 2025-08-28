@@ -917,27 +917,51 @@ class BusinessCardAPITester:
     
     def run_all_tests(self):
         """Run all tests in sequence"""
-        print("=" * 60)
-        print("DIGITAL BUSINESS CARDS API TEST SUITE")
-        print("=" * 60)
+        print("=" * 80)
+        print("DIGITAL BUSINESS CARDS API TEST SUITE - ENHANCED WITH MEETING ROOMS")
+        print("=" * 80)
         print(f"Testing API at: {API_BASE}")
         print()
         
         tests = [
+            # Core API tests
             self.test_health_check,
             self.test_user_registration,
             self.test_user_login,
             self.test_protected_endpoint,
+            
+            # Business card tests
             self.test_create_business_card,
             self.test_get_user_cards,
             self.test_get_specific_card,
             self.test_update_business_card,
+            
+            # Custom code tests
+            self.test_create_business_card_with_custom_code,
+            self.test_check_code_availability,
+            self.test_access_card_by_code,
+            self.test_code_uniqueness_validation,
+            
+            # Meeting room tests
+            self.test_create_meeting_room,
+            self.test_get_meeting_room,
+            self.test_join_meeting_room,
+            self.test_list_user_meeting_rooms,
+            self.test_enhanced_code_access_meeting_room,
+            self.test_close_meeting_room,
+            
+            # Utility tests
             self.test_qr_code_generation,
             self.test_vcard_generation,
+            
+            # Privacy/GDPR tests
             self.test_privacy_report,
             self.test_data_export,
+            
+            # Error handling tests
             self.test_invalid_authentication,
-            self.test_nonexistent_card
+            self.test_nonexistent_card,
+            self.test_invalid_meeting_room_operations
         ]
         
         passed = 0
