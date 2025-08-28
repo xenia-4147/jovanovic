@@ -8,6 +8,7 @@ import api, { cardsApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
 import ExpressShareModal from '../components/ExpressShareModal';
+import EarlyAdopterBadge from '../components/EarlyAdopterBadge';
 
 const HomePage = () => {
   const navigate = useNavigate();
