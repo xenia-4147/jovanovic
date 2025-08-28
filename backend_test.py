@@ -3865,6 +3865,13 @@ END:VCARD"""
             self.test_access_card_by_code,
             self.test_code_uniqueness_validation,
             
+            # Early Adopter Bonus System Tests (CRITICAL)
+            self.test_early_adopter_user_registration,
+            self.test_early_adopter_premium_feature_access,
+            self.test_early_adopter_vs_regular_user_comparison,
+            self.test_user_count_api_logic,
+            self.test_subscription_status_response_format,
+            
             # Subscription & Monetization System Tests
             self.test_get_subscription_status,
             self.test_check_feature_access_free_user,
