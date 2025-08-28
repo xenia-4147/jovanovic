@@ -15,6 +15,7 @@ const HomePage = () => {
   const { user, logout } = useAuth();
   const [businessCards, setBusinessCards] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showExpressModal, setShowExpressModal] = useState(false);
 
   useEffect(() => {
     loadBusinessCards();
