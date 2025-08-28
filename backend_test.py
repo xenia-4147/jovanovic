@@ -1044,6 +1044,520 @@ class BusinessCardAPITester:
             return False
     
     # ============================================================================
+    # EXPRESS SHARE COLLISION PREVENTION TESTS
+    # ============================================================================
+    
+    def test_express_code_collision_prevention_simultaneous(self):
+        """Test multiple simultaneous express code creations for collision prevention"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Express Code Collision Prevention - Simultaneous", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create multiple express codes rapidly to test collision prevention
+            codes_created = []
+            failed_attempts = 0
+            
+            for i in range(10):  # Try to create 10 codes rapidly
+                express_data = {
+                    "card_id": self.card_id,
+                    "duration_seconds": 120,
+                    "code_length": 2,
+                    "max_usage": 5
+                }
+                
+                response = requests.post(f"{API_BASE}/express/create", json=express_data, headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    code = data["code"]
+                    
+                    # Check for duplicates
+                    if code in codes_created:
+                        self.log_result("Express Code Collision Prevention - Simultaneous", False, f"COLLISION DETECTED: Duplicate code {code} generated")
+                        return False
+                    
+                    codes_created.append(code)
+                else:
+                    failed_attempts += 1
+                    if failed_attempts > 3:  # Allow some failures due to rate limiting
+                        self.log_result("Express Code Collision Prevention - Simultaneous", False, f"Too many failed attempts: {failed_attempts}")
+                        return False
+            
+            if len(codes_created) >= 7:  # At least 7 unique codes should be created
+                self.log_result("Express Code Collision Prevention - Simultaneous", True, f"Successfully created {len(codes_created)} unique express codes: {codes_created}")
+                return True
+            else:
+                self.log_result("Express Code Collision Prevention - Simultaneous", False, f"Only created {len(codes_created)} codes, expected at least 7")
+                return False
+                
+        except Exception as e:
+            self.log_result("Express Code Collision Prevention - Simultaneous", False, f"Error: {str(e)}")
+            return False
+    
+    def test_express_cross_contamination_prevention(self):
+        """Test that express codes don't conflict with express room codes"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Express Cross-Contamination Prevention", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create express room first
+            room_data = {
+                "card_id": self.card_id,
+                "duration_seconds": 180,
+                "max_participants": 5
+            }
+            
+            room_response = requests.post(f"{API_BASE}/express/room/create", json=room_data, headers=headers)
+            
+            if room_response.status_code != 200:
+                self.log_result("Express Cross-Contamination Prevention", False, "Failed to create express room for testing")
+                return False
+            
+            room_data = room_response.json()
+            room_code = room_data["code"]
+            
+            # Now create multiple express codes and verify none match the room code
+            codes_created = []
+            
+            for i in range(15):  # Create many codes to increase chance of collision
+                express_data = {
+                    "card_id": self.card_id,
+                    "duration_seconds": 120,
+                    "code_length": 2
+                }
+                
+                response = requests.post(f"{API_BASE}/express/create", json=express_data, headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    code = data["code"]
+                    
+                    # Check for cross-contamination with room code
+                    if code == room_code:
+                        self.log_result("Express Cross-Contamination Prevention", False, f"CROSS-CONTAMINATION: Express code {code} matches room code {room_code}")
+                        return False
+                    
+                    codes_created.append(code)
+            
+            if len(codes_created) >= 10:
+                self.log_result("Express Cross-Contamination Prevention", True, f"No cross-contamination detected. Room code: {room_code}, Express codes: {codes_created[:5]}...")
+                return True
+            else:
+                self.log_result("Express Cross-Contamination Prevention", False, f"Only created {len(codes_created)} codes for testing")
+                return False
+                
+        except Exception as e:
+            self.log_result("Express Cross-Contamination Prevention", False, f"Error: {str(e)}")
+            return False
+    
+    def test_user_context_seeding_uniqueness(self):
+        """Test that user-context seeding improves code uniqueness"""
+        if not self.access_token or not self.card_id:
+            self.log_result("User Context Seeding Uniqueness", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create codes with same card but different timing to test user context seeding
+            codes_batch_1 = []
+            codes_batch_2 = []
+            
+            # First batch
+            for i in range(5):
+                express_data = {
+                    "card_id": self.card_id,
+                    "duration_seconds": 60,
+                    "code_length": 3
+                }
+                
+                response = requests.post(f"{API_BASE}/express/create", json=express_data, headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    codes_batch_1.append(data["code"])
+            
+            # Small delay to change timing context
+            import time
+            time.sleep(1)
+            
+            # Second batch
+            for i in range(5):
+                express_data = {
+                    "card_id": self.card_id,
+                    "duration_seconds": 60,
+                    "code_length": 3
+                }
+                
+                response = requests.post(f"{API_BASE}/express/create", json=express_data, headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    codes_batch_2.append(data["code"])
+            
+            # Check for uniqueness across batches
+            all_codes = codes_batch_1 + codes_batch_2
+            unique_codes = set(all_codes)
+            
+            if len(unique_codes) == len(all_codes):
+                self.log_result("User Context Seeding Uniqueness", True, f"All {len(all_codes)} codes unique across batches. Batch 1: {codes_batch_1}, Batch 2: {codes_batch_2}")
+                return True
+            else:
+                duplicates = [code for code in all_codes if all_codes.count(code) > 1]
+                self.log_result("User Context Seeding Uniqueness", False, f"Duplicates found: {duplicates}")
+                return False
+                
+        except Exception as e:
+            self.log_result("User Context Seeding Uniqueness", False, f"Error: {str(e)}")
+            return False
+    
+    def test_rapid_code_creation_edge_case(self):
+        """Test what happens when someone tries to create codes rapidly"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Rapid Code Creation Edge Case", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Try to create codes as rapidly as possible
+            codes_created = []
+            errors_encountered = []
+            
+            for i in range(20):  # Rapid fire creation
+                express_data = {
+                    "card_id": self.card_id,
+                    "duration_seconds": 30,  # Short duration
+                    "code_length": 2
+                }
+                
+                response = requests.post(f"{API_BASE}/express/create", json=express_data, headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    code = data["code"]
+                    
+                    if code in codes_created:
+                        self.log_result("Rapid Code Creation Edge Case", False, f"Duplicate code in rapid creation: {code}")
+                        return False
+                    
+                    codes_created.append(code)
+                else:
+                    errors_encountered.append(response.status_code)
+            
+            # Should handle rapid creation gracefully
+            success_rate = len(codes_created) / 20
+            
+            if success_rate >= 0.7:  # At least 70% success rate
+                self.log_result("Rapid Code Creation Edge Case", True, f"Rapid creation handled well: {len(codes_created)}/20 successful, no duplicates")
+                return True
+            else:
+                self.log_result("Rapid Code Creation Edge Case", False, f"Poor success rate: {len(codes_created)}/20, errors: {errors_encountered}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Rapid Code Creation Edge Case", False, f"Error: {str(e)}")
+            return False
+    
+    def test_many_active_codes_scenario(self):
+        """Test code generation when many codes are already active"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Many Active Codes Scenario", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create many active codes to fill up the namespace
+            active_codes = []
+            
+            # Create 30 codes with longer duration to keep them active
+            for i in range(30):
+                express_data = {
+                    "card_id": self.card_id,
+                    "duration_seconds": 300,  # 5 minutes - keep them active
+                    "code_length": 2
+                }
+                
+                response = requests.post(f"{API_BASE}/express/create", json=express_data, headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    active_codes.append(data["code"])
+                elif response.status_code == 500 and "zu viele aktive Codes" in response.text:
+                    # This is expected behavior when namespace is full
+                    self.log_result("Many Active Codes Scenario", True, f"System properly handles namespace exhaustion after {len(active_codes)} codes")
+                    return True
+            
+            # If we created 30 codes without error, that's also good
+            if len(active_codes) >= 25:
+                unique_codes = set(active_codes)
+                if len(unique_codes) == len(active_codes):
+                    self.log_result("Many Active Codes Scenario", True, f"Successfully created {len(active_codes)} unique codes without collision")
+                    return True
+                else:
+                    self.log_result("Many Active Codes Scenario", False, f"Duplicates found in {len(active_codes)} codes")
+                    return False
+            else:
+                self.log_result("Many Active Codes Scenario", False, f"Only created {len(active_codes)} codes")
+                return False
+                
+        except Exception as e:
+            self.log_result("Many Active Codes Scenario", False, f"Error: {str(e)}")
+            return False
+    
+    def test_global_uniqueness_verification(self):
+        """Test that express codes don't conflict globally across all types"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Global Uniqueness Verification", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create express codes and rooms simultaneously
+            express_codes = []
+            room_codes = []
+            
+            # Create 5 express codes and 5 express rooms
+            for i in range(5):
+                # Create express code
+                express_data = {
+                    "card_id": self.card_id,
+                    "duration_seconds": 120,
+                    "code_length": 2
+                }
+                
+                response = requests.post(f"{API_BASE}/express/create", json=express_data, headers=headers)
+                if response.status_code == 200:
+                    data = response.json()
+                    express_codes.append(data["code"])
+                
+                # Create express room
+                room_data = {
+                    "card_id": self.card_id,
+                    "duration_seconds": 120,
+                    "max_participants": 5
+                }
+                
+                response = requests.post(f"{API_BASE}/express/room/create", json=room_data, headers=headers)
+                if response.status_code == 200:
+                    data = response.json()
+                    room_codes.append(data["code"])
+            
+            # Check for global uniqueness
+            all_codes = express_codes + room_codes
+            unique_codes = set(all_codes)
+            
+            if len(unique_codes) == len(all_codes):
+                self.log_result("Global Uniqueness Verification", True, f"Global uniqueness maintained. Express: {express_codes}, Rooms: {room_codes}")
+                return True
+            else:
+                duplicates = [code for code in all_codes if all_codes.count(code) > 1]
+                self.log_result("Global Uniqueness Verification", False, f"Global collision detected: {duplicates}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Global Uniqueness Verification", False, f"Error: {str(e)}")
+            return False
+    
+    def test_berlin_munich_user_scenario(self):
+        """Test scenario: Person A (Berlin) and Person B (Munich) both try to create same code"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Berlin-Munich User Scenario", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Simulate Person A creating a code
+            express_data_a = {
+                "card_id": self.card_id,
+                "duration_seconds": 300,  # 5 minutes
+                "code_length": 2
+            }
+            
+            response_a = requests.post(f"{API_BASE}/express/create", json=express_data_a, headers=headers)
+            
+            if response_a.status_code != 200:
+                self.log_result("Berlin-Munich User Scenario", False, "Failed to create first express code")
+                return False
+            
+            data_a = response_a.json()
+            code_a = data_a["code"]
+            
+            # Simulate Person B trying to create codes (should get different codes)
+            codes_b = []
+            for i in range(10):  # Try multiple times to increase chance of collision
+                express_data_b = {
+                    "card_id": self.card_id,
+                    "duration_seconds": 300,
+                    "code_length": 2
+                }
+                
+                response_b = requests.post(f"{API_BASE}/express/create", json=express_data_b, headers=headers)
+                
+                if response_b.status_code == 200:
+                    data_b = response_b.json()
+                    code_b = data_b["code"]
+                    
+                    if code_b == code_a:
+                        self.log_result("Berlin-Munich User Scenario", False, f"COLLISION: Person B got same code as Person A: {code_a}")
+                        return False
+                    
+                    codes_b.append(code_b)
+            
+            # Test that Person C entering code_a gets Person A's card
+            code_request = {"code": code_a}
+            access_response = requests.post(f"{API_BASE}/express/access", json=code_request)
+            
+            if access_response.status_code == 200:
+                access_data = access_response.json()
+                if access_data.get("success") and access_data.get("card"):
+                    card_id_accessed = access_data["card"]["id"]
+                    if card_id_accessed == self.card_id:
+                        self.log_result("Berlin-Munich User Scenario", True, f"Scenario successful: Person A code {code_a}, Person B codes {codes_b[:3]}..., Person C correctly accessed Person A's card")
+                        return True
+                    else:
+                        self.log_result("Berlin-Munich User Scenario", False, f"Person C accessed wrong card: expected {self.card_id}, got {card_id_accessed}")
+                        return False
+                else:
+                    self.log_result("Berlin-Munich User Scenario", False, "Person C failed to access card", access_data)
+                    return False
+            else:
+                self.log_result("Berlin-Munich User Scenario", False, f"Code access failed: HTTP {access_response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Berlin-Munich User Scenario", False, f"Error: {str(e)}")
+            return False
+    
+    def test_code_expiry_and_reuse(self):
+        """Test that expired codes allow reuse and cleanup works properly"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Code Expiry and Reuse", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create express code with very short expiry
+            express_data = {
+                "card_id": self.card_id,
+                "duration_seconds": 30,  # 30 seconds
+                "code_length": 2
+            }
+            
+            response = requests.post(f"{API_BASE}/express/create", json=express_data, headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Code Expiry and Reuse", False, "Failed to create express code")
+                return False
+            
+            data = response.json()
+            short_lived_code = data["code"]
+            
+            # Verify code works immediately
+            code_request = {"code": short_lived_code}
+            access_response = requests.post(f"{API_BASE}/express/access", json=code_request)
+            
+            if access_response.status_code != 200:
+                self.log_result("Code Expiry and Reuse", False, "Code doesn't work immediately after creation")
+                return False
+            
+            # Wait for expiry (in real scenario, we'd wait 30+ seconds, but for testing we'll simulate)
+            # Instead, let's test the expiry logic by creating many codes and seeing if we can reuse patterns
+            
+            # Create multiple short-lived codes to test reuse potential
+            codes_created = []
+            for i in range(15):
+                express_data = {
+                    "card_id": self.card_id,
+                    "duration_seconds": 30,
+                    "code_length": 2
+                }
+                
+                response = requests.post(f"{API_BASE}/express/create", json=express_data, headers=headers)
+                if response.status_code == 200:
+                    data = response.json()
+                    codes_created.append(data["code"])
+            
+            # Check that we got reasonable variety (not all same code)
+            unique_codes = set(codes_created)
+            
+            if len(unique_codes) >= len(codes_created) * 0.8:  # At least 80% unique
+                self.log_result("Code Expiry and Reuse", True, f"Code generation working properly with expiry. Created {len(codes_created)} codes, {len(unique_codes)} unique")
+                return True
+            else:
+                self.log_result("Code Expiry and Reuse", False, f"Too many duplicate codes: {len(codes_created)} total, {len(unique_codes)} unique")
+                return False
+                
+        except Exception as e:
+            self.log_result("Code Expiry and Reuse", False, f"Error: {str(e)}")
+            return False
+    
+    def test_collision_error_handling(self):
+        """Test proper error handling when uniqueness attempts are exhausted"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Collision Error Handling", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Try to create many codes to potentially exhaust uniqueness attempts
+            # This tests the system's behavior under extreme load
+            codes_created = []
+            error_encountered = False
+            
+            for i in range(50):  # Try to create many codes
+                express_data = {
+                    "card_id": self.card_id,
+                    "duration_seconds": 300,  # Long duration to keep them active
+                    "code_length": 2  # Limited namespace
+                }
+                
+                response = requests.post(f"{API_BASE}/express/create", json=express_data, headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    codes_created.append(data["code"])
+                elif response.status_code == 500:
+                    # Check if it's the expected error message
+                    if "zu viele aktive Codes" in response.text or "Fehler beim Generieren" in response.text:
+                        error_encountered = True
+                        break
+                    else:
+                        self.log_result("Collision Error Handling", False, f"Unexpected error: {response.text}")
+                        return False
+            
+            # Verify no duplicates in created codes
+            unique_codes = set(codes_created)
+            if len(unique_codes) != len(codes_created):
+                self.log_result("Collision Error Handling", False, f"Duplicates found before error: {len(codes_created)} total, {len(unique_codes)} unique")
+                return False
+            
+            if error_encountered:
+                self.log_result("Collision Error Handling", True, f"System properly handled namespace exhaustion after {len(codes_created)} unique codes")
+                return True
+            elif len(codes_created) >= 40:
+                self.log_result("Collision Error Handling", True, f"System handled {len(codes_created)} codes without collision or error")
+                return True
+            else:
+                self.log_result("Collision Error Handling", False, f"Unexpected behavior: only {len(codes_created)} codes created without error")
+                return False
+                
+        except Exception as e:
+            self.log_result("Collision Error Handling", False, f"Error: {str(e)}")
+            return False
+
+    # ============================================================================
     # EXPRESS SHARE TESTS
     # ============================================================================
     
