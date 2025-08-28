@@ -247,7 +247,7 @@ const CodeAccessPage = () => {
                   )}
                 </Button>
 
-                {result && result.success && (
+                {result && result.success && result.type === 'business_card' && (
                   <div className="grid grid-cols-2 gap-3">
                     <Button 
                       variant="outline" 
@@ -255,6 +255,27 @@ const CodeAccessPage = () => {
                       className="w-full"
                     >
                       Visitenkarte anzeigen
+                    </Button>
+                    
+                    <Button 
+                      variant="outline" 
+                      onClick={handleClearResults}
+                      className="w-full"
+                    >
+                      Neuer Code
+                    </Button>
+                  </div>
+                )}
+
+                {result && result.success && result.type === 'meeting_room' && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button 
+                      variant="outline" 
+                      onClick={handleViewMeetingRoom}
+                      className="w-full"
+                    >
+                      <Users className="w-4 h-4 mr-1" />
+                      Meeting Room anzeigen
                     </Button>
                     
                     <Button 
