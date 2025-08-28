@@ -2188,6 +2188,38 @@ async def check_feature_access(
         logger.error(f"Feature access check failed: {str(e)}")
         raise HTTPException(status_code=500, detail="Feature-Zugriff konnte nicht geprüft werden")
 
+async def track_feature_usage_internal(user_id: str, event_type: str, event_data: dict = {}):
+    """Internal function to track feature usage without HTTP dependencies"""
+    try:
+        subscription = await get_user_subscription(user_id)
+        
+        # Update usage counters
+        usage_key = get_usage_key_for_event(event_type)
+        if usage_key and usage_key in subscription.monthly_usage:
+            await db.usersubscriptions.update_one(
+                {"user_id": user_id},
+                {"$inc": {f"monthly_usage.{usage_key}": 1}}
+            )
+        
+        # Log usage event
+        usage_event = UsageTrackingEvent(
+            user_id=user_id,
+            event_type=event_type,
+            event_data=event_data,
+            plan_type=subscription.plan_type
+        )
+        
+        event_dict = usage_event.dict()
+        await db.usageevents.insert_one(event_dict)
+        
+        # Check if we should show upgrade prompt
+        await check_and_create_upgrade_prompt(user_id, event_type, subscription)
+        
+        logger.info(f"Usage tracked internally: {event_type} for user {user_id}")
+        
+    except Exception as e:
+        logger.error(f"Internal usage tracking failed: {str(e)}")
+
 @api_router.post("/subscription/track-usage")
 async def track_feature_usage(
     event_type: str,
