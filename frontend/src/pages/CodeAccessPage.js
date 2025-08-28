@@ -156,7 +156,7 @@ const CodeAccessPage = () => {
               </Alert>
             )}
 
-            {result && result.success && (
+            {result && result.success && result.type === 'business_card' && (
               <Alert className="mb-6 bg-green-50 border-green-200">
                 <CheckCircle className="h-4 w-4 text-green-600" />
                 <AlertDescription className="text-green-800">
@@ -174,6 +174,30 @@ const CodeAccessPage = () => {
                   </div>
                   <div className="mt-2 text-sm">
                     Code verwendet: <strong>{result.code_usage_count}</strong> Mal
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {result && result.success && result.type === 'meeting_room' && (
+              <Alert className="mb-6 bg-blue-50 border-blue-200">
+                <Users className="h-4 w-4 text-blue-600" />
+                <AlertDescription className="text-blue-800">
+                  <div className="font-medium mb-2">Meeting Room gefunden!</div>
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-2">
+                      <code className="bg-blue-100 px-2 py-1 rounded font-mono font-bold">
+                        {result.room.code}
+                      </code>
+                      <span className="text-sm">von {result.room.created_by_card_name}</span>
+                    </div>
+                    {result.room.description && (
+                      <p className="text-sm">{result.room.description}</p>
+                    )}
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>Teilnehmer: <strong>{result.room.participants.length}/{result.room.max_participants}</strong></div>
+                      <div>Zeit übrig: <strong>{result.room.time_remaining_minutes} min</strong></div>
+                    </div>
                   </div>
                 </AlertDescription>
               </Alert>
