@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Test the new Monetization Infrastructure for the growth-first strategy with 95% free features including Subscription Management, Feature Access Control, Usage Tracking System, Intelligent Upgrade Prompts, and Integration with Existing Features."
+user_problem_statement: "Complete implementation and testing of the 'First 100,000 Users' Early Adopter Bonus feature, ensuring proper backend user counting logic, frontend EarlyAdopterBadge integration, and comprehensive testing of the early adopter flow."
 
 frontend:
   - task: "Express Share Modal Frontend"
