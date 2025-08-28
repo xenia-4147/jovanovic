@@ -1802,6 +1802,8 @@ async def import_from_contact_picker(request: ContactImportRequest, user: User) 
 
 async def import_from_vcf_file(request: ContactImportRequest, user: User) -> ContactImportResponse:
     """Import contacts from VCF file"""
+    from bson import ObjectId
+    
     if not request.file_content:
         raise HTTPException(status_code=400, detail="Keine Datei bereitgestellt")
     
