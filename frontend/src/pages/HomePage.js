@@ -7,6 +7,7 @@ import { Plus, QrCode, Share2, Edit, Eye, Globe, Lock, LogOut, User, Settings, B
 import { cardsApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
+import ExpressShareModal from '../components/ExpressShareModal';
 
 const HomePage = () => {
   const navigate = useNavigate();
