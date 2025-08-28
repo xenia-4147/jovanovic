@@ -55,6 +55,10 @@ class MeetingRoom(BaseModel):
         if not v:
             return v
         
+        # Ensure v is a string
+        if not isinstance(v, str):
+            v = str(v)
+        
         # Convert to uppercase and remove spaces
         code = v.replace(' ', '').upper()
         
