@@ -230,9 +230,15 @@ async def create_business_card(
     """Create new business card"""
     try:
         # Create business card with string user ID
+        card_dict = card_data.dict()
+        
+        # Ensure social_media is properly handled
+        if card_dict.get('social_media') is None:
+            card_dict['social_media'] = SocialMedia()
+        
         card = BusinessCard(
             user_id=str(current_user.id),
-            **card_data.dict()
+            **card_dict
         )
         
         # Insert into database
