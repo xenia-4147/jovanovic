@@ -3,175 +3,263 @@
     "test": "Health Check",
     "success": true,
     "message": "API is running - Digital Business Cards API",
-    "timestamp": "2025-08-28T11:26:55.034301"
+    "timestamp": "2025-08-28T12:15:35.974676"
   },
   {
     "test": "User Registration",
     "success": true,
-    "message": "User registered successfully: testuser_b1971a4c@example.com",
-    "timestamp": "2025-08-28T11:26:55.319620"
+    "message": "User registered successfully: testuser_9ef1ffd1@example.com",
+    "timestamp": "2025-08-28T12:15:36.274898"
   },
   {
     "test": "User Login",
     "success": true,
-    "message": "Login successful for: logintest_70d28db8@example.com",
-    "timestamp": "2025-08-28T11:26:55.890952"
+    "message": "Login successful for: logintest_fac3e9d5@example.com",
+    "timestamp": "2025-08-28T12:15:36.857126"
   },
   {
     "test": "Protected Endpoint",
     "success": true,
-    "message": "User profile retrieved: testuser_b1971a4c@example.com",
-    "timestamp": "2025-08-28T11:26:55.946588"
+    "message": "User profile retrieved: testuser_9ef1ffd1@example.com",
+    "timestamp": "2025-08-28T12:15:36.917310"
   },
   {
     "test": "Create Business Card",
     "success": true,
     "message": "Card created: John Doe",
-    "timestamp": "2025-08-28T11:26:56.002775"
+    "timestamp": "2025-08-28T12:15:36.973612"
   },
   {
     "test": "Get User Cards",
     "success": true,
     "message": "No cards found (empty list)",
-    "timestamp": "2025-08-28T11:26:56.063356"
+    "timestamp": "2025-08-28T12:15:37.032451"
   },
   {
     "test": "Get Specific Card",
     "success": true,
     "message": "Card retrieved: John Doe",
-    "timestamp": "2025-08-28T11:26:56.117825"
+    "timestamp": "2025-08-28T12:15:37.087957"
   },
   {
     "test": "Update Business Card",
     "success": true,
     "message": "Card updated successfully",
-    "timestamp": "2025-08-28T11:26:56.172350"
+    "timestamp": "2025-08-28T12:15:37.142554"
   },
   {
     "test": "Create Card with Custom Code",
     "success": true,
-    "message": "Card created with custom code: TEST4023BC",
-    "timestamp": "2025-08-28T11:26:56.226769"
+    "message": "Card created with custom code: TEST463DA8",
+    "timestamp": "2025-08-28T12:15:37.198502"
   },
   {
     "test": "Check Code Availability - Available",
     "success": true,
-    "message": "Code AVAIL9EA8 is available",
-    "timestamp": "2025-08-28T11:26:56.274650"
+    "message": "Code AVAILDA26 is available",
+    "timestamp": "2025-08-28T12:15:37.246735"
   },
   {
     "test": "Check Code Availability - Taken",
     "success": true,
-    "message": "Code TEST4023BC is correctly marked as taken",
-    "timestamp": "2025-08-28T11:26:56.325334"
+    "message": "Code TEST463DA8 is correctly marked as taken",
+    "timestamp": "2025-08-28T12:15:37.295480"
   },
   {
     "test": "Access Card by Code",
     "success": true,
-    "message": "Successfully accessed card using code: TEST4023BC",
-    "timestamp": "2025-08-28T11:26:56.374936"
+    "message": "Successfully accessed card using code: TEST463DA8",
+    "timestamp": "2025-08-28T12:15:37.347886"
   },
   {
     "test": "Code Uniqueness Validation",
     "success": false,
     "message": "Expected validation error, got HTTP 500",
-    "timestamp": "2025-08-28T11:26:56.431036",
-    "response": "{\"detail\":\"Card creation failed: E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TEST4023BC\\\" }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TEST4023BC\\\" }', 'keyPattern': {'custom_code': 1}, 'keyValue': {'custom_code': 'TEST4023BC'}}\"}"
+    "timestamp": "2025-08-28T12:15:37.401838",
+    "response": "{\"detail\":\"Card creation failed: E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TEST463DA8\\\" }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TEST463DA8\\\" }', 'keyPattern': {'custom_code': 1}, 'keyValue': {'custom_code': 'TEST463DA8'}}\"}"
   },
   {
     "test": "Social Media Fix with Custom Code - Missing Field",
     "success": true,
-    "message": "Card created with custom code SOCIAL8495D3, social_media properly initialized",
-    "timestamp": "2025-08-28T11:26:56.486830"
+    "message": "Card created with custom code SOCIALD91467, social_media properly initialized",
+    "timestamp": "2025-08-28T12:15:37.454957"
   },
   {
     "test": "Social Media Fix with Custom Code - Null Field",
     "success": true,
-    "message": "Card created with custom code SOCIALCC4723, null social_media properly handled",
-    "timestamp": "2025-08-28T11:26:56.540487"
+    "message": "Card created with custom code SOCIALCCDFF4, null social_media properly handled",
+    "timestamp": "2025-08-28T12:15:37.513634"
   },
   {
     "test": "Create Meeting Room",
     "success": true,
-    "message": "Meeting room created with code: UF85W",
-    "timestamp": "2025-08-28T11:26:56.597324"
+    "message": "Meeting room created with code: D4JJM",
+    "timestamp": "2025-08-28T12:15:37.567910"
   },
   {
     "test": "Get Meeting Room",
     "success": true,
-    "message": "Meeting room retrieved: UF85W",
-    "timestamp": "2025-08-28T11:26:56.647758"
+    "message": "Meeting room retrieved: D4JJM",
+    "timestamp": "2025-08-28T12:15:37.618294"
   },
   {
     "test": "Join Meeting Room",
     "success": true,
-    "message": "Successfully joined meeting room: UF85W",
-    "timestamp": "2025-08-28T11:26:56.706890"
+    "message": "Successfully joined meeting room: D4JJM",
+    "timestamp": "2025-08-28T12:15:37.679542"
   },
   {
     "test": "List User Meeting Rooms",
     "success": true,
     "message": "No meeting rooms found (empty list)",
-    "timestamp": "2025-08-28T11:26:56.763350"
+    "timestamp": "2025-08-28T12:15:37.731508"
   },
   {
     "test": "Enhanced Code Access - Meeting Room",
     "success": true,
     "message": "Meeting room code properly rejected by card access endpoint",
-    "timestamp": "2025-08-28T11:26:56.818418"
+    "timestamp": "2025-08-28T12:15:37.779082"
   },
   {
     "test": "Close Meeting Room",
     "success": true,
-    "message": "Meeting room UF85W closed successfully",
-    "timestamp": "2025-08-28T11:26:56.874770"
+    "message": "Meeting room D4JJM closed successfully",
+    "timestamp": "2025-08-28T12:15:37.832736"
+  },
+  {
+    "test": "Create Express Code (2-char)",
+    "success": true,
+    "message": "Express code created: C4 (expires in 59s)",
+    "timestamp": "2025-08-28T12:15:37.885702"
+  },
+  {
+    "test": "Create Express Code (3-char)",
+    "success": true,
+    "message": "Express code created: 62L (expires in 179s)",
+    "timestamp": "2025-08-28T12:15:37.942314"
+  },
+  {
+    "test": "Access by Express Code",
+    "success": true,
+    "message": "Successfully accessed card using express code: C4",
+    "timestamp": "2025-08-28T12:15:37.995215"
+  },
+  {
+    "test": "Express Code Expiry",
+    "success": true,
+    "message": "Express code 49 works immediately after creation and will expire in 30s",
+    "timestamp": "2025-08-28T12:15:38.103377"
+  },
+  {
+    "test": "Create Express Room",
+    "success": true,
+    "message": "Express room created with code: 99 (expires in 119s)",
+    "timestamp": "2025-08-28T12:15:38.158418"
+  },
+  {
+    "test": "Join Express Room",
+    "success": false,
+    "message": "Missing fields in received card data",
+    "timestamp": "2025-08-28T12:15:38.215913",
+    "response": {
+      "id": "68b04868451749f84a7a7477",
+      "name": "John Doe",
+      "company": "Tech Solutions Inc",
+      "position": "Lead Developer",
+      "phones": [
+        {
+          "label": "work",
+          "number": "+1-555-123-4567",
+          "is_primary": true
+        }
+      ],
+      "emails": [
+        {
+          "label": "work",
+          "address": "john.doe@techsolutions.com",
+          "is_primary": true
+        }
+      ],
+      "website": "https://johndoe.dev",
+      "profile_image": null
+    }
+  },
+  {
+    "test": "Express Code Uniqueness",
+    "success": true,
+    "message": "Generated unique codes: ['XN', 'LN', 'MP'] and room codes: ['97', '61']",
+    "timestamp": "2025-08-28T12:15:38.509112"
+  },
+  {
+    "test": "Express Integration",
+    "success": false,
+    "message": "Express code accessible via regular endpoint: HTTP 400",
+    "timestamp": "2025-08-28T12:15:38.557191"
+  },
+  {
+    "test": "Express Room Limits",
+    "success": true,
+    "message": "Express room 31 properly handles participant limits",
+    "timestamp": "2025-08-28T12:15:38.718690"
+  },
+  {
+    "test": "Invalid Express Operations - Code",
+    "success": true,
+    "message": "Non-existent express code properly rejected",
+    "timestamp": "2025-08-28T12:15:38.774669"
+  },
+  {
+    "test": "Invalid Express Operations - Room",
+    "success": false,
+    "message": "Expected 404, got 200",
+    "timestamp": "2025-08-28T12:15:38.827810"
   },
   {
     "test": "QR Code Generation",
     "success": true,
-    "message": "QR code generated (size: 698 bytes)",
-    "timestamp": "2025-08-28T11:26:56.947995"
+    "message": "QR code generated (size: 683 bytes)",
+    "timestamp": "2025-08-28T12:15:38.903333"
   },
   {
     "test": "vCard Generation",
     "success": true,
     "message": "vCard generated successfully",
-    "timestamp": "2025-08-28T11:26:57.003124"
+    "timestamp": "2025-08-28T12:15:38.953549"
   },
   {
     "test": "Privacy Report",
     "success": true,
     "message": "Privacy report generated successfully",
-    "timestamp": "2025-08-28T11:26:57.056513"
+    "timestamp": "2025-08-28T12:15:39.012776"
   },
   {
     "test": "Data Export",
     "success": true,
     "message": "GDPR data export completed successfully",
-    "timestamp": "2025-08-28T11:26:57.106442"
+    "timestamp": "2025-08-28T12:15:39.064236"
   },
   {
     "test": "Invalid Authentication",
     "success": true,
     "message": "Properly rejected invalid token",
-    "timestamp": "2025-08-28T11:26:57.153309"
+    "timestamp": "2025-08-28T12:15:39.113271"
   },
   {
     "test": "Non-existent Card",
     "success": true,
     "message": "Properly returned 404 for non-existent card",
-    "timestamp": "2025-08-28T11:26:57.200809"
+    "timestamp": "2025-08-28T12:15:39.162161"
   },
   {
     "test": "Invalid Meeting Room Operations - Non-existent",
     "success": true,
     "message": "Non-existent meeting room properly rejected",
-    "timestamp": "2025-08-28T11:26:57.254141"
+    "timestamp": "2025-08-28T12:15:39.215757"
   },
   {
     "test": "Invalid Meeting Room Operations - Get Non-existent",
     "success": true,
     "message": "Non-existent meeting room get properly rejected",
-    "timestamp": "2025-08-28T11:26:57.303467"
+    "timestamp": "2025-08-28T12:15:39.264869"
   }
 ]
