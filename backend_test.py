@@ -1070,6 +1070,9 @@ class BusinessCardAPITester:
             self.test_access_card_by_code,
             self.test_code_uniqueness_validation,
             
+            # Targeted fix tests
+            self.test_social_media_fix_with_custom_code,
+            
             # Meeting room tests
             self.test_create_meeting_room,
             self.test_get_meeting_room,
