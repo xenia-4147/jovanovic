@@ -462,7 +462,117 @@ async def update_business_card(
         raise HTTPException(status_code=500, detail="Card update failed")
 
 # ============================================================================
-# UTILITY ENDPOINTS (QR, vCard, etc.)
+# CODE ACCESS ENDPOINTS
+# ============================================================================
+
+@api_router.post("/cards/access-by-code", response_model=dict)
+async def access_card_by_code(
+    code_request: dict,
+    request: Request,
+    background_tasks: BackgroundTasks
+):
+    """Access business card using custom code"""
+    try:
+        code = code_request.get("code", "").replace(" ", "").upper()
+        
+        if not code:
+            raise HTTPException(status_code=400, detail="Code ist erforderlich")
+        
+        if len(code) < 3 or len(code) > 50:
+            raise HTTPException(status_code=400, detail="Code muss zwischen 3 und 50 Zeichen lang sein")
+        
+        # Find card by custom code
+        card_data = await db.businesscards.find_one({"custom_code": code})
+        
+        if not card_data:
+            raise HTTPException(status_code=404, detail="Code nicht gefunden")
+        
+        # Convert ObjectId to string for compatibility
+        if "_id" in card_data:
+            card_data["_id"] = str(card_data["_id"])
+        if "userId" in card_data:
+            card_data["userId"] = str(card_data["userId"])
+        
+        card = BusinessCard(**card_data)
+        
+        # Check if card is public or accessible
+        if not card.is_public:
+            raise HTTPException(status_code=403, detail="Diese Visitenkarte ist nicht öffentlich zugänglich")
+        
+        # Update code usage count
+        await db.businesscards.update_one(
+            {"_id": card_data["_id"]},
+            {"$inc": {"code_usage_count": 1}}
+        )
+        
+        # Track analytics (in background)
+        background_tasks.add_task(
+            track_card_analytics,
+            str(card.id),
+            "code_access",
+            request,
+            {"access_method": "code", "code_used": code}
+        )
+        
+        # Get updated usage count
+        updated_card_data = await db.businesscards.find_one({"_id": card_data["_id"]})
+        usage_count = updated_card_data.get("code_usage_count", 1)
+        
+        logger.info(f"Code access successful: {code} -> Card {card.id} (Usage: {usage_count})")
+        
+        return {
+            "success": True,
+            "message": f"Visitenkarte von {card.name} gefunden",
+            "card": BusinessCardResponse(
+                id=str(card.id),
+                **card.dict(exclude={"id", "user_id"}),
+                code_usage_count=usage_count,
+                is_owner=False
+            ),
+            "code_usage_count": usage_count
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Code access failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Code-Zugriff fehlgeschlagen")
+
+@api_router.get("/cards/check-code/{code}")
+async def check_code_availability(code: str):
+    """Check if a custom code is available"""
+    try:
+        # Clean and validate code
+        clean_code = code.replace(" ", "").upper()
+        
+        if len(clean_code) < 3 or len(clean_code) > 50:
+            return {"available": False, "message": "Code muss zwischen 3 und 50 Zeichen lang sein"}
+        
+        if not clean_code.replace('_', '').replace('-', '').isalnum():
+            return {"available": False, "message": "Code darf nur Buchstaben, Zahlen, Unterstriche und Bindestriche enthalten"}
+        
+        # Check if code exists
+        existing_card = await db.businesscards.find_one({"custom_code": clean_code})
+        
+        if existing_card:
+            return {
+                "available": False, 
+                "message": "Dieser Code ist bereits vergeben",
+                "suggestion": f"{clean_code}{len(clean_code) + 1}"
+            }
+        
+        return {
+            "available": True, 
+            "message": "Code ist verfügbar",
+            "code": clean_code
+        }
+        
+    except Exception as e:
+        logger.error(f"Code availability check failed: {str(e)}")
+        return {"available": False, "message": "Fehler bei der Code-Prüfung"}
+
+# ============================================================================
+# ENHANCED UTILITY ENDPOINTS
 # ============================================================================
 
 @api_router.get("/cards/{card_id}/qr")
