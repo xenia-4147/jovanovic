@@ -2212,6 +2212,16 @@ async def startup_event():
         # Compound unique index to prevent duplicate active room codes
         await db.expressrooms.create_index([("code", 1), ("is_active", 1), ("expires_at", 1)], sparse=True)
         
+        # Contact import indexes
+        await db.contactsources.create_index("user_id")
+        await db.contactsources.create_index([("user_id", 1), ("source_type", 1)])
+        await db.importedcontacts.create_index("user_id")
+        await db.importedcontacts.create_index("source_id")
+        await db.importedcontacts.create_index([("user_id", 1), ("name", 1)])
+        await db.importedcontacts.create_index("external_id", sparse=True)
+        await db.syncjobs.create_index("user_id")
+        await db.syncjobs.create_index([("status", 1), ("scheduled_at", 1)])
+        
         logger.info("Database indexes created successfully")
         
     except Exception as e:
