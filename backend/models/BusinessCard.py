@@ -60,7 +60,8 @@ class SocialMedia(BaseModel):
     tiktok: Optional[str] = None
     telegram: Optional[str] = None
     
-    @validator('*', pre=True)
+    @field_validator('instagram', 'linkedin', 'twitter', 'tiktok', 'telegram', mode='before')
+    @classmethod
     def clean_social_handles(cls, v):
         if v and isinstance(v, str):
             # Remove @ symbol if present
