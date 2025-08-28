@@ -388,44 +388,44 @@ const CreateCardPage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                      <div>
-                        <Label htmlFor="isPublic">Öffentlich sichtbar</Label>
-                        <p className="text-sm text-gray-500">Jeder mit dem Link kann Ihre Visitenkarte sehen</p>
+                        <div>
+                          <Label htmlFor="isPublic">Öffentlich sichtbar</Label>
+                          <p className="text-sm text-gray-500">Jeder mit dem Link kann Ihre Visitenkarte sehen</p>
+                        </div>
+                        <Switch
+                          id="isPublic"
+                          checked={formData.is_public}
+                          onCheckedChange={(checked) => handleInputChange('is_public', checked)}
+                        />
                       </div>
-                      <Switch
-                        id="isPublic"
-                        checked={formData.is_public}
-                        onCheckedChange={(checked) => handleInputChange('is_public', checked)}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label htmlFor="allowEmbedding" className="flex items-center">
-                          <Globe className="w-4 h-4 mr-2" />
-                          Einbettung erlauben
-                        </Label>
-                        <p className="text-sm text-gray-500">Andere können Ihre Karte in Webseiten einbetten</p>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label htmlFor="allowEmbedding" className="flex items-center">
+                            <Globe className="w-4 h-4 mr-2" />
+                            Einbettung erlauben
+                          </Label>
+                          <p className="text-sm text-gray-500">Andere können Ihre Karte in Webseiten einbetten</p>
+                        </div>
+                        <Switch
+                          id="allowEmbedding"
+                          checked={formData.allow_embedding}
+                          onCheckedChange={(checked) => handleInputChange('allow_embedding', checked)}
+                        />
                       </div>
-                      <Switch
-                        id="allowEmbedding"
-                        checked={formData.allow_embedding}
-                        onCheckedChange={(checked) => handleInputChange('allow_embedding', checked)}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <Label htmlFor="autoUpdate">Auto-Update</Label>
-                        <p className="text-sm text-gray-500">Änderungen werden automatisch an alle Empfänger gesendet</p>
+                      
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <Label htmlFor="autoUpdate">Auto-Update</Label>
+                          <p className="text-sm text-gray-500">Änderungen werden automatisch an alle Empfänger gesendet</p>
+                        </div>
+                        <Switch
+                          id="autoUpdate"
+                          checked={formData.auto_update_enabled}
+                          onCheckedChange={(checked) => handleInputChange('auto_update_enabled', checked)}
+                        />
                       </div>
-                      <Switch
-                        id="autoUpdate"
-                        checked={formData.auto_update_enabled}
-                        onCheckedChange={(checked) => handleInputChange('auto_update_enabled', checked)}
-                      />
                     </div>
-                  </div>
                   
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
