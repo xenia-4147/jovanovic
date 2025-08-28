@@ -3442,6 +3442,13 @@ END:VCARD"""
             self.test_access_card_by_code,
             self.test_code_uniqueness_validation,
             
+            # Subscription & Monetization System Tests
+            self.test_get_subscription_status,
+            self.test_check_feature_access_free_user,
+            self.test_track_usage_system,
+            self.test_integration_with_existing_features,
+            self.test_growth_first_validation,
+            
             # Contact Import System Tests
             self.test_list_contact_sources_empty,
             self.test_import_contacts_contact_picker,
