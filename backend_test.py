@@ -884,6 +884,134 @@ class BusinessCardAPITester:
             self.log_result("Code Uniqueness Validation", False, f"Error: {str(e)}")
             return False
     
+    def test_social_media_fix_with_custom_code(self):
+        """Test POST /api/cards with custom_code and missing social_media field (targeted fix test)"""
+        if not self.access_token:
+            self.log_result("Social Media Fix with Custom Code", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Generate unique custom code
+            custom_code = f"SOCIAL{uuid.uuid4().hex[:6].upper()}"
+            
+            # Test 1: Card with custom_code but NO social_media field
+            card_data_no_social = {
+                "name": "Test User No Social",
+                "company": "Social Media Test Corp",
+                "position": "QA Engineer",
+                "description": "Testing social media field handling",
+                "phones": [
+                    {
+                        "label": "work",
+                        "number": "+49-30-987-6543",
+                        "is_primary": True
+                    }
+                ],
+                "emails": [
+                    {
+                        "label": "work", 
+                        "address": "test.nosocial@example.com",
+                        "is_primary": True
+                    }
+                ],
+                "custom_code": custom_code,
+                "is_public": True,
+                "background_color": "#ffffff",
+                "text_color": "#000000",
+                "accent_color": "#3b82f6"
+                # NOTE: social_media field is intentionally missing
+            }
+            
+            response = requests.post(f"{API_BASE}/cards", json=card_data_no_social, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify card was created successfully
+                if data.get("custom_code") == custom_code:
+                    # Verify social_media field exists and is properly initialized
+                    if "social_media" in data:
+                        social_media = data["social_media"]
+                        # Should be an empty SocialMedia object (all fields None or empty)
+                        expected_fields = ["linkedin", "twitter", "facebook", "instagram", "github", "website"]
+                        has_social_structure = any(field in social_media for field in expected_fields)
+                        
+                        self.log_result("Social Media Fix with Custom Code - Missing Field", True, 
+                                      f"Card created with custom code {custom_code}, social_media properly initialized")
+                    else:
+                        self.log_result("Social Media Fix with Custom Code - Missing Field", False, 
+                                      "social_media field missing from response", data)
+                        return False
+                else:
+                    self.log_result("Social Media Fix with Custom Code - Missing Field", False, 
+                                  "Custom code not reflected in response", data)
+                    return False
+            else:
+                self.log_result("Social Media Fix with Custom Code - Missing Field", False, 
+                              f"HTTP {response.status_code}", response.text)
+                return False
+            
+            # Test 2: Card with custom_code and explicit social_media: null
+            custom_code_2 = f"SOCIAL{uuid.uuid4().hex[:6].upper()}"
+            
+            card_data_null_social = {
+                "name": "Test User Null Social",
+                "company": "Social Media Test Corp",
+                "position": "QA Engineer",
+                "description": "Testing social media field handling with null",
+                "phones": [
+                    {
+                        "label": "work",
+                        "number": "+49-30-987-6544",
+                        "is_primary": True
+                    }
+                ],
+                "emails": [
+                    {
+                        "label": "work", 
+                        "address": "test.nullsocial@example.com",
+                        "is_primary": True
+                    }
+                ],
+                "custom_code": custom_code_2,
+                "social_media": None,  # Explicitly set to None
+                "is_public": True,
+                "background_color": "#ffffff",
+                "text_color": "#000000",
+                "accent_color": "#3b82f6"
+            }
+            
+            response = requests.post(f"{API_BASE}/cards", json=card_data_null_social, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify card was created successfully
+                if data.get("custom_code") == custom_code_2:
+                    # Verify social_media field exists and is properly initialized
+                    if "social_media" in data:
+                        self.log_result("Social Media Fix with Custom Code - Null Field", True, 
+                                      f"Card created with custom code {custom_code_2}, null social_media properly handled")
+                        return True
+                    else:
+                        self.log_result("Social Media Fix with Custom Code - Null Field", False, 
+                                      "social_media field missing from response", data)
+                        return False
+                else:
+                    self.log_result("Social Media Fix with Custom Code - Null Field", False, 
+                                  "Custom code not reflected in response", data)
+                    return False
+            else:
+                self.log_result("Social Media Fix with Custom Code - Null Field", False, 
+                              f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Social Media Fix with Custom Code", False, f"Error: {str(e)}")
+            return False
+    
     def test_invalid_meeting_room_operations(self):
         """Test various invalid meeting room operations"""
         try:
