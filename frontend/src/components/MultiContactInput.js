@@ -27,7 +27,14 @@ const MultiContactInput = ({
       id: Date.now(),
       label: availableLabels[0],
       [type === 'phone' ? 'number' : 'address']: '',
-      isPrimary: items.length === 0
+      isPrimary: items.length === 0,
+      // Add default messaging apps for phone numbers
+      ...(type === 'phone' && {
+        messaging_apps: [
+          { name: 'whatsapp', enabled: true },
+          { name: 'sms', enabled: true }
+        ]
+      })
     };
     onChange([...items, newItem]);
   };
