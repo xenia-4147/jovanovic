@@ -36,6 +36,7 @@ const EditCardPage = () => {
       tiktok: '',
       telegram: ''
     },
+    custom_code: '',
     is_public: true,
     background_color: '#ffffff',
     text_color: '#1f2937',
