@@ -1044,6 +1044,580 @@ class BusinessCardAPITester:
             return False
     
     # ============================================================================
+    # CONTACT IMPORT SYSTEM TESTS
+    # ============================================================================
+    
+    def test_list_contact_sources_empty(self):
+        """Test GET /api/contacts/sources with no sources configured"""
+        if not self.access_token:
+            self.log_result("List Contact Sources - Empty", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/contacts/sources", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if isinstance(data, list):
+                    self.log_result("List Contact Sources - Empty", True, f"Retrieved {len(data)} contact sources (empty list expected)")
+                    return True
+                else:
+                    self.log_result("List Contact Sources - Empty", False, "Response is not a list", data)
+                    return False
+            else:
+                self.log_result("List Contact Sources - Empty", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("List Contact Sources - Empty", False, f"Error: {str(e)}")
+            return False
+    
+    def test_import_contacts_contact_picker(self):
+        """Test POST /api/contacts/import with Contact Picker API data"""
+        if not self.access_token:
+            self.log_result("Import Contacts - Contact Picker", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Simulate Contact Picker API data
+            import_data = {
+                "source_type": "contact_picker",
+                "display_name": "Browser Contacts Import",
+                "contacts_data": [
+                    {
+                        "name": ["John Smith"],
+                        "tel": ["+1-555-123-4567", "+1-555-987-6543"],
+                        "email": ["john.smith@example.com", "j.smith@work.com"]
+                    },
+                    {
+                        "name": ["Sarah Johnson"],
+                        "tel": ["+44-20-7946-0958"],
+                        "email": ["sarah.johnson@company.co.uk"]
+                    },
+                    {
+                        "name": ["Alex Chen"],
+                        "tel": ["+49-30-123-4567"],
+                        "email": ["alex.chen@tech.de"]
+                    }
+                ]
+            }
+            
+            response = requests.post(f"{API_BASE}/contacts/import", json=import_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "message", "source_id", "contacts_imported"]
+                
+                if all(field in data for field in required_fields):
+                    if data["success"] == True and data["contacts_imported"] == 3:
+                        self.contact_source_id = data["source_id"]
+                        self.log_result("Import Contacts - Contact Picker", True, f"Successfully imported {data['contacts_imported']} contacts from Contact Picker")
+                        return True
+                    else:
+                        self.log_result("Import Contacts - Contact Picker", False, f"Expected 3 contacts imported, got {data.get('contacts_imported')}", data)
+                        return False
+                else:
+                    self.log_result("Import Contacts - Contact Picker", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Import Contacts - Contact Picker", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Import Contacts - Contact Picker", False, f"Error: {str(e)}")
+            return False
+    
+    def test_import_contacts_vcf_file(self):
+        """Test POST /api/contacts/import with VCF file data"""
+        if not self.access_token:
+            self.log_result("Import Contacts - VCF File", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create sample VCF content
+            vcf_content = """BEGIN:VCARD
+VERSION:3.0
+FN:Maria Schmidt
+ORG:Digital Innovation GmbH
+TITLE:Product Manager
+TEL;TYPE=WORK:+49-30-987-6543
+TEL;TYPE=CELL:+49-176-123-4567
+EMAIL;TYPE=WORK:maria.schmidt@digitalinnovation.de
+EMAIL;TYPE=HOME:maria@example.com
+END:VCARD
+
+BEGIN:VCARD
+VERSION:3.0
+FN:David Wilson
+ORG:Tech Solutions Ltd
+TITLE:Senior Developer
+TEL;TYPE=WORK:+44-20-1234-5678
+EMAIL;TYPE=WORK:david.wilson@techsolutions.co.uk
+END:VCARD"""
+            
+            import base64
+            encoded_content = base64.b64encode(vcf_content.encode('utf-8')).decode('utf-8')
+            
+            import_data = {
+                "source_type": "vcf_file",
+                "display_name": "VCF Import Test",
+                "file_content": encoded_content,
+                "file_name": "contacts.vcf"
+            }
+            
+            response = requests.post(f"{API_BASE}/contacts/import", json=import_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "message", "source_id", "contacts_imported"]
+                
+                if all(field in data for field in required_fields):
+                    if data["success"] == True and data["contacts_imported"] == 2:
+                        self.vcf_source_id = data["source_id"]
+                        self.log_result("Import Contacts - VCF File", True, f"Successfully imported {data['contacts_imported']} contacts from VCF file")
+                        return True
+                    else:
+                        self.log_result("Import Contacts - VCF File", False, f"Expected 2 contacts imported, got {data.get('contacts_imported')}", data)
+                        return False
+                else:
+                    self.log_result("Import Contacts - VCF File", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Import Contacts - VCF File", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Import Contacts - VCF File", False, f"Error: {str(e)}")
+            return False
+    
+    def test_import_contacts_google_placeholder(self):
+        """Test POST /api/contacts/import with Google Contacts (placeholder)"""
+        if not self.access_token:
+            self.log_result("Import Contacts - Google Placeholder", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            import_data = {
+                "source_type": "google_contacts",
+                "display_name": "My Google Contacts"
+            }
+            
+            response = requests.post(f"{API_BASE}/contacts/import", json=import_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Should return placeholder response with auth_required=True
+                if data.get("success") == False and data.get("auth_required") == True:
+                    if "Google Contacts" in data.get("message", ""):
+                        self.log_result("Import Contacts - Google Placeholder", True, "Google Contacts placeholder response working correctly")
+                        return True
+                    else:
+                        self.log_result("Import Contacts - Google Placeholder", False, "Unexpected message in placeholder response", data)
+                        return False
+                else:
+                    self.log_result("Import Contacts - Google Placeholder", False, "Expected placeholder response with auth_required=True", data)
+                    return False
+            else:
+                self.log_result("Import Contacts - Google Placeholder", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Import Contacts - Google Placeholder", False, f"Error: {str(e)}")
+            return False
+    
+    def test_import_contacts_apple_placeholder(self):
+        """Test POST /api/contacts/import with Apple iCloud (placeholder)"""
+        if not self.access_token:
+            self.log_result("Import Contacts - Apple Placeholder", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            import_data = {
+                "source_type": "apple_icloud",
+                "display_name": "My iCloud Contacts"
+            }
+            
+            response = requests.post(f"{API_BASE}/contacts/import", json=import_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Should return placeholder response with auth_required=True
+                if data.get("success") == False and data.get("auth_required") == True:
+                    if "Apple iCloud" in data.get("message", ""):
+                        self.log_result("Import Contacts - Apple Placeholder", True, "Apple iCloud placeholder response working correctly")
+                        return True
+                    else:
+                        self.log_result("Import Contacts - Apple Placeholder", False, "Unexpected message in placeholder response", data)
+                        return False
+                else:
+                    self.log_result("Import Contacts - Apple Placeholder", False, "Expected placeholder response with auth_required=True", data)
+                    return False
+            else:
+                self.log_result("Import Contacts - Apple Placeholder", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Import Contacts - Apple Placeholder", False, f"Error: {str(e)}")
+            return False
+    
+    def test_import_contacts_csv_unsupported(self):
+        """Test POST /api/contacts/import with CSV file (should be unsupported)"""
+        if not self.access_token:
+            self.log_result("Import Contacts - CSV Unsupported", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            import_data = {
+                "source_type": "csv_file",
+                "display_name": "CSV Import Test",
+                "file_content": "name,phone,email\nTest User,+1-555-123-4567,test@example.com"
+            }
+            
+            response = requests.post(f"{API_BASE}/contacts/import", json=import_data, headers=headers)
+            
+            # Should return 400 or 500 error for unsupported source type
+            if response.status_code in [400, 500]:
+                self.log_result("Import Contacts - CSV Unsupported", True, "CSV import properly rejected as unsupported")
+                return True
+            else:
+                self.log_result("Import Contacts - CSV Unsupported", False, f"Expected error for unsupported CSV, got HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Import Contacts - CSV Unsupported", False, f"Error: {str(e)}")
+            return False
+    
+    def test_list_contact_sources_with_data(self):
+        """Test GET /api/contacts/sources after importing contacts"""
+        if not self.access_token or not hasattr(self, 'contact_source_id'):
+            self.log_result("List Contact Sources - With Data", False, "No access token or contact source available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/contacts/sources", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if isinstance(data, list) and len(data) > 0:
+                    # Check first source structure
+                    source = data[0]
+                    required_fields = ["id", "source_type", "display_name", "sync_enabled", "sync_status", "total_contacts_imported"]
+                    
+                    if all(field in source for field in required_fields):
+                        # Verify we have the expected sources
+                        source_types = [s["source_type"] for s in data]
+                        
+                        if "contact_picker" in source_types:
+                            # Find contact picker source and verify data
+                            picker_source = next((s for s in data if s["source_type"] == "contact_picker"), None)
+                            
+                            if picker_source and picker_source["total_contacts_imported"] == 3:
+                                self.log_result("List Contact Sources - With Data", True, f"Retrieved {len(data)} contact sources with correct data")
+                                return True
+                            else:
+                                self.log_result("List Contact Sources - With Data", False, f"Contact picker source data incorrect: {picker_source}")
+                                return False
+                        else:
+                            self.log_result("List Contact Sources - With Data", False, f"Expected contact_picker source, got: {source_types}")
+                            return False
+                    else:
+                        self.log_result("List Contact Sources - With Data", False, "Missing required fields in source data", source)
+                        return False
+                else:
+                    self.log_result("List Contact Sources - With Data", False, f"Expected sources list with data, got {len(data) if isinstance(data, list) else 'non-list'}")
+                    return False
+            else:
+                self.log_result("List Contact Sources - With Data", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("List Contact Sources - With Data", False, f"Error: {str(e)}")
+            return False
+    
+    def test_unified_contacts_list(self):
+        """Test GET /api/contacts/unified - Combined business cards and imported contacts"""
+        if not self.access_token:
+            self.log_result("Unified Contacts List", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/contacts/unified", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if isinstance(data, list):
+                    # Should have both business cards and imported contacts
+                    business_cards = [c for c in data if c.get("source_type") == "business_card"]
+                    imported_contacts = [c for c in data if c.get("source_type") == "imported_contact"]
+                    
+                    # Verify structure of unified contacts
+                    if len(data) > 0:
+                        contact = data[0]
+                        required_fields = ["id", "source_type", "name", "phones", "emails", "is_business_card", "is_imported_contact"]
+                        
+                        if all(field in contact for field in required_fields):
+                            # Verify we have imported contacts (should be at least 5 from our tests)
+                            if len(imported_contacts) >= 5:
+                                # Check messaging apps in imported contacts
+                                imported_with_messaging = [c for c in imported_contacts if c.get("phones") and len(c["phones"]) > 0 and "messaging_apps" in c["phones"][0]]
+                                
+                                if len(imported_with_messaging) > 0:
+                                    self.log_result("Unified Contacts List", True, f"Retrieved {len(data)} unified contacts ({len(business_cards)} business cards, {len(imported_contacts)} imported contacts)")
+                                    return True
+                                else:
+                                    self.log_result("Unified Contacts List", False, "Imported contacts missing messaging apps configuration")
+                                    return False
+                            else:
+                                self.log_result("Unified Contacts List", False, f"Expected at least 5 imported contacts, got {len(imported_contacts)}")
+                                return False
+                        else:
+                            self.log_result("Unified Contacts List", False, "Missing required fields in unified contact", contact)
+                            return False
+                    else:
+                        self.log_result("Unified Contacts List", True, "No contacts found (empty list)")
+                        return True
+                else:
+                    self.log_result("Unified Contacts List", False, "Response is not a list", data)
+                    return False
+            else:
+                self.log_result("Unified Contacts List", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Unified Contacts List", False, f"Error: {str(e)}")
+            return False
+    
+    def test_unified_contacts_search(self):
+        """Test GET /api/contacts/unified with search functionality"""
+        if not self.access_token:
+            self.log_result("Unified Contacts Search", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Search for "John" (should find John Smith from contact picker import)
+            response = requests.get(f"{API_BASE}/contacts/unified?search=John", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if isinstance(data, list):
+                    # Should find John Smith
+                    john_contacts = [c for c in data if "John" in c.get("name", "")]
+                    
+                    if len(john_contacts) > 0:
+                        john_contact = john_contacts[0]
+                        
+                        # Verify it's an imported contact with correct data
+                        if (john_contact.get("source_type") == "imported_contact" and 
+                            john_contact.get("name") == "John Smith" and
+                            len(john_contact.get("phones", [])) == 2 and
+                            len(john_contact.get("emails", [])) == 2):
+                            
+                            self.log_result("Unified Contacts Search", True, f"Search found {len(john_contacts)} contacts matching 'John'")
+                            return True
+                        else:
+                            self.log_result("Unified Contacts Search", False, f"John contact data incorrect: {john_contact}")
+                            return False
+                    else:
+                        self.log_result("Unified Contacts Search", False, "Search for 'John' returned no results")
+                        return False
+                else:
+                    self.log_result("Unified Contacts Search", False, "Search response is not a list", data)
+                    return False
+            else:
+                self.log_result("Unified Contacts Search", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Unified Contacts Search", False, f"Error: {str(e)}")
+            return False
+    
+    def test_imported_contact_messaging_apps(self):
+        """Test that imported contacts have messaging apps configured"""
+        if not self.access_token:
+            self.log_result("Imported Contact Messaging Apps", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/contacts/unified?search=Sarah", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if isinstance(data, list) and len(data) > 0:
+                    # Find Sarah Johnson from our imports
+                    sarah_contacts = [c for c in data if "Sarah" in c.get("name", "")]
+                    
+                    if len(sarah_contacts) > 0:
+                        sarah = sarah_contacts[0]
+                        
+                        # Check messaging apps configuration
+                        if "phones" in sarah and len(sarah["phones"]) > 0:
+                            phone = sarah["phones"][0]
+                            
+                            if "messaging_apps" in phone and len(phone["messaging_apps"]) > 0:
+                                messaging_apps = phone["messaging_apps"]
+                                app_names = [app["name"] for app in messaging_apps]
+                                
+                                # Should have default WhatsApp and SMS
+                                if "whatsapp" in app_names and "sms" in app_names:
+                                    # Check that both are enabled
+                                    whatsapp_enabled = next((app["enabled"] for app in messaging_apps if app["name"] == "whatsapp"), False)
+                                    sms_enabled = next((app["enabled"] for app in messaging_apps if app["name"] == "sms"), False)
+                                    
+                                    if whatsapp_enabled and sms_enabled:
+                                        self.log_result("Imported Contact Messaging Apps", True, f"Imported contact has correct messaging apps: {app_names}")
+                                        return True
+                                    else:
+                                        self.log_result("Imported Contact Messaging Apps", False, f"Messaging apps not enabled correctly: WhatsApp={whatsapp_enabled}, SMS={sms_enabled}")
+                                        return False
+                                else:
+                                    self.log_result("Imported Contact Messaging Apps", False, f"Missing default messaging apps. Found: {app_names}")
+                                    return False
+                            else:
+                                self.log_result("Imported Contact Messaging Apps", False, "Phone missing messaging_apps field")
+                                return False
+                        else:
+                            self.log_result("Imported Contact Messaging Apps", False, "Contact has no phones")
+                            return False
+                    else:
+                        self.log_result("Imported Contact Messaging Apps", False, "Sarah contact not found")
+                        return False
+                else:
+                    self.log_result("Imported Contact Messaging Apps", False, "No contacts found in search")
+                    return False
+            else:
+                self.log_result("Imported Contact Messaging Apps", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Imported Contact Messaging Apps", False, f"Error: {str(e)}")
+            return False
+    
+    def test_contact_type_identification(self):
+        """Test that unified contacts properly identify business_card vs imported_contact types"""
+        if not self.access_token:
+            self.log_result("Contact Type Identification", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/contacts/unified", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if isinstance(data, list) and len(data) > 0:
+                    business_cards = [c for c in data if c.get("source_type") == "business_card"]
+                    imported_contacts = [c for c in data if c.get("source_type") == "imported_contact"]
+                    
+                    # Verify type identification
+                    type_validation_passed = True
+                    validation_errors = []
+                    
+                    for contact in business_cards:
+                        if not contact.get("is_business_card") or contact.get("is_imported_contact"):
+                            validation_errors.append(f"Business card {contact.get('name')} has incorrect type flags")
+                            type_validation_passed = False
+                        
+                        # Business cards should have custom_code and is_public fields
+                        if "custom_code" not in contact or "is_public" not in contact:
+                            validation_errors.append(f"Business card {contact.get('name')} missing business card specific fields")
+                            type_validation_passed = False
+                    
+                    for contact in imported_contacts:
+                        if contact.get("is_business_card") or not contact.get("is_imported_contact"):
+                            validation_errors.append(f"Imported contact {contact.get('name')} has incorrect type flags")
+                            type_validation_passed = False
+                        
+                        # Imported contacts should have external_source and last_synced fields
+                        if "external_source" not in contact or "last_synced" not in contact:
+                            validation_errors.append(f"Imported contact {contact.get('name')} missing imported contact specific fields")
+                            type_validation_passed = False
+                    
+                    if type_validation_passed:
+                        self.log_result("Contact Type Identification", True, f"Contact type identification working correctly ({len(business_cards)} business cards, {len(imported_contacts)} imported contacts)")
+                        return True
+                    else:
+                        self.log_result("Contact Type Identification", False, f"Type identification errors: {validation_errors}")
+                        return False
+                else:
+                    self.log_result("Contact Type Identification", False, "No contacts found for type validation")
+                    return False
+            else:
+                self.log_result("Contact Type Identification", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Contact Type Identification", False, f"Error: {str(e)}")
+            return False
+    
+    def test_contact_import_invalid_data(self):
+        """Test contact import with invalid data"""
+        if not self.access_token:
+            self.log_result("Contact Import Invalid Data", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Test with missing contacts_data
+            import_data = {
+                "source_type": "contact_picker",
+                "display_name": "Invalid Import Test"
+                # Missing contacts_data
+            }
+            
+            response = requests.post(f"{API_BASE}/contacts/import", json=import_data, headers=headers)
+            
+            if response.status_code == 400:
+                self.log_result("Contact Import Invalid Data - Missing Data", True, "Missing contacts_data properly rejected")
+            else:
+                self.log_result("Contact Import Invalid Data - Missing Data", False, f"Expected 400 for missing data, got {response.status_code}")
+                return False
+            
+            # Test with invalid VCF content
+            import_data = {
+                "source_type": "vcf_file",
+                "display_name": "Invalid VCF Test",
+                "file_content": "invalid_base64_content"
+            }
+            
+            response = requests.post(f"{API_BASE}/contacts/import", json=import_data, headers=headers)
+            
+            if response.status_code == 400:
+                self.log_result("Contact Import Invalid Data - Invalid VCF", True, "Invalid VCF content properly rejected")
+                return True
+            else:
+                self.log_result("Contact Import Invalid Data - Invalid VCF", False, f"Expected 400 for invalid VCF, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Contact Import Invalid Data", False, f"Error: {str(e)}")
+            return False
+
+    # ============================================================================
     # MESSAGING APPS ENHANCEMENT TESTS
     # ============================================================================
     
