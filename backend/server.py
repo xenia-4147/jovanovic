@@ -20,6 +20,7 @@ from models.User import User, UserCreate, UserLogin, UserResponse, UserUpdate, P
 from models.BusinessCard import BusinessCard, BusinessCardCreate, BusinessCardUpdate, BusinessCardResponse, ContactPhone, ContactEmail, SocialMedia, CardRecipient, CardAnalytics, ShareRequest, EmbedOptions
 from models.MeetingRoom import MeetingRoom, MeetingRoomCreate, MeetingRoomJoin, MeetingRoomResponse, MeetingRoomListResponse, MeetingRoomJoinResponse, MeetingRoomParticipant
 from models.ExpressShare import ExpressCode, ExpressMeetingRoom, ExpressShareCreate, ExpressRoomCreate, ExpressRoomJoin, ExpressCodeResponse, ExpressRoomResponse, ExpressAccessResponse
+from models.ContactImport import ContactSource, ImportedContact, SyncJob, ContactImportRequest, ContactImportResponse, ContactSourceResponse, UnifiedContact, ContactSourceType, SyncStatus
 from auth import get_current_user, get_optional_user, create_access_token, create_refresh_token, AuthService
 from privacy import PrivacyService, scheduled_privacy_cleanup
 
