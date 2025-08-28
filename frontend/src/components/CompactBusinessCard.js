@@ -23,6 +23,7 @@ import {
   ChevronUp,
   Info
 } from 'lucide-react';
+import MessagingButtons from './MessagingButtons';
 
 const CompactBusinessCard = ({ card, onCall, onMessage, onEmail, onNavigate, onDownloadVCard, onShare, onGenerateQR }) => {
   const [isExpanded, setIsExpanded] = useState(false);
