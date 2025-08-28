@@ -2538,6 +2538,14 @@ class BusinessCardAPITester:
             self.test_access_card_by_code,
             self.test_code_uniqueness_validation,
             
+            # Messaging Apps Enhancement Tests
+            self.test_messaging_apps_default_configuration,
+            self.test_messaging_apps_custom_configuration,
+            self.test_messaging_apps_update_configuration,
+            self.test_messaging_apps_api_response_validation,
+            self.test_messaging_apps_persistence,
+            self.test_messaging_apps_multiple_phones_independence,
+            
             # Targeted fix tests
             self.test_social_media_fix_with_custom_code,
             
