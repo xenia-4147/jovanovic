@@ -232,6 +232,9 @@ async def create_business_card(
 ):
     """Create new business card"""
     try:
+        # Track usage for analytics and upgrade prompts
+        await track_feature_usage_internal(str(current_user.id), "business_card_created")
+        
         # Create business card with string user ID
         card_dict = card_data.dict()
         
