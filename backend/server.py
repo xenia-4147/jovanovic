@@ -1304,7 +1304,18 @@ async def startup_event():
         # Create indexes for better performance
         await db.users.create_index("email", unique=True)
         await db.businesscards.create_index("userId")
-        await db.businesscards.create_index("custom_code", unique=True, sparse=True)
+        # Drop existing custom_code index if it exists to fix null value conflicts
+        try:
+            await db.businesscards.drop_index("custom_code_1")
+        except:
+            pass  # Index might not exist
+        
+        # Create partial index that only indexes non-null custom_code values
+        await db.businesscards.create_index(
+            "custom_code", 
+            unique=True, 
+            partialFilterExpression={"custom_code": {"$ne": None}}
+        )
         await db.businesscards.create_index([("is_public", 1), ("created_at", -1)])
         await db.cardrecipients.create_index("card_id")
         await db.cardanalytics.create_index([("card_id", 1), ("timestamp", -1)])
