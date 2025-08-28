@@ -175,6 +175,30 @@ const CodeAccessPage = () => {
               </Alert>
             )}
 
+            {result && result.success && result.type === 'express_code' && (
+              <Alert className="mb-6 bg-yellow-50 border-yellow-200">
+                <Zap className="h-4 w-4 text-yellow-600" />
+                <AlertDescription className="text-yellow-800">
+                  <div className="font-medium mb-2">Express Code gefunden! ⚡</div>
+                  <div className="flex items-center space-x-3">
+                    <img
+                      src={result.card.profile_image || `https://ui-avatars.com/api/?name=${encodeURIComponent(result.card.name)}&background=f59e0b&color=fff`}
+                      alt={result.card.name}
+                      className="w-10 h-10 rounded-full"
+                    />
+                    <div>
+                      <p className="font-semibold">{result.card.name}</p>
+                      {result.card.company && <p className="text-sm">{result.card.company}</p>}
+                    </div>
+                  </div>
+                  <div className="mt-2 text-sm">
+                    Express Code: <strong>{result.express_code?.code}</strong> | 
+                    Verwendungen: <strong>{result.express_code?.usage_count}</strong>
+                  </div>
+                </AlertDescription>
+              </Alert>
+            )}
+
             {result && result.success && result.type === 'business_card' && (
               <Alert className="mb-6 bg-green-50 border-green-200">
                 <CheckCircle className="h-4 w-4 text-green-600" />
