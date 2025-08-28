@@ -120,7 +120,8 @@ class BusinessCard(BaseModel):
         
         return code
     
-    @validator('phones')
+    @field_validator('phones')
+    @classmethod
     def validate_phones(cls, v):
         if not v:
             return v
