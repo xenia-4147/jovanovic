@@ -1513,7 +1513,7 @@ class BusinessCardAPITester:
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("=" * 80)
-        print("DIGITAL BUSINESS CARDS API TEST SUITE - ENHANCED WITH MEETING ROOMS")
+        print("DIGITAL BUSINESS CARDS API TEST SUITE - EXPRESS SHARE TESTING")
         print("=" * 80)
         print(f"Testing API at: {API_BASE}")
         print()
