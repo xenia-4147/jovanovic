@@ -20,7 +20,18 @@ const HomePage = () => {
 
   useEffect(() => {
     loadBusinessCards();
+    loadSubscriptionStatus();
   }, []);
+
+  const loadSubscriptionStatus = async () => {
+    try {
+      const response = await api.get('/subscription/status');
+      setSubscriptionStatus(response.data);
+    } catch (error) {
+      console.error('Failed to load subscription status:', error);
+      // Don't show error for subscription status - it's not critical
+    }
+  };
 
   const loadBusinessCards = async () => {
     try {
