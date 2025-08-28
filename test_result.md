@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Complete the implementation of custom sharing code features for business cards. This includes both personal permanent codes and Meeting Room codes for group networking."
+user_problem_statement: "Test the new All-in-One Contact Import & Management system that enables importing contacts from multiple sources including Contact Picker API, VCF files, CSV files, and integration with Google Contacts and Apple iCloud."
 
 frontend:
   - task: "Express Share Modal Frontend"
