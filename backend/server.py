@@ -523,7 +523,7 @@ async def access_card_by_code(
         
         # Get updated usage count
         updated_card_data = await db.businesscards.find_one({"_id": card_data["_id"]})
-        usage_count = updated_card_data.get("code_usage_count", 1)
+        usage_count = updated_card_data.get("code_usage_count", 1) if updated_card_data else 1
         
         logger.info(f"Code access successful: {code} -> Card {card.id} (Usage: {usage_count})")
         
