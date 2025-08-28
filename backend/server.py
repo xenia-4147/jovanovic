@@ -732,6 +732,466 @@ FN:{card.name}"""
         raise HTTPException(status_code=500, detail="vCard generation failed")
 
 # ============================================================================
+# MEETING ROOM ENDPOINTS
+# ============================================================================
+
+@api_router.post("/meeting-rooms", response_model=MeetingRoomResponse)
+async def create_meeting_room(
+    room_data: MeetingRoomCreate,
+    request: Request,
+    current_user: Optional[User] = Depends(get_optional_user)
+):
+    """Create a new meeting room"""
+    try:
+        # Get the card that's creating the room
+        from bson import ObjectId
+        
+        # Try to find card by string ID first, then ObjectId
+        card_data = await db.businesscards.find_one({"_id": room_data.card_id})
+        if not card_data:
+            try:
+                card_data = await db.businesscards.find_one({"_id": ObjectId(room_data.card_id)})
+            except:
+                pass
+        
+        if not card_data:
+            raise HTTPException(status_code=404, detail="Visitenkarte nicht gefunden")
+        
+        # Convert ObjectId to string for compatibility
+        if "_id" in card_data:
+            card_data["_id"] = str(card_data["_id"])
+        if "userId" in card_data:
+            card_data["userId"] = str(card_data["userId"])
+        
+        card = BusinessCard(**card_data)
+        
+        # Check if user owns this card (if logged in)
+        if current_user:
+            is_owner = str(card.user_id) == str(current_user.id)
+            if not is_owner:
+                raise HTTPException(status_code=403, detail="Sie können nur Meeting Rooms für Ihre eigenen Karten erstellen")
+        
+        # Check if card is public for anonymous users
+        if not current_user and not card.is_public:
+            raise HTTPException(status_code=403, detail="Diese Visitenkarte ist nicht öffentlich")
+        
+        # Generate code if not provided
+        if not room_data.code:
+            code = MeetingRoom.generate_random_code(5)
+            # Ensure uniqueness
+            attempts = 0
+            while attempts < 10:
+                existing = await db.meetingrooms.find_one({
+                    "code": code,
+                    "is_active": True,
+                    "expires_at": {"$gt": datetime.utcnow()}
+                })
+                if not existing:
+                    break
+                code = MeetingRoom.generate_random_code(5)
+                attempts += 1
+            
+            if attempts >= 10:
+                raise HTTPException(status_code=500, detail="Fehler beim Generieren des Codes")
+        else:
+            code = room_data.code
+            # Check if code is already in use
+            existing = await db.meetingrooms.find_one({
+                "code": code.upper(),
+                "is_active": True,
+                "expires_at": {"$gt": datetime.utcnow()}
+            })
+            if existing:
+                raise HTTPException(status_code=400, detail="Dieser Code wird bereits für einen aktiven Meeting Room verwendet")
+        
+        # Create meeting room
+        expires_at = datetime.utcnow() + timedelta(minutes=room_data.duration_minutes)
+        
+        meeting_room = MeetingRoom(
+            code=code.upper(),
+            created_by_user_id=str(current_user.id) if current_user else None,
+            created_by_card_id=str(card.id),
+            created_by_card_name=card.name,
+            expires_at=expires_at,
+            max_participants=room_data.max_participants,
+            description=room_data.description
+        )
+        
+        # Add creator as first participant
+        creator_participant = MeetingRoomParticipant(
+            user_id=str(current_user.id) if current_user else None,
+            card_id=str(card.id),
+            card_name=card.name,
+            card_company=card.company,
+            card_profile_image=card.profile_image,
+            ip_address=request.client.host if request.client else None
+        )
+        meeting_room.participants.append(creator_participant)
+        
+        # Save to database
+        room_dict = meeting_room.dict(by_alias=True, exclude={"id"})
+        result = await db.meetingrooms.insert_one(room_dict)
+        meeting_room.id = str(result.inserted_id)
+        
+        logger.info(f"Meeting room created: {code} by card {card.name}")
+        
+        time_remaining = max(0, int((meeting_room.expires_at - datetime.utcnow()).total_seconds() / 60))
+        
+        return MeetingRoomResponse(
+            id=str(meeting_room.id),
+            code=meeting_room.code,
+            created_by_card_name=meeting_room.created_by_card_name,
+            created_at=meeting_room.created_at,
+            expires_at=meeting_room.expires_at,
+            participants=meeting_room.participants,
+            max_participants=meeting_room.max_participants,
+            is_active=meeting_room.is_active,
+            description=meeting_room.description,
+            time_remaining_minutes=time_remaining,
+            can_join=meeting_room.can_join(),
+            is_creator=True
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Meeting room creation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Meeting Room Erstellung fehlgeschlagen: {str(e)}")
+
+@api_router.post("/meeting-rooms/join", response_model=MeetingRoomJoinResponse)
+async def join_meeting_room(
+    join_data: MeetingRoomJoin,
+    request: Request,
+    current_user: Optional[User] = Depends(get_optional_user)
+):
+    """Join a meeting room with a card"""
+    try:
+        # Find the meeting room
+        room_data = await db.meetingrooms.find_one({
+            "code": join_data.code.upper(),
+            "is_active": True,
+            "expires_at": {"$gt": datetime.utcnow()}
+        })
+        
+        if not room_data:
+            raise HTTPException(status_code=404, detail="Meeting Room nicht gefunden oder abgelaufen")
+        
+        # Convert ObjectId to string for compatibility
+        if "_id" in room_data:
+            room_data["_id"] = str(room_data["_id"])
+        
+        room = MeetingRoom(**room_data)
+        
+        # Check if room can accept new participants
+        if not room.can_join():
+            if room.is_expired():
+                raise HTTPException(status_code=400, detail="Meeting Room ist abgelaufen")
+            elif len(room.participants) >= room.max_participants:
+                raise HTTPException(status_code=400, detail="Meeting Room ist voll")
+            else:
+                raise HTTPException(status_code=400, detail="Meeting Room ist nicht aktiv")
+        
+        # Get the card that wants to join
+        from bson import ObjectId
+        card_data = await db.businesscards.find_one({"_id": join_data.card_id})
+        if not card_data:
+            try:
+                card_data = await db.businesscards.find_one({"_id": ObjectId(join_data.card_id)})
+            except:
+                pass
+        
+        if not card_data:
+            raise HTTPException(status_code=404, detail="Visitenkarte nicht gefunden")
+        
+        # Convert ObjectId to string for compatibility
+        if "_id" in card_data:
+            card_data["_id"] = str(card_data["_id"])
+        if "userId" in card_data:
+            card_data["userId"] = str(card_data["userId"])
+        
+        card = BusinessCard(**card_data)
+        
+        # Check if user owns this card (if logged in)
+        if current_user:
+            is_owner = str(card.user_id) == str(current_user.id)
+            if not is_owner:
+                raise HTTPException(status_code=403, detail="Sie können nur Ihre eigenen Karten in Meeting Rooms verwenden")
+        
+        # Check if card is public for anonymous users
+        if not current_user and not card.is_public:
+            raise HTTPException(status_code=403, detail="Diese Visitenkarte ist nicht öffentlich")
+        
+        # Create participant
+        participant = MeetingRoomParticipant(
+            user_id=str(current_user.id) if current_user else None,
+            card_id=str(card.id),
+            card_name=card.name,
+            card_company=card.company,
+            card_profile_image=card.profile_image,
+            ip_address=request.client.host if request.client else None
+        )
+        
+        # Check if participant already in room
+        for existing in room.participants:
+            if existing.card_id == str(card.id):
+                # Already in room, just return the room state
+                time_remaining = max(0, int((room.expires_at - datetime.utcnow()).total_seconds() / 60))
+                is_creator = room.created_by_card_id == str(card.id)
+                
+                # Get all other participants' cards for response
+                cards_received = []
+                for p in room.participants:
+                    if p.card_id != str(card.id):  # Exclude own card
+                        participant_card_data = await db.businesscards.find_one({"_id": p.card_id})
+                        if not participant_card_data:
+                            try:
+                                participant_card_data = await db.businesscards.find_one({"_id": ObjectId(p.card_id)})
+                            except:
+                                continue
+                        
+                        if participant_card_data:
+                            # Convert ObjectId to string for compatibility
+                            if "_id" in participant_card_data:
+                                participant_card_data["_id"] = str(participant_card_data["_id"])
+                            if "userId" in participant_card_data:
+                                participant_card_data["userId"] = str(participant_card_data["userId"])
+                            
+                            participant_card = BusinessCard(**participant_card_data)
+                            cards_received.append({
+                                "id": str(participant_card.id),
+                                "name": participant_card.name,
+                                "company": participant_card.company,
+                                "position": participant_card.position,
+                                "profile_image": participant_card.profile_image,
+                                "joined_at": p.joined_at.isoformat()
+                            })
+                
+                return MeetingRoomJoinResponse(
+                    success=True,
+                    message=f"Sie sind bereits im Meeting Room '{room.code}'",
+                    room=MeetingRoomResponse(
+                        id=str(room.id),
+                        code=room.code,
+                        created_by_card_name=room.created_by_card_name,
+                        created_at=room.created_at,
+                        expires_at=room.expires_at,
+                        participants=room.participants,
+                        max_participants=room.max_participants,
+                        is_active=room.is_active,
+                        description=room.description,
+                        time_remaining_minutes=time_remaining,
+                        can_join=room.can_join(),
+                        is_creator=is_creator
+                    ),
+                    cards_received=cards_received
+                )
+        
+        # Add participant to room
+        room.participants.append(participant)
+        
+        # Update room in database
+        await db.meetingrooms.update_one(
+            {"_id": ObjectId(str(room.id))},
+            {"$set": {"participants": [p.dict() for p in room.participants]}}
+        )
+        
+        logger.info(f"Card {card.name} joined meeting room {room.code}")
+        
+        time_remaining = max(0, int((room.expires_at - datetime.utcnow()).total_seconds() / 60))
+        is_creator = room.created_by_card_id == str(card.id)
+        
+        # Get all other participants' cards for response
+        cards_received = []
+        for p in room.participants:
+            if p.card_id != str(card.id):  # Exclude own card
+                participant_card_data = await db.businesscards.find_one({"_id": p.card_id})
+                if not participant_card_data:
+                    try:
+                        participant_card_data = await db.businesscards.find_one({"_id": ObjectId(p.card_id)})
+                    except:
+                        continue
+                
+                if participant_card_data:
+                    # Convert ObjectId to string for compatibility
+                    if "_id" in participant_card_data:
+                        participant_card_data["_id"] = str(participant_card_data["_id"])
+                    if "userId" in participant_card_data:
+                        participant_card_data["userId"] = str(participant_card_data["userId"])
+                    
+                    participant_card = BusinessCard(**participant_card_data)
+                    cards_received.append({
+                        "id": str(participant_card.id),
+                        "name": participant_card.name,
+                        "company": participant_card.company,
+                        "position": participant_card.position,
+                        "profile_image": participant_card.profile_image,
+                        "joined_at": p.joined_at.isoformat()
+                    })
+        
+        return MeetingRoomJoinResponse(
+            success=True,
+            message=f"Sie sind dem Meeting Room '{room.code}' beigetreten! Sie haben {len(cards_received)} neue Kontakte erhalten.",
+            room=MeetingRoomResponse(
+                id=str(room.id),
+                code=room.code,
+                created_by_card_name=room.created_by_card_name,
+                created_at=room.created_at,
+                expires_at=room.expires_at,
+                participants=room.participants,
+                max_participants=room.max_participants,
+                is_active=room.is_active,
+                description=room.description,
+                time_remaining_minutes=time_remaining,
+                can_join=room.can_join(),
+                is_creator=is_creator
+            ),
+            cards_received=cards_received
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Meeting room join failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Meeting Room Beitritt fehlgeschlagen: {str(e)}")
+
+@api_router.get("/meeting-rooms/{room_code}", response_model=MeetingRoomResponse)
+async def get_meeting_room(
+    room_code: str,
+    current_user: Optional[User] = Depends(get_optional_user)
+):
+    """Get meeting room details"""
+    try:
+        room_data = await db.meetingrooms.find_one({
+            "code": room_code.upper(),
+            "is_active": True,
+            "expires_at": {"$gt": datetime.utcnow()}
+        })
+        
+        if not room_data:
+            raise HTTPException(status_code=404, detail="Meeting Room nicht gefunden oder abgelaufen")
+        
+        # Convert ObjectId to string for compatibility
+        if "_id" in room_data:
+            room_data["_id"] = str(room_data["_id"])
+        
+        room = MeetingRoom(**room_data)
+        
+        time_remaining = max(0, int((room.expires_at - datetime.utcnow()).total_seconds() / 60))
+        
+        # Check if current user created this room
+        is_creator = False
+        if current_user:
+            is_creator = (
+                room.created_by_user_id == str(current_user.id) or
+                any(p.user_id == str(current_user.id) and p.card_id == room.created_by_card_id for p in room.participants)
+            )
+        
+        return MeetingRoomResponse(
+            id=str(room.id),
+            code=room.code,
+            created_by_card_name=room.created_by_card_name,
+            created_at=room.created_at,
+            expires_at=room.expires_at,
+            participants=room.participants,
+            max_participants=room.max_participants,
+            is_active=room.is_active,
+            description=room.description,
+            time_remaining_minutes=time_remaining,
+            can_join=room.can_join(),
+            is_creator=is_creator
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get meeting room: {str(e)}")
+        raise HTTPException(status_code=500, detail="Meeting Room konnte nicht geladen werden")
+
+@api_router.get("/meeting-rooms", response_model=List[MeetingRoomListResponse])
+async def list_user_meeting_rooms(current_user: User = Depends(get_current_user)):
+    """Get user's active meeting rooms"""
+    try:
+        # Find rooms created by user's cards
+        user_cards = await db.businesscards.find({"userId": str(current_user.id)}).to_list(length=100)
+        user_card_ids = [str(card["_id"]) for card in user_cards]
+        
+        # Find active meeting rooms created by user's cards
+        rooms_cursor = db.meetingrooms.find({
+            "created_by_card_id": {"$in": user_card_ids},
+            "is_active": True,
+            "expires_at": {"$gt": datetime.utcnow()}
+        }).sort("created_at", -1)
+        
+        rooms = []
+        async for room_data in rooms_cursor:
+            # Convert ObjectId to string for compatibility
+            if "_id" in room_data:
+                room_data["_id"] = str(room_data["_id"])
+            
+            room = MeetingRoom(**room_data)
+            time_remaining = max(0, int((room.expires_at - datetime.utcnow()).total_seconds() / 60))
+            
+            rooms.append(MeetingRoomListResponse(
+                id=str(room.id),
+                code=room.code,
+                created_by_card_name=room.created_by_card_name,
+                created_at=room.created_at,
+                expires_at=room.expires_at,
+                participant_count=len(room.participants),
+                max_participants=room.max_participants,
+                description=room.description,
+                time_remaining_minutes=time_remaining,
+                is_creator=True
+            ))
+        
+        return rooms
+        
+    except Exception as e:
+        logger.error(f"Failed to list meeting rooms: {str(e)}")
+        raise HTTPException(status_code=500, detail="Meeting Rooms konnten nicht geladen werden")
+
+@api_router.delete("/meeting-rooms/{room_code}")
+async def close_meeting_room(
+    room_code: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Close/deactivate a meeting room (creator only)"""
+    try:
+        room_data = await db.meetingrooms.find_one({
+            "code": room_code.upper(),
+            "is_active": True
+        })
+        
+        if not room_data:
+            raise HTTPException(status_code=404, detail="Meeting Room nicht gefunden")
+        
+        # Convert ObjectId to string for compatibility
+        if "_id" in room_data:
+            room_data["_id"] = str(room_data["_id"])
+        
+        room = MeetingRoom(**room_data)
+        
+        # Check if user is the creator
+        if room.created_by_user_id != str(current_user.id):
+            raise HTTPException(status_code=403, detail="Nur der Ersteller kann den Meeting Room schließen")
+        
+        # Deactivate room
+        await db.meetingrooms.update_one(
+            {"_id": ObjectId(str(room.id))},
+            {"$set": {"is_active": False}}
+        )
+        
+        logger.info(f"Meeting room {room.code} closed by {current_user.email}")
+        
+        return {"message": f"Meeting Room '{room.code}' wurde geschlossen"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to close meeting room: {str(e)}")
+        raise HTTPException(status_code=500, detail="Meeting Room konnte nicht geschlossen werden")
+
+# ============================================================================
 # PRIVACY & GDPR ENDPOINTS
 # ============================================================================
 
