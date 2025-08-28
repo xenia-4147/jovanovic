@@ -256,22 +256,10 @@ const CompactBusinessCard = ({ card, onCall, onMessage, onEmail, onNavigate, onD
                               {phone.is_primary && (
                                 <Badge variant="secondary" className="text-xs">Primär</Badge>
                               )}
-                              <Button
-                                variant="ghost"
+                              <MessagingButtons 
+                                phone={phone}
                                 size="sm"
-                                onClick={() => onCall(phone)}
-                                className="h-8 w-8 p-0"
-                              >
-                                <Phone className="w-3 h-3" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onMessage(phone)}
-                                className="h-8 w-8 p-0"
-                              >
-                                <MessageCircle className="w-3 h-3" />
-                              </Button>
+                              />
                             </div>
                           </div>
                         ))}
