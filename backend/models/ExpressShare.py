@@ -40,12 +40,28 @@ class ExpressCode(BaseModel):
         json_encoders = {ObjectId: str}
     
     @classmethod
-    def generate_express_code(cls, length: int = 2) -> str:
+    def generate_express_code(cls, length: int = 2, user_context: Optional[str] = None) -> str:
         """Generate ultra-short express code (2-3 characters)"""
         # Use only unambiguous characters
         characters = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
         # Exclude: I, O, 0, 1 (confusing characters)
-        return ''.join(random.choice(characters) for _ in range(length))
+        
+        # If user_context provided, use it to seed randomization for better uniqueness
+        if user_context:
+            # Create a more unique seed based on user context + current time
+            import hashlib
+            import time
+            seed_string = f"{user_context}_{int(time.time() * 1000)}"
+            seed = int(hashlib.md5(seed_string.encode()).hexdigest()[:8], 16)
+            random.seed(seed)
+        
+        code = ''.join(random.choice(characters) for _ in range(length))
+        
+        # Reset random seed if we used context
+        if user_context:
+            random.seed()
+            
+        return code
     
     def is_expired(self) -> bool:
         """Check if the express code has expired"""
