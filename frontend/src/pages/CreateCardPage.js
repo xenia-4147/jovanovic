@@ -426,48 +426,49 @@ const CreateCardPage = () => {
                         />
                       </div>
                     </div>
-                  
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="accentColor">Akzentfarbe</Label>
-                        <Input
-                          id="accentColor"
-                          type="color"
-                          value={formData.accent_color}
-                          onChange={(e) => handleInputChange('accent_color', e.target.value)}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="textColor">Textfarbe</Label>
-                        <Input
-                          id="textColor"
-                          type="color"
-                          value={formData.text_color}
-                          onChange={(e) => handleInputChange('text_color', e.target.value)}
-                        />
-                      </div>
-                    </div>
                     
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="backgroundColor">Karten-Hintergrund</Label>
-                        <Input
-                          id="backgroundColor"
-                          type="color"
-                          value={formData.background_color}
-                          onChange={(e) => handleInputChange('background_color', e.target.value)}
-                        />
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="accentColor">Akzentfarbe</Label>
+                          <Input
+                            id="accentColor"
+                            type="color"
+                            value={formData.accent_color}
+                            onChange={(e) => handleInputChange('accent_color', e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="textColor">Textfarbe</Label>
+                          <Input
+                            id="textColor"
+                            type="color"
+                            value={formData.text_color}
+                            onChange={(e) => handleInputChange('text_color', e.target.value)}
+                          />
+                        </div>
                       </div>
-                      <div>
-                        <Label htmlFor="embedBackgroundColor">Einbettungs-Hintergrund</Label>
-                        <Input
-                          id="embedBackgroundColor"
-                          type="color"
-                          value={formData.embed_background_color}
-                          onChange={(e) => handleInputChange('embed_background_color', e.target.value)}
-                        />
-                        <p className="text-xs text-gray-500 mt-1">Für Webseiten-Integration</p>
+                      
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="backgroundColor">Karten-Hintergrund</Label>
+                          <Input
+                            id="backgroundColor"
+                            type="color"
+                            value={formData.background_color}
+                            onChange={(e) => handleInputChange('background_color', e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="embedBackgroundColor">Einbettungs-Hintergrund</Label>
+                          <Input
+                            id="embedBackgroundColor"
+                            type="color"
+                            value={formData.embed_background_color}
+                            onChange={(e) => handleInputChange('embed_background_color', e.target.value)}
+                          />
+                          <p className="text-xs text-gray-500 mt-1">Für Webseiten-Integration</p>
+                        </div>
                       </div>
                     </div>
                   </div>
