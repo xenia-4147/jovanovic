@@ -220,6 +220,8 @@ const MultiContactInput = ({
                 <Star className={`w-4 h-4 ${item.isPrimary ? 'fill-current' : ''}`} />
               </Button>
               
+              {type === 'phone' && <MessagingAppsDialog item={item} />}
+              
               {items.length > 1 && (
                 <Button
                   type="button"
