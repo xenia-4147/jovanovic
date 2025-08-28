@@ -784,6 +784,7 @@ async def create_meeting_room(
         # Generate code if not provided
         if not room_data.code:
             code = MeetingRoom.generate_random_code(5)
+            logger.info(f"Generated meeting room code: {code} (type: {type(code)})")
             # Ensure uniqueness
             attempts = 0
             while attempts < 10:
