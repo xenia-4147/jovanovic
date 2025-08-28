@@ -163,13 +163,19 @@ const HomePage = () => {
           </Button>
           
           {subscriptionStatus?.plan_type === 'free' && (
-            <Badge 
-              variant="secondary" 
-              className="bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-300 hidden sm:inline-flex"
-            >
-              <Zap className="w-3 h-3 mr-1" />
-              Fast alles kostenlos! 🚀
-            </Badge>
+            <>
+              {subscriptionStatus?.plan_name?.includes('Early Adopter') ? (
+                <EarlyAdopterBadge className="hidden sm:inline-flex" />
+              ) : (
+                <Badge 
+                  variant="secondary" 
+                  className="bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-300 hidden sm:inline-flex"
+                >
+                  <Zap className="w-3 h-3 mr-1" />
+                  Fast alles kostenlos! 🚀
+                </Badge>
+              )}
+            </>
           )}
           
           <Button variant="outline" size="sm">
