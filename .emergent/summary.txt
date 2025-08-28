@@ -1,0 +1,65 @@
+<analysis>
+The previous AI engineer successfully built a full-stack digital business card application from scratch, adhering to an iterative development workflow. Initially, a robust frontend was developed with mock data, providing a complete user experience including card creation, viewing, QR code generation, vCard download, and various customization options. This phase focused on delivering a functional teaser app.
+
+Subsequently, the engineer transitioned to backend development, establishing a FastAPI API with MongoDB integration for data persistence, user authentication (JWT), and GDPR compliance. Throughout this phase, the engineer iteratively addressed user feedback, adding complex features like multiple contact fields, addresses with Google Maps integration, a collapsible address book, and mobile UI fixes. Bug reports were handled systematically, involving debugging frontend and backend logs to resolve issues like Visitenkarte nicht gefunden and Card update failed, often stemming from API integration or data model inconsistencies. The project concluded with the implementation of a custom sharing code feature currently in progress, indicating a continuous development cycle with prompt response to user-reported issues and feature requests.
+</analysis>
+
+<product_requirements>
+The user requires a digital business card application compatible with all major platforms (Android, Apple, phone contacts, WhatsApp, email, websites). Key features include:
+1.  **Card Creation & Customization**: Name, company, position, website, multiple phone numbers and email addresses (with labels and primary designation), social media links (Instagram, LinkedIn, Twitter, TikTok, Telegram), profile picture, logo upload, a creator's note/description, privacy settings (public/private), and extensive color customization (background, text, accent, embedding colors).
+2.  **Sharing & Compatibility**: QR code generation, Airdrop, Bluetooth (with potential for even better possibilities), direct vCard (.vcf) download, and embedding on websites.
+3.  **Advanced Features**: Direct call/message/WhatsApp/email links from the card, an auto-update system for data changes (notifying recipients), addresses with Google Maps navigation, an alphabetized, collapsible address book view (displaying profile picture, logo, name/company), and a custom sharing code for each card.
+4.  **Privacy**: Backend must be GDPR-compliant.
+5.  **Design**: Modern, individually adjustable, responsive design for all devices, and a distinct, compact view for external users resembling a phone contact list entry.
+</product_requirements>
+
+<key_technical_concepts>
+-   **Full-stack**: React.js (frontend), FastAPI (backend), MongoDB (database).
+-   **UI/UX**: Shadcn UI components, Tailwind CSS.
+-   **API Integration**:  for frontend-backend communication, Pydantic for data models.
+-   **Authentication**: JWT for secure user login and protected routes.
+-   **Data Handling**:  for async MongoDB operations,  for JWT.
+-   **Utilities**:  and  for QR code generation.
+-   **Routing**:  for client-side navigation.
+</key_technical_concepts>
+
+<code_architecture>
+
+
+
+-   **/app/backend/server.py**: Main FastAPI application orchestrating all backend logic. It defines API endpoints for user authentication, business card CRUD operations, and privacy features. It was extensively modified to implement all new features, integrate with MongoDB, handle JWT, and fix various bugs related to data validation and updates.
+-   **/app/backend/models/BusinessCard.py**: Defines the Pydantic data model for business cards, mapping to MongoDB. It was updated multiple times to include fields for multiple phone numbers, emails, addresses, social media links, descriptions, privacy settings, and the custom sharing code.
+-   **/app/backend/models/User.py**: Pydantic model for user data, supporting registration and authentication. This file was created to manage user accounts.
+-   **/app/backend/auth.py**: Manages user authentication, including password hashing and JWT token generation/validation. This file was created to secure API endpoints.
+-   **/app/backend/privacy.py**: Contains logic for GDPR compliance. This file was created to implement privacy-related features.
+-   **/app/frontend/src/App.js**: The main React component defining the application's routing structure. It was updated to include new routes for login, registration, card creation, viewing, editing, the address book, and the custom code access page, along with  for authentication.
+-   **/app/frontend/src/pages/CreateCardPage.js**: Form for creating new business cards. Initially built with mock data, it was later refactored to interact with the backend API, incorporating all requested fields like multi-contact inputs, address fields, image uploads, and privacy settings. It also includes a live preview feature.
+-   **/app/frontend/src/pages/EditCardPage.js**: Form for editing existing business cards. Similar to , it transitioned from mock data to API integration, handling card data retrieval and updates, including fixes for authentication and data validation issues during save.
+-   **/app/frontend/src/pages/ViewCardPage.js**: Displays a specific business card. It was enhanced to fetch data from the backend, provide direct contact actions, QR code generation, vCard download, embedding options, and a new collapsible, compact view for external users.
+-   **/app/frontend/src/pages/AddressBookPage.js**: A new page created to display all business cards in an alphabetized, collapsible list, with search and Google Maps navigation features.
+-   **/app/frontend/src/pages/CodeAccessPage.js**: A new page created for users to input a custom code to retrieve a business card. This file is part of the ongoing implementation.
+-   **/app/frontend/src/components/MultiContactInput.js**: A reusable React component for handling multiple phone numbers and email addresses with labels.
+-   **/app/frontend/src/components/AddressInput.js**: A reusable React component for handling multiple addresses with Google Maps integration.
+-   **/app/frontend/src/components/CompactBusinessCard.js**: A new React component for the collapsible, contact-list-like view of a business card, designed for external users.
+-   **/app/frontend/src/services/api.js**: Centralized service for making API calls to the backend. This file was created to abstract API interactions.
+-   **/app/contracts.md**: Documentation outlining API contracts and backend implementation details. This file was created to guide full-stack integration.
+
+</code_architecture>
+
+<pending_tasks>
+-   Full implementation of the custom sharing code feature: This includes completing the frontend logic in  to process the code and fetch the corresponding business card, and ensuring the backend  and  correctly handle the custom code generation, storage, and retrieval.
+</pending_tasks>
+
+<current_work>
+The AI engineer is currently in the process of implementing a new feature that allows users to generate a custom code for each business card. This code can then be shared, and anyone who enters it into the app will automatically receive the contact information associated with that card.
+
+Specifically, the work involves:
+1.  **Backend Model Update**: The  model has been modified to include a field for this custom code.
+2.  **Frontend Page Creation**: A new page, , has been created. This page is intended to provide an input field where users can type in the custom code to access a business card.
+
+The task is not yet complete, as the full integration of code generation (on the card owner's side) and contact retrieval (on the recipient's side) is still pending. The last interaction confirms that the engineer is proceeding with the vollständige Implementierung of this feature.
+</current_work>
+
+<optional_next_step>
+Complete the implementation of the custom sharing code feature for business cards.
+</optional_next_step>

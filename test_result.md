@@ -230,7 +230,7 @@ test_plan:
 
 agent_communication:
     - agent: "testing"
-    - message: "Starting comprehensive testing of the digital business cards application. Will test complete user journey from registration through card creation, management, and sharing. Application uses real backend API integration at https://vcard-connect-1.preview.emergentagent.com/api"
+    - message: "Starting comprehensive testing of the digital business cards application. Will test complete user journey from registration through card creation, management, and sharing. Application uses real backend API integration at https://cardshare-2.preview.emergentagent.com/api"
     - agent: "testing"
     - message: "COMPREHENSIVE TESTING COMPLETED. ✅ WORKING: Registration with GDPR compliance, Login/Logout, Dashboard, Protected Routes, Card Viewing infrastructure, Responsive Design. ❌ CRITICAL ISSUE: Business Card Creation - form loads and fills correctly but submission fails with timeout and React runtime errors. All other core functionality working perfectly. The app is 85% functional with excellent UX/UI."
     - agent: "testing"
