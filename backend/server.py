@@ -1209,6 +1209,479 @@ async def close_meeting_room(
         raise HTTPException(status_code=500, detail="Meeting Room konnte nicht geschlossen werden")
 
 # ============================================================================
+# EXPRESS SHARE ENDPOINTS
+# ============================================================================
+
+@api_router.post("/express/create", response_model=ExpressCodeResponse)
+async def create_express_code(
+    express_data: ExpressShareCreate,
+    request: Request,
+    current_user: Optional[User] = Depends(get_optional_user)
+):
+    """Create ultra-short express code for quick sharing"""
+    try:
+        # Get the business card
+        from bson import ObjectId
+        card_data = await db.businesscards.find_one({"_id": express_data.card_id})
+        if not card_data:
+            try:
+                card_data = await db.businesscards.find_one({"_id": ObjectId(express_data.card_id)})
+            except:
+                pass
+        
+        if not card_data:
+            raise HTTPException(status_code=404, detail="Visitenkarte nicht gefunden")
+        
+        # Convert ObjectId to string for compatibility
+        if "_id" in card_data:
+            card_data["_id"] = str(card_data["_id"])
+        if "userId" in card_data:
+            card_data["userId"] = str(card_data["userId"])
+        
+        card = BusinessCard(**card_data)
+        
+        # Check if user owns this card (if logged in)
+        if current_user:
+            is_owner = str(card.user_id) == str(current_user.id)
+            if not is_owner:
+                raise HTTPException(status_code=403, detail="Sie können nur Express Codes für Ihre eigenen Karten erstellen")
+        
+        # Check if card is public for anonymous users
+        if not current_user and not card.is_public:
+            raise HTTPException(status_code=403, detail="Diese Visitenkarte ist nicht öffentlich")
+        
+        # Generate unique express code
+        code = ExpressCode.generate_express_code(express_data.code_length)
+        attempts = 0
+        while attempts < 20:
+            existing = await db.expresscodes.find_one({
+                "code": code,
+                "is_active": True,
+                "expires_at": {"$gt": datetime.utcnow()}
+            })
+            if not existing:
+                break
+            code = ExpressCode.generate_express_code(express_data.code_length)
+            attempts += 1
+        
+        if attempts >= 20:
+            raise HTTPException(status_code=500, detail="Fehler beim Generieren des Express-Codes")
+        
+        # Create express code
+        expires_at = datetime.utcnow() + timedelta(seconds=express_data.duration_seconds)
+        
+        express_code = ExpressCode(
+            code=code,
+            card_id=str(card.id),
+            user_id=str(current_user.id) if current_user else None,
+            expires_at=expires_at,
+            max_usage=express_data.max_usage
+        )
+        
+        # Save to database
+        code_dict = express_code.dict(by_alias=True, exclude={"id"})
+        result = await db.expresscodes.insert_one(code_dict)
+        express_code.id = str(result.inserted_id)
+        
+        logger.info(f"Express code created: {code} for card {card.name} (expires in {express_data.duration_seconds}s)")
+        
+        time_remaining = max(0, int((express_code.expires_at - datetime.utcnow()).total_seconds()))
+        
+        return ExpressCodeResponse(
+            id=str(express_code.id),
+            code=express_code.code,
+            created_at=express_code.created_at,
+            expires_at=express_code.expires_at,
+            time_remaining_seconds=time_remaining,
+            usage_count=express_code.usage_count,
+            max_usage=express_code.max_usage,
+            is_active=express_code.is_active,
+            card_name=card.name,
+            card_company=card.company
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Express code creation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Express Code Erstellung fehlgeschlagen: {str(e)}")
+
+@api_router.post("/express/access", response_model=ExpressAccessResponse)
+async def access_by_express_code(
+    code_request: dict,
+    request: Request,
+    background_tasks: BackgroundTasks
+):
+    """Access business card using express code"""
+    try:
+        code = code_request.get("code", "").upper().strip()
+        
+        if not code:
+            raise HTTPException(status_code=400, detail="Express Code ist erforderlich")
+        
+        # Find active express code
+        express_data = await db.expresscodes.find_one({
+            "code": code,
+            "is_active": True,
+            "expires_at": {"$gt": datetime.utcnow()}
+        })
+        
+        if not express_data:
+            raise HTTPException(status_code=404, detail="Express Code nicht gefunden oder abgelaufen")
+        
+        # Convert ObjectId to string for compatibility
+        if "_id" in express_data:
+            express_data["_id"] = str(express_data["_id"])
+        
+        express_code = ExpressCode(**express_data)
+        
+        # Check if code is valid
+        if not express_code.is_valid():
+            raise HTTPException(status_code=400, detail="Express Code ist nicht mehr gültig")
+        
+        # Get associated business card
+        from bson import ObjectId
+        card_data = await db.businesscards.find_one({"_id": express_code.card_id})
+        if not card_data:
+            try:
+                card_data = await db.businesscards.find_one({"_id": ObjectId(express_code.card_id)})
+            except:
+                pass
+        
+        if not card_data:
+            raise HTTPException(status_code=404, detail="Zugeordnete Visitenkarte nicht gefunden")
+        
+        # Convert ObjectId to string for compatibility
+        if "_id" in card_data:
+            card_data["_id"] = str(card_data["_id"])
+        if "userId" in card_data:
+            card_data["userId"] = str(card_data["userId"])
+        
+        card = BusinessCard(**card_data)
+        
+        # Check if card is public
+        if not card.is_public:
+            raise HTTPException(status_code=403, detail="Diese Visitenkarte ist nicht öffentlich zugänglich")
+        
+        # Update usage count
+        await db.expresscodes.update_one(
+            {"_id": ObjectId(str(express_code.id))},
+            {"$inc": {"usage_count": 1}}
+        )
+        
+        # Track analytics (in background)
+        background_tasks.add_task(
+            track_card_analytics,
+            str(card.id),
+            "express_access",
+            request,
+            {"access_method": "express_code", "code_used": code}
+        )
+        
+        logger.info(f"Express code access successful: {code} -> Card {card.name}")
+        
+        time_remaining = max(0, int((express_code.expires_at - datetime.utcnow()).total_seconds()))
+        
+        return ExpressAccessResponse(
+            success=True,
+            message=f"Visitenkarte von {card.name} über Express Code erhalten",
+            card={
+                "id": str(card.id),
+                "name": card.name,
+                "company": card.company,
+                "position": card.position,
+                "phones": [{"label": p.label, "number": p.number, "is_primary": p.is_primary} for p in card.phones],
+                "emails": [{"label": e.label, "address": e.address, "is_primary": e.is_primary} for e in card.emails],
+                "website": card.website,
+                "profile_image": card.profile_image,
+                "social_media": card.social_media.dict() if card.social_media else {}
+            },
+            express_code=ExpressCodeResponse(
+                id=str(express_code.id),
+                code=express_code.code,
+                created_at=express_code.created_at,
+                expires_at=express_code.expires_at,
+                time_remaining_seconds=time_remaining,
+                usage_count=express_code.usage_count + 1,
+                max_usage=express_code.max_usage,
+                is_active=express_code.is_active,
+                card_name=card.name,
+                card_company=card.company
+            )
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Express code access failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Express Code-Zugriff fehlgeschlagen")
+
+@api_router.post("/express/room/create", response_model=ExpressRoomResponse)
+async def create_express_room(
+    room_data: ExpressRoomCreate,
+    request: Request,
+    current_user: Optional[User] = Depends(get_optional_user)
+):
+    """Create express meeting room for quick group sharing"""
+    try:
+        # Get the business card
+        from bson import ObjectId
+        card_data = await db.businesscards.find_one({"_id": room_data.card_id})
+        if not card_data:
+            try:
+                card_data = await db.businesscards.find_one({"_id": ObjectId(room_data.card_id)})
+            except:
+                pass
+        
+        if not card_data:
+            raise HTTPException(status_code=404, detail="Visitenkarte nicht gefunden")
+        
+        # Convert ObjectId to string for compatibility
+        if "_id" in card_data:
+            card_data["_id"] = str(card_data["_id"])
+        if "userId" in card_data:
+            card_data["userId"] = str(card_data["userId"])
+        
+        card = BusinessCard(**card_data)
+        
+        # Check if user owns this card (if logged in)
+        if current_user:
+            is_owner = str(card.user_id) == str(current_user.id)
+            if not is_owner:
+                raise HTTPException(status_code=403, detail="Sie können nur Express Rooms für Ihre eigenen Karten erstellen")
+        
+        # Check if card is public for anonymous users
+        if not current_user and not card.is_public:
+            raise HTTPException(status_code=403, detail="Diese Visitenkarte ist nicht öffentlich")
+        
+        # Generate unique 2-digit room code
+        code = ExpressMeetingRoom.generate_express_room_code()
+        attempts = 0
+        while attempts < 20:
+            existing = await db.expressrooms.find_one({
+                "code": code,
+                "is_active": True,
+                "expires_at": {"$gt": datetime.utcnow()}
+            })
+            if not existing:
+                break
+            code = ExpressMeetingRoom.generate_express_room_code()
+            attempts += 1
+        
+        if attempts >= 20:
+            raise HTTPException(status_code=500, detail="Fehler beim Generieren des Express Room Codes")
+        
+        # Create express meeting room
+        expires_at = datetime.utcnow() + timedelta(seconds=room_data.duration_seconds)
+        
+        express_room = ExpressMeetingRoom(
+            code=code,
+            created_by_card_id=str(card.id),
+            created_by_card_name=card.name,
+            created_by_user_id=str(current_user.id) if current_user else None,
+            expires_at=expires_at,
+            max_participants=room_data.max_participants,
+            participants=[str(card.id)]  # Creator joins automatically
+        )
+        
+        # Save to database
+        room_dict = express_room.dict(by_alias=True, exclude={"id"})
+        result = await db.expressrooms.insert_one(room_dict)
+        express_room.id = str(result.inserted_id)
+        
+        logger.info(f"Express room created: {code} by {card.name} (expires in {room_data.duration_seconds}s)")
+        
+        time_remaining = max(0, int((express_room.expires_at - datetime.utcnow()).total_seconds()))
+        
+        return ExpressRoomResponse(
+            id=str(express_room.id),
+            code=express_room.code,
+            created_by_card_name=express_room.created_by_card_name,
+            created_at=express_room.created_at,
+            expires_at=express_room.expires_at,
+            time_remaining_seconds=time_remaining,
+            participant_count=len(express_room.participants),
+            max_participants=express_room.max_participants,
+            can_join=express_room.can_join(),
+            participants=[{
+                "card_id": str(card.id),
+                "name": card.name,
+                "company": card.company,
+                "joined_at": express_room.created_at.isoformat()
+            }]
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Express room creation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Express Room Erstellung fehlgeschlagen: {str(e)}")
+
+@api_router.post("/express/room/join", response_model=dict)
+async def join_express_room(
+    join_data: ExpressRoomJoin,
+    request: Request,
+    current_user: Optional[User] = Depends(get_optional_user)
+):
+    """Join express meeting room with business card"""
+    try:
+        # Find active express room
+        room_data = await db.expressrooms.find_one({
+            "code": join_data.code,
+            "is_active": True,
+            "expires_at": {"$gt": datetime.utcnow()}
+        })
+        
+        if not room_data:
+            raise HTTPException(status_code=404, detail="Express Room nicht gefunden oder abgelaufen")
+        
+        # Convert ObjectId to string for compatibility
+        if "_id" in room_data:
+            room_data["_id"] = str(room_data["_id"])
+        
+        express_room = ExpressMeetingRoom(**room_data)
+        
+        # Check if room can accept new participants
+        if not express_room.can_join():
+            if express_room.is_expired():
+                raise HTTPException(status_code=400, detail="Express Room ist abgelaufen")
+            elif len(express_room.participants) >= express_room.max_participants:
+                raise HTTPException(status_code=400, detail="Express Room ist voll")
+            else:
+                raise HTTPException(status_code=400, detail="Express Room ist nicht aktiv")
+        
+        # Get the business card
+        from bson import ObjectId
+        card_data = await db.businesscards.find_one({"_id": join_data.card_id})
+        if not card_data:
+            try:
+                card_data = await db.businesscards.find_one({"_id": ObjectId(join_data.card_id)})
+            except:
+                pass
+        
+        if not card_data:
+            raise HTTPException(status_code=404, detail="Visitenkarte nicht gefunden")
+        
+        # Convert ObjectId to string for compatibility
+        if "_id" in card_data:
+            card_data["_id"] = str(card_data["_id"])
+        if "userId" in card_data:
+            card_data["userId"] = str(card_data["userId"])
+        
+        card = BusinessCard(**card_data)
+        
+        # Check if user owns this card (if logged in)
+        if current_user:
+            is_owner = str(card.user_id) == str(current_user.id)
+            if not is_owner:
+                raise HTTPException(status_code=403, detail="Sie können nur Ihre eigenen Karten verwenden")
+        
+        # Check if card is public for anonymous users
+        if not current_user and not card.is_public:
+            raise HTTPException(status_code=403, detail="Diese Visitenkarte ist nicht öffentlich")
+        
+        # Check if already in room
+        if str(card.id) in express_room.participants:
+            # Get all participant cards for response
+            participant_cards = []
+            for participant_id in express_room.participants:
+                if participant_id != str(card.id):
+                    p_data = await db.businesscards.find_one({"_id": participant_id})
+                    if not p_data:
+                        try:
+                            p_data = await db.businesscards.find_one({"_id": ObjectId(participant_id)})
+                        except:
+                            continue
+                    
+                    if p_data:
+                        # Convert ObjectId to string
+                        if "_id" in p_data:
+                            p_data["_id"] = str(p_data["_id"])
+                        if "userId" in p_data:
+                            p_data["userId"] = str(p_data["userId"])
+                        
+                        p_card = BusinessCard(**p_data)
+                        participant_cards.append({
+                            "id": str(p_card.id),
+                            "name": p_card.name,
+                            "company": p_card.company,
+                            "position": p_card.position,
+                            "phones": [{"label": ph.label, "number": ph.number, "is_primary": ph.is_primary} for ph in p_card.phones],
+                            "emails": [{"label": em.label, "address": em.address, "is_primary": em.is_primary} for em in p_card.emails],
+                            "website": p_card.website,
+                            "profile_image": p_card.profile_image
+                        })
+            
+            return {
+                "success": True,
+                "message": f"Sie sind bereits im Express Room '{express_room.code}'",
+                "cards_received": participant_cards,
+                "room_info": {
+                    "code": express_room.code,
+                    "time_remaining_seconds": max(0, int((express_room.expires_at - datetime.utcnow()).total_seconds())),
+                    "participant_count": len(express_room.participants)
+                }
+            }
+        
+        # Add participant to room
+        express_room.participants.append(str(card.id))
+        
+        # Update room in database
+        await db.expressrooms.update_one(
+            {"_id": ObjectId(str(express_room.id))},
+            {"$set": {"participants": express_room.participants}}
+        )
+        
+        # Get all other participant cards for response
+        participant_cards = []
+        for participant_id in express_room.participants:
+            if participant_id != str(card.id):
+                p_data = await db.businesscards.find_one({"_id": participant_id})
+                if not p_data:
+                    try:
+                        p_data = await db.businesscards.find_one({"_id": ObjectId(participant_id)})
+                    except:
+                        continue
+                
+                if p_data:
+                    # Convert ObjectId to string
+                    if "_id" in p_data:
+                        p_data["_id"] = str(p_data["_id"])
+                    if "userId" in p_data:
+                        p_data["userId"] = str(p_data["userId"])
+                    
+                    p_card = BusinessCard(**p_data)
+                    participant_cards.append({
+                        "id": str(p_card.id),
+                        "name": p_card.name,
+                        "company": p_card.company,
+                        "position": p_card.position,
+                        "phones": [{"label": ph.label, "number": ph.number, "is_primary": ph.is_primary} for ph in p_card.phones],
+                        "emails": [{"label": em.label, "address": em.address, "is_primary": em.is_primary} for em in p_card.emails],
+                        "website": p_card.website,
+                        "profile_image": p_card.profile_image
+                    })
+        
+        logger.info(f"Card {card.name} joined express room {express_room.code}")
+        
+        return {
+            "success": True,
+            "message": f"Sie sind dem Express Room '{express_room.code}' beigetreten! {len(participant_cards)} Kontakte erhalten.",
+            "cards_received": participant_cards,
+            "room_info": {
+                "code": express_room.code,
+                "time_remaining_seconds": max(0, int((express_room.expires_at - datetime.utcnow()).total_seconds())),
+                "participant_count": len(express_room.participants)
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Express room join failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Express Room Beitritt fehlgeschlagen: {str(e)}")
+
+# ============================================================================
 # PRIVACY & GDPR ENDPOINTS
 # ============================================================================
 
