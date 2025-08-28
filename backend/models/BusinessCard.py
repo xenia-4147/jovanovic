@@ -171,7 +171,8 @@ class BusinessCard(BaseModel):
             
         return v
     
-    @validator('website')
+    @field_validator('website')
+    @classmethod
     def validate_website(cls, v):
         if v and not v.startswith(('http://', 'https://')):
             return f'https://{v}'
