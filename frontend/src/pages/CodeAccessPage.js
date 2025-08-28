@@ -292,12 +292,24 @@ const CodeAccessPage = () => {
 
             <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <h3 className="font-medium text-blue-900 mb-2">💡 Wie funktioniert es?</h3>
-              <ul className="text-sm text-blue-800 space-y-1">
-                <li>• Visitenkarten-Besitzer können eigene Codes erstellen</li>
-                <li>• Codes sind einzigartig und leicht zu merken</li>
-                <li>• Einfacher als QR-Codes bei Telefongesprächen</li>
-                <li>• Automatischer Kontaktimport möglich</li>
-              </ul>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h4 className="font-medium text-blue-900 mb-2">Visitenkarten-Codes</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• Persönliche Codes für einzelne Visitenkarten</li>
+                    <li>• Dauerhaft gültig bis geändert</li>
+                    <li>• Ideal für Einzelkontakte</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-medium text-blue-900 mb-2">Meeting Room Codes</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• Temporäre Räume für Gruppen-Austausch</li>
+                    <li>• Automatischer Ablauf nach 10-60 Minuten</li>
+                    <li>• Perfekt für Events und Netzwerken</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
