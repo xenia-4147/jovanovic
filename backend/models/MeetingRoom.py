@@ -58,11 +58,16 @@ class MeetingRoom(BaseModel):
         # Ensure v is a string and handle None case
         if v is None:
             return v
-        if not isinstance(v, str):
-            v = str(v)
         
-        # Convert to uppercase and remove spaces
-        code = v.replace(' ', '').upper()
+        try:
+            # Ensure it's a string
+            if not isinstance(v, str):
+                v = str(v)
+            
+            # Convert to uppercase and remove spaces
+            code = str(v).replace(' ', '').upper()
+        except Exception as e:
+            raise ValueError(f'Invalid meeting code format: {str(e)}')
         
         # Check if code contains only letters and numbers
         if not re.match(r'^[A-Z0-9]+$', code):
