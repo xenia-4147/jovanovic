@@ -2062,6 +2062,17 @@ class BusinessCardAPITester:
             self.test_enhanced_code_access_meeting_room,
             self.test_close_meeting_room,
             
+            # Express Share Collision Prevention Tests (CRITICAL)
+            self.test_express_code_collision_prevention_simultaneous,
+            self.test_express_cross_contamination_prevention,
+            self.test_user_context_seeding_uniqueness,
+            self.test_rapid_code_creation_edge_case,
+            self.test_many_active_codes_scenario,
+            self.test_global_uniqueness_verification,
+            self.test_berlin_munich_user_scenario,
+            self.test_code_expiry_and_reuse,
+            self.test_collision_error_handling,
+            
             # Express Share tests
             self.test_create_express_code_2_char,
             self.test_create_express_code_3_char,
