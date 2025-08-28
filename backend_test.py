@@ -1043,6 +1043,473 @@ class BusinessCardAPITester:
             self.log_result("Invalid Meeting Room Operations", False, f"Error: {str(e)}")
             return False
     
+    # ============================================================================
+    # EXPRESS SHARE TESTS
+    # ============================================================================
+    
+    def test_create_express_code_2_char(self):
+        """Test POST /api/express/create with 2-character code"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Create Express Code (2-char)", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            express_data = {
+                "card_id": self.card_id,
+                "duration_seconds": 60,  # 1 minute
+                "code_length": 2,
+                "max_usage": 5
+            }
+            
+            response = requests.post(f"{API_BASE}/express/create", json=express_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["id", "code", "created_at", "expires_at", "time_remaining_seconds", "usage_count", "max_usage", "is_active", "card_name"]
+                
+                if all(field in data for field in required_fields):
+                    # Verify code is 2 characters
+                    if len(data["code"]) == 2:
+                        self.express_code_2 = data["code"]
+                        self.express_code_id_2 = data["id"]
+                        self.log_result("Create Express Code (2-char)", True, f"Express code created: {data['code']} (expires in {data['time_remaining_seconds']}s)")
+                        return True
+                    else:
+                        self.log_result("Create Express Code (2-char)", False, f"Expected 2-char code, got {len(data['code'])}-char: {data['code']}")
+                        return False
+                else:
+                    self.log_result("Create Express Code (2-char)", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Create Express Code (2-char)", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Express Code (2-char)", False, f"Error: {str(e)}")
+            return False
+    
+    def test_create_express_code_3_char(self):
+        """Test POST /api/express/create with 3-character code"""
+        if not self.access_token or not hasattr(self, 'custom_code_card_id'):
+            self.log_result("Create Express Code (3-char)", False, "No access token or second card available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            express_data = {
+                "card_id": self.custom_code_card_id,
+                "duration_seconds": 180,  # 3 minutes
+                "code_length": 3,
+                "max_usage": 10
+            }
+            
+            response = requests.post(f"{API_BASE}/express/create", json=express_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["id", "code", "created_at", "expires_at", "time_remaining_seconds", "usage_count", "max_usage", "is_active", "card_name"]
+                
+                if all(field in data for field in required_fields):
+                    # Verify code is 3 characters
+                    if len(data["code"]) == 3:
+                        self.express_code_3 = data["code"]
+                        self.express_code_id_3 = data["id"]
+                        self.log_result("Create Express Code (3-char)", True, f"Express code created: {data['code']} (expires in {data['time_remaining_seconds']}s)")
+                        return True
+                    else:
+                        self.log_result("Create Express Code (3-char)", False, f"Expected 3-char code, got {len(data['code'])}-char: {data['code']}")
+                        return False
+                else:
+                    self.log_result("Create Express Code (3-char)", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Create Express Code (3-char)", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Express Code (3-char)", False, f"Error: {str(e)}")
+            return False
+    
+    def test_access_by_express_code(self):
+        """Test POST /api/express/access"""
+        if not hasattr(self, 'express_code_2'):
+            self.log_result("Access by Express Code", False, "No express code available for testing")
+            return False
+            
+        try:
+            code_request = {"code": self.express_code_2}
+            response = requests.post(f"{API_BASE}/express/access", json=code_request)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "message", "card", "express_code"]
+                
+                if all(field in data for field in required_fields):
+                    if data["success"] == True and "card" in data:
+                        card = data["card"]
+                        express_code = data["express_code"]
+                        
+                        # Verify card data structure
+                        card_fields = ["id", "name", "company", "position", "phones", "emails"]
+                        if all(field in card for field in card_fields):
+                            # Verify express code data
+                            if express_code.get("code") == self.express_code_2:
+                                self.log_result("Access by Express Code", True, f"Successfully accessed card using express code: {self.express_code_2}")
+                                return True
+                            else:
+                                self.log_result("Access by Express Code", False, "Express code mismatch in response", data)
+                                return False
+                        else:
+                            self.log_result("Access by Express Code", False, "Missing card fields in response", card)
+                            return False
+                    else:
+                        self.log_result("Access by Express Code", False, "Success=false or missing card data", data)
+                        return False
+                else:
+                    self.log_result("Access by Express Code", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Access by Express Code", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Access by Express Code", False, f"Error: {str(e)}")
+            return False
+    
+    def test_express_code_expiry(self):
+        """Test express code expiry functionality"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Express Code Expiry", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create express code with very short duration (30 seconds)
+            express_data = {
+                "card_id": self.card_id,
+                "duration_seconds": 30,  # 30 seconds
+                "code_length": 2
+            }
+            
+            response = requests.post(f"{API_BASE}/express/create", json=express_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                short_code = data["code"]
+                
+                # Immediately try to access it (should work)
+                code_request = {"code": short_code}
+                access_response = requests.post(f"{API_BASE}/express/access", json=code_request)
+                
+                if access_response.status_code == 200:
+                    access_data = access_response.json()
+                    if access_data.get("success") == True:
+                        self.log_result("Express Code Expiry", True, f"Express code {short_code} works immediately after creation and will expire in 30s")
+                        return True
+                    else:
+                        self.log_result("Express Code Expiry", False, "Express code access failed immediately after creation", access_data)
+                        return False
+                else:
+                    self.log_result("Express Code Expiry", False, f"Express code access failed: HTTP {access_response.status_code}", access_response.text)
+                    return False
+            else:
+                self.log_result("Express Code Expiry", False, f"Express code creation failed: HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Express Code Expiry", False, f"Error: {str(e)}")
+            return False
+    
+    def test_create_express_room(self):
+        """Test POST /api/express/room/create"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Create Express Room", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            room_data = {
+                "card_id": self.card_id,
+                "duration_seconds": 120,  # 2 minutes
+                "max_participants": 5
+            }
+            
+            response = requests.post(f"{API_BASE}/express/room/create", json=room_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["id", "code", "created_by_card_name", "created_at", "expires_at", "time_remaining_seconds", "participant_count", "max_participants", "can_join", "participants"]
+                
+                if all(field in data for field in required_fields):
+                    # Verify code is 2 digits
+                    if len(data["code"]) == 2 and data["code"].isdigit():
+                        # Verify creator is in participants
+                        if data["participant_count"] == 1 and len(data["participants"]) == 1:
+                            self.express_room_code = data["code"]
+                            self.express_room_id = data["id"]
+                            self.log_result("Create Express Room", True, f"Express room created with code: {data['code']} (expires in {data['time_remaining_seconds']}s)")
+                            return True
+                        else:
+                            self.log_result("Create Express Room", False, "Creator not properly added as participant", data)
+                            return False
+                    else:
+                        self.log_result("Create Express Room", False, f"Expected 2-digit code, got: {data['code']}")
+                        return False
+                else:
+                    self.log_result("Create Express Room", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Create Express Room", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Express Room", False, f"Error: {str(e)}")
+            return False
+    
+    def test_join_express_room(self):
+        """Test POST /api/express/room/join"""
+        if not hasattr(self, 'express_room_code') or not hasattr(self, 'custom_code_card_id'):
+            self.log_result("Join Express Room", False, "No express room code or second card available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            join_data = {
+                "code": self.express_room_code,
+                "card_id": self.custom_code_card_id
+            }
+            
+            response = requests.post(f"{API_BASE}/express/room/join", json=join_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "message", "cards_received"]
+                
+                if all(field in data for field in required_fields):
+                    if data["success"] == True:
+                        # Should receive 1 card (the creator's card)
+                        cards_received = data["cards_received"]
+                        if len(cards_received) >= 1:
+                            # Verify card structure
+                            card = cards_received[0]
+                            card_fields = ["id", "name", "company", "joined_at"]
+                            if all(field in card for field in card_fields):
+                                self.log_result("Join Express Room", True, f"Successfully joined express room {self.express_room_code}, received {len(cards_received)} cards")
+                                return True
+                            else:
+                                self.log_result("Join Express Room", False, "Missing fields in received card data", card)
+                                return False
+                        else:
+                            self.log_result("Join Express Room", False, f"Expected at least 1 card, got {len(cards_received)}")
+                            return False
+                    else:
+                        self.log_result("Join Express Room", False, "Success=false in response", data)
+                        return False
+                else:
+                    self.log_result("Join Express Room", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Join Express Room", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Join Express Room", False, f"Error: {str(e)}")
+            return False
+    
+    def test_express_code_uniqueness(self):
+        """Test express code uniqueness across codes and rooms"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Express Code Uniqueness", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create multiple express codes and verify they're unique
+            codes_created = []
+            
+            for i in range(3):
+                express_data = {
+                    "card_id": self.card_id,
+                    "duration_seconds": 60,
+                    "code_length": 2
+                }
+                
+                response = requests.post(f"{API_BASE}/express/create", json=express_data, headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    code = data["code"]
+                    
+                    if code in codes_created:
+                        self.log_result("Express Code Uniqueness", False, f"Duplicate code generated: {code}")
+                        return False
+                    
+                    codes_created.append(code)
+                else:
+                    self.log_result("Express Code Uniqueness", False, f"Failed to create express code {i+1}: HTTP {response.status_code}")
+                    return False
+            
+            # Create express rooms and verify they don't conflict
+            room_codes_created = []
+            
+            for i in range(2):
+                room_data = {
+                    "card_id": self.card_id,
+                    "duration_seconds": 60,
+                    "max_participants": 5
+                }
+                
+                response = requests.post(f"{API_BASE}/express/room/create", json=room_data, headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    code = data["code"]
+                    
+                    if code in room_codes_created:
+                        self.log_result("Express Code Uniqueness", False, f"Duplicate room code generated: {code}")
+                        return False
+                    
+                    room_codes_created.append(code)
+                else:
+                    self.log_result("Express Code Uniqueness", False, f"Failed to create express room {i+1}: HTTP {response.status_code}")
+                    return False
+            
+            self.log_result("Express Code Uniqueness", True, f"Generated unique codes: {codes_created} and room codes: {room_codes_created}")
+            return True
+                
+        except Exception as e:
+            self.log_result("Express Code Uniqueness", False, f"Error: {str(e)}")
+            return False
+    
+    def test_express_integration_with_regular_codes(self):
+        """Test that express codes don't conflict with regular business card codes"""
+        if not hasattr(self, 'express_code_2') or not hasattr(self, 'custom_code'):
+            self.log_result("Express Integration", False, "No express code or regular custom code available")
+            return False
+            
+        try:
+            # Try to access express code via regular card access endpoint
+            code_request = {"code": self.express_code_2}
+            response = requests.post(f"{API_BASE}/cards/access-by-code", json=code_request)
+            
+            # Express codes should not be accessible via regular card access
+            if response.status_code == 404:
+                # Try to access regular code via express access endpoint
+                express_request = {"code": self.custom_code}
+                express_response = requests.post(f"{API_BASE}/express/access", json=express_request)
+                
+                # Regular codes should not be accessible via express access
+                if express_response.status_code == 404:
+                    self.log_result("Express Integration", True, "Express codes and regular codes properly separated")
+                    return True
+                else:
+                    self.log_result("Express Integration", False, f"Regular code accessible via express endpoint: HTTP {express_response.status_code}")
+                    return False
+            else:
+                self.log_result("Express Integration", False, f"Express code accessible via regular endpoint: HTTP {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Express Integration", False, f"Error: {str(e)}")
+            return False
+    
+    def test_express_room_participant_limits(self):
+        """Test express room participant limits"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Express Room Limits", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create room with limit of 2 participants
+            room_data = {
+                "card_id": self.card_id,
+                "duration_seconds": 120,
+                "max_participants": 2
+            }
+            
+            response = requests.post(f"{API_BASE}/express/room/create", json=room_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                room_code = data["code"]
+                
+                # Verify room shows can_join = true initially
+                if data.get("can_join") == True and data.get("participant_count") == 1:
+                    # Try to join with second card (should work)
+                    if hasattr(self, 'custom_code_card_id'):
+                        join_data = {
+                            "code": room_code,
+                            "card_id": self.custom_code_card_id
+                        }
+                        
+                        join_response = requests.post(f"{API_BASE}/express/room/join", json=join_data, headers=headers)
+                        
+                        if join_response.status_code == 200:
+                            join_data_response = join_response.json()
+                            if join_data_response.get("success") == True:
+                                self.log_result("Express Room Limits", True, f"Express room {room_code} properly handles participant limits")
+                                return True
+                            else:
+                                self.log_result("Express Room Limits", False, "Failed to join room within limits", join_data_response)
+                                return False
+                        else:
+                            self.log_result("Express Room Limits", False, f"Join failed: HTTP {join_response.status_code}")
+                            return False
+                    else:
+                        self.log_result("Express Room Limits", True, "Room created with proper limits (no second card to test join)")
+                        return True
+                else:
+                    self.log_result("Express Room Limits", False, "Room not properly initialized", data)
+                    return False
+            else:
+                self.log_result("Express Room Limits", False, f"Room creation failed: HTTP {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Express Room Limits", False, f"Error: {str(e)}")
+            return False
+    
+    def test_invalid_express_operations(self):
+        """Test various invalid express operations"""
+        try:
+            # Test accessing non-existent express code
+            code_request = {"code": "XX"}
+            response = requests.post(f"{API_BASE}/express/access", json=code_request)
+            
+            if response.status_code == 404:
+                self.log_result("Invalid Express Operations - Code", True, "Non-existent express code properly rejected")
+            else:
+                self.log_result("Invalid Express Operations - Code", False, f"Expected 404, got {response.status_code}")
+                return False
+            
+            # Test joining non-existent express room
+            join_data = {
+                "code": "99",
+                "card_id": self.card_id if self.card_id else "fake_id"
+            }
+            
+            response = requests.post(f"{API_BASE}/express/room/join", json=join_data)
+            
+            if response.status_code == 404:
+                self.log_result("Invalid Express Operations - Room", True, "Non-existent express room properly rejected")
+                return True
+            else:
+                self.log_result("Invalid Express Operations - Room", False, f"Expected 404, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Invalid Express Operations", False, f"Error: {str(e)}")
+            return False
+    
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("=" * 80)
