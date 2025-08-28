@@ -101,7 +101,8 @@ class BusinessCard(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
     
-    @validator('custom_code', pre=True)
+    @field_validator('custom_code', mode='before')
+    @classmethod
     def validate_custom_code(cls, v):
         if not v:
             return v
