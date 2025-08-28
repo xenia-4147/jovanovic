@@ -314,7 +314,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Enhanced Messaging Apps Frontend Testing - COMPLETED"
+    - "Contact Import System Backend Testing - COMPLETED"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
