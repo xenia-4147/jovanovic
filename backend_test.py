@@ -1548,6 +1548,18 @@ class BusinessCardAPITester:
             self.test_enhanced_code_access_meeting_room,
             self.test_close_meeting_room,
             
+            # Express Share tests
+            self.test_create_express_code_2_char,
+            self.test_create_express_code_3_char,
+            self.test_access_by_express_code,
+            self.test_express_code_expiry,
+            self.test_create_express_room,
+            self.test_join_express_room,
+            self.test_express_code_uniqueness,
+            self.test_express_integration_with_regular_codes,
+            self.test_express_room_participant_limits,
+            self.test_invalid_express_operations,
+            
             # Utility tests
             self.test_qr_code_generation,
             self.test_vcard_generation,
