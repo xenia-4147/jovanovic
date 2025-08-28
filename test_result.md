@@ -224,10 +224,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Express Share Code Features"
-    - "Express Meeting Room Features"
-    - "Express Code Generation and Uniqueness"
-    - "Express Integration with Existing Systems"
+    - "Express Share Collision Prevention System"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
