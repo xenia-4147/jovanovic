@@ -133,7 +133,7 @@ const HomePage = () => {
           </p>
         </div>
         
-        <div className="flex items-center space-x-4">
+        <div className="flex flex-wrap items-center gap-2">
           <Button 
             variant="outline" 
             size="sm"
@@ -160,6 +160,16 @@ const HomePage = () => {
             <Upload className="w-4 h-4 mr-2" />
             Kontakte verwalten
           </Button>
+          
+          {subscriptionStatus?.plan_type === 'free' && (
+            <Badge 
+              variant="secondary" 
+              className="bg-gradient-to-r from-yellow-100 to-orange-100 text-yellow-800 border border-yellow-300 hidden sm:inline-flex"
+            >
+              <Zap className="w-3 h-3 mr-1" />
+              Fast alles kostenlos! 🚀
+            </Badge>
+          )}
           
           <Button variant="outline" size="sm">
             <User className="w-4 h-4 mr-2" />
