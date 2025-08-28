@@ -132,7 +132,8 @@ class MeetingRoomJoin(BaseModel):
     code: str = Field(..., min_length=3, max_length=10)
     card_id: str
     
-    @validator('code', pre=True)
+    @field_validator('code', mode='before')
+    @classmethod
     def validate_and_clean_code(cls, v):
         if not v:
             raise ValueError('Meeting Code ist erforderlich')
