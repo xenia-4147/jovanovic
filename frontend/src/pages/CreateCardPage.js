@@ -364,9 +364,30 @@ const CreateCardPage = () => {
                 <CardDescription>Datenschutz, Darstellung und automatische Updates</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
+                <div className="space-y-6">
+                  {/* Custom Code Section */}
+                  <div className="space-y-2">
+                    <Label htmlFor="customCode" className="flex items-center">
+                      <Send className="w-4 h-4 mr-2" />
+                      Persönlicher Code (optional)
+                    </Label>
+                    <Input
+                      id="customCode"
+                      type="text"
+                      placeholder="z.B. MaxMustermann2024 oder WerbegiganCH"
+                      value={formData.custom_code}
+                      onChange={(e) => handleInputChange('custom_code', e.target.value.toUpperCase())}
+                      maxLength={50}
+                    />
+                    <p className="text-sm text-gray-500">
+                      Ein eindeutiger Code, den andere eingeben können, um Ihre Visitenkarte zu erhalten. 
+                      3-50 Zeichen aus Buchstaben und Zahlen.
+                    </p>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
                       <div>
                         <Label htmlFor="isPublic">Öffentlich sichtbar</Label>
                         <p className="text-sm text-gray-500">Jeder mit dem Link kann Ihre Visitenkarte sehen</p>
