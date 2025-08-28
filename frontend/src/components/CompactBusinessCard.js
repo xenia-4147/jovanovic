@@ -123,31 +123,12 @@ const CompactBusinessCard = ({ card, onCall, onMessage, onEmail, onNavigate, onD
                 {!isExpanded && (
                   <>
                     {primaryPhone && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onCall(primaryPhone);
-                        }}
-                        className="h-8 w-8 p-0"
-                      >
-                        <Phone className="w-4 h-4" />
-                      </Button>
-                    )}
-                    
-                    {primaryPhone && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onMessage(primaryPhone);
-                        }}
-                        className="h-8 w-8 p-0"
-                      >
-                        <MessageCircle className="w-4 h-4" />
-                      </Button>
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <MessagingButtons 
+                          phone={primaryPhone}
+                          size="sm"
+                        />
+                      </div>
                     )}
                   </>
                 )}
