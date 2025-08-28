@@ -1310,11 +1310,11 @@ async def startup_event():
         except:
             pass  # Index might not exist
         
-        # Create partial index that only indexes non-null custom_code values
+        # Create sparse unique index that only indexes non-null custom_code values
         await db.businesscards.create_index(
             "custom_code", 
             unique=True, 
-            partialFilterExpression={"custom_code": {"$ne": None}}
+            sparse=True
         )
         await db.businesscards.create_index([("is_public", 1), ("created_at", -1)])
         await db.cardrecipients.create_index("card_id")
