@@ -1250,18 +1250,27 @@ async def create_express_code(
         if not current_user and not card.is_public:
             raise HTTPException(status_code=403, detail="Diese Visitenkarte ist nicht öffentlich")
         
-        # Generate unique express code
-        code = ExpressCode.generate_express_code(express_data.code_length)
+        # Generate unique express code with user context for better uniqueness
+        user_context = str(current_user.id) if current_user else str(card.id)
+        code = ExpressCode.generate_express_code(express_data.code_length, user_context)
         attempts = 0
-        while attempts < 20:
+        while attempts < 30:  # Increased attempts for better collision handling
+            # Check for global uniqueness across all active express codes
             existing = await db.expresscodes.find_one({
                 "code": code,
                 "is_active": True,
                 "expires_at": {"$gt": datetime.utcnow()}
             })
-            if not existing:
+            # Also check express rooms to prevent cross-contamination
+            existing_room = await db.expressrooms.find_one({
+                "code": code,
+                "is_active": True,
+                "expires_at": {"$gt": datetime.utcnow()}
+            })
+            
+            if not existing and not existing_room:
                 break
-            code = ExpressCode.generate_express_code(express_data.code_length)
+            code = ExpressCode.generate_express_code(express_data.code_length, f"{user_context}_{attempts}")
             attempts += 1
         
         if attempts >= 20:
