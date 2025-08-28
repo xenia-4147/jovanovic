@@ -759,6 +759,17 @@ async def create_meeting_room(
 ):
     """Create a new meeting room"""
     try:
+        # Track usage for potential upgrade prompts
+        if current_user:
+            await track_feature_usage_internal(str(current_user.id), "meeting_room_created")
+        
+        # Check if user exceeds meeting room participant limits (soft limit for growth)
+        if current_user and room_data.max_participants > 15:
+            subscription = await get_user_subscription(str(current_user.id))
+            if subscription.plan_type == PlanType.FREE:
+                logger.info(f"Free user {current_user.email} tried to create room with {room_data.max_participants} participants (soft limit: 15)")
+                # Don't block, but log for analytics - we want growth over restrictions
+                # Could show gentle upgrade hint in frontend later
         # Get the card that's creating the room
         from bson import ObjectId
         
