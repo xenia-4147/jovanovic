@@ -299,7 +299,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Messaging Apps Enhancement Testing - COMPLETED"
+    - "Enhanced Messaging Apps Frontend Testing - COMPLETED"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
