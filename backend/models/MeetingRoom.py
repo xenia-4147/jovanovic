@@ -85,7 +85,7 @@ class MeetingRoom(BaseModel):
         """Generate a random meeting room code"""
         characters = string.ascii_uppercase + string.digits
         # Exclude confusing characters
-        characters = characters.replace('0', '').replace('O', '').replace('I', '').replace('1')
+        characters = characters.replace('0', '').replace('O', '').replace('I', '').replace('1', '')
         return ''.join(random.choice(characters) for _ in range(length))
     
     def is_expired(self) -> bool:
