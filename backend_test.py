@@ -3418,7 +3418,7 @@ END:VCARD"""
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("=" * 80)
-        print("DIGITAL BUSINESS CARDS API TEST SUITE - CONTACT IMPORT SYSTEM TESTING")
+        print("DIGITAL BUSINESS CARDS API TEST SUITE - MONETIZATION INFRASTRUCTURE TESTING")
         print("=" * 80)
         print(f"Testing API at: {API_BASE}")
         print()
