@@ -1747,6 +1747,8 @@ async def import_contacts(
 
 async def import_from_contact_picker(request: ContactImportRequest, user: User) -> ContactImportResponse:
     """Import contacts from browser Contact Picker API"""
+    from bson import ObjectId
+    
     if not request.contacts_data:
         raise HTTPException(status_code=400, detail="Keine Kontaktdaten bereitgestellt")
     
