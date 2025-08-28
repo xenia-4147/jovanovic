@@ -336,7 +336,7 @@ const CodeAccessPage = () => {
 
             <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <h3 className="font-medium text-blue-900 mb-2">💡 Wie funktioniert es?</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <h4 className="font-medium text-blue-900 mb-2">Express Codes ⚡</h4>
                   <ul className="text-sm text-blue-800 space-y-1">
