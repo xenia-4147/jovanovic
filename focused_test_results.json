@@ -1,0 +1,68 @@
+[
+  {
+    "test": "Setup",
+    "success": true,
+    "message": "User and card created successfully",
+    "timestamp": "2025-08-28T10:56:32.160445"
+  },
+  {
+    "test": "Create Card with Custom Code",
+    "success": true,
+    "message": "Card created with code: FOCUSD0AD17",
+    "timestamp": "2025-08-28T10:56:32.222891"
+  },
+  {
+    "test": "Check Code Availability - Taken",
+    "success": true,
+    "message": "Code correctly marked as taken",
+    "timestamp": "2025-08-28T10:56:32.275122"
+  },
+  {
+    "test": "Check Code Availability - Available",
+    "success": true,
+    "message": "Available code correctly identified",
+    "timestamp": "2025-08-28T10:56:32.324762"
+  },
+  {
+    "test": "Access Card by Code",
+    "success": true,
+    "message": "Successfully accessed card using code: FOCUSD0AD17",
+    "timestamp": "2025-08-28T10:56:32.383246"
+  },
+  {
+    "test": "Code Uniqueness Validation",
+    "success": true,
+    "message": "Duplicate code properly rejected",
+    "timestamp": "2025-08-28T10:56:32.438912"
+  },
+  {
+    "test": "Create Meeting Room - Auto Code",
+    "success": false,
+    "message": "HTTP 500: {\"detail\":\"Meeting Room Erstellung fehlgeschlagen: replace expected at least 2 arguments, got 1\"}",
+    "timestamp": "2025-08-28T10:56:32.494754"
+  },
+  {
+    "test": "Code System Integration - Card Access",
+    "success": true,
+    "message": "Business card code properly handled",
+    "timestamp": "2025-08-28T10:56:32.549615"
+  },
+  {
+    "test": "Error Handling - Invalid Room Join",
+    "success": true,
+    "message": "Non-existent room properly rejected",
+    "timestamp": "2025-08-28T10:56:32.599973"
+  },
+  {
+    "test": "Error Handling - Invalid Room Get",
+    "success": true,
+    "message": "Non-existent room get properly rejected",
+    "timestamp": "2025-08-28T10:56:32.651313"
+  },
+  {
+    "test": "Error Handling - Invalid Code Access",
+    "success": true,
+    "message": "Non-existent code properly rejected",
+    "timestamp": "2025-08-28T10:56:32.702662"
+  }
+]
