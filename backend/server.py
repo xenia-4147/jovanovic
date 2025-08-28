@@ -1298,9 +1298,15 @@ async def startup_event():
         # Create indexes for better performance
         await db.users.create_index("email", unique=True)
         await db.businesscards.create_index("userId")
+        await db.businesscards.create_index("custom_code", unique=True, sparse=True)
         await db.businesscards.create_index([("is_public", 1), ("created_at", -1)])
         await db.cardrecipients.create_index("card_id")
         await db.cardanalytics.create_index([("card_id", 1), ("timestamp", -1)])
+        
+        # Meeting room indexes
+        await db.meetingrooms.create_index("code")
+        await db.meetingrooms.create_index("created_by_card_id")
+        await db.meetingrooms.create_index([("is_active", 1), ("expires_at", 1)])
         
         logger.info("Database indexes created successfully")
         
