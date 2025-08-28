@@ -1466,19 +1466,27 @@ async def create_express_room(
         # Generate unique 2-digit room code
         code = ExpressMeetingRoom.generate_express_room_code()
         attempts = 0
-        while attempts < 20:
-            existing = await db.expressrooms.find_one({
+        while attempts < 30:  # Increased attempts
+            # Check express rooms
+            existing_room = await db.expressrooms.find_one({
                 "code": code,
                 "is_active": True,
                 "expires_at": {"$gt": datetime.utcnow()}
             })
-            if not existing:
+            # Also check express codes to prevent cross-contamination
+            existing_code = await db.expresscodes.find_one({
+                "code": code,
+                "is_active": True,
+                "expires_at": {"$gt": datetime.utcnow()}
+            })
+            
+            if not existing_room and not existing_code:
                 break
             code = ExpressMeetingRoom.generate_express_room_code()
             attempts += 1
         
-        if attempts >= 20:
-            raise HTTPException(status_code=500, detail="Fehler beim Generieren des Express Room Codes")
+        if attempts >= 30:
+            raise HTTPException(status_code=500, detail="Fehler beim Generieren des Express Room Codes - zu viele aktive Codes")
         
         # Create express meeting room
         expires_at = datetime.utcnow() + timedelta(seconds=room_data.duration_seconds)
