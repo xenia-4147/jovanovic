@@ -38,6 +38,11 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/meeting-room/:roomCode" element={<MeetingRoomViewPage />} />
+            <Route path="/contacts" element={
+              <ProtectedRoute>
+                <ContactImportPage />
+              </ProtectedRoute>
+            } />
             <Route path="/" element={
               <ProtectedRoute>
                 <HomePage />
