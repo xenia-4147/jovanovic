@@ -1809,6 +1809,14 @@ async def startup_event():
         await db.meetingrooms.create_index("created_by_card_id")
         await db.meetingrooms.create_index([("is_active", 1), ("expires_at", 1)])
         
+        # Express share indexes
+        await db.expresscodes.create_index("code")
+        await db.expresscodes.create_index("card_id")
+        await db.expresscodes.create_index([("is_active", 1), ("expires_at", 1)])
+        await db.expressrooms.create_index("code")
+        await db.expressrooms.create_index("created_by_card_id")
+        await db.expressrooms.create_index([("is_active", 1), ("expires_at", 1)])
+        
         logger.info("Database indexes created successfully")
         
     except Exception as e:
