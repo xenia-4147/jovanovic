@@ -1172,6 +1172,7 @@ async def close_meeting_room(
 ):
     """Close/deactivate a meeting room (creator only)"""
     try:
+        from bson import ObjectId
         room_data = await db.meetingrooms.find_one({
             "code": room_code.upper(),
             "is_active": True
