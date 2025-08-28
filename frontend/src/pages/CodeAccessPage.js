@@ -31,42 +31,61 @@ const CodeAccessPage = () => {
     try {
       const cleanCode = code.trim().toUpperCase();
       
-      // First try as business card code
+      // First try as express code
       try {
-        const response = await api.post('/cards/access-by-code', { code: cleanCode });
+        const response = await api.post('/express/access', { code: cleanCode });
         
         if (response.data.success) {
           setResult({
             ...response.data,
-            type: 'business_card'
+            type: 'express_code'
           });
           toast({
-            title: "Visitenkarte gefunden!",
-            description: `Visitenkarte von ${response.data.card.name} gefunden.`,
+            title: "Express Code gefunden!",
+            description: `Visitenkarte von ${response.data.card.name} über Express Code erhalten.`,
           });
           return;
         }
-      } catch (cardError) {
-        // If business card code fails, try as meeting room code
-        if (cardError.response?.status === 404) {
+      } catch (expressError) {
+        // If express code fails, try as business card code
+        if (expressError.response?.status === 404) {
           try {
-            const roomResponse = await api.get(`/meeting-rooms/${cleanCode}`);
+            const response = await api.post('/cards/access-by-code', { code: cleanCode });
             
-            if (roomResponse.data) {
+            if (response.data.success) {
               setResult({
-                success: true,
-                type: 'meeting_room',
-                room: roomResponse.data,
-                message: `Meeting Room "${roomResponse.data.code}" gefunden`
+                ...response.data,
+                type: 'business_card'
               });
               toast({
-                title: "Meeting Room gefunden!",
-                description: `Meeting Room "${roomResponse.data.code}" mit ${roomResponse.data.participants.length} Teilnehmern gefunden.`,
+                title: "Visitenkarte gefunden!",
+                description: `Visitenkarte von ${response.data.card.name} gefunden.`,
               });
               return;
             }
-          } catch (roomError) {
-            // Both failed, show generic error
+          } catch (cardError) {
+            // If business card code fails, try as meeting room code
+            if (cardError.response?.status === 404) {
+              try {
+                const roomResponse = await api.get(`/meeting-rooms/${cleanCode}`);
+                
+                if (roomResponse.data) {
+                  setResult({
+                    success: true,
+                    type: 'meeting_room',
+                    room: roomResponse.data,
+                    message: `Meeting Room "${roomResponse.data.code}" gefunden`
+                  });
+                  toast({
+                    title: "Meeting Room gefunden!",
+                    description: `Meeting Room "${roomResponse.data.code}" mit ${roomResponse.data.participants.length} Teilnehmern gefunden.`,
+                  });
+                  return;
+                }
+              } catch (roomError) {
+                // All failed, show generic error
+              }
+            }
           }
         }
       }
