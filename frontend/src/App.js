@@ -12,6 +12,7 @@ import AddressBookPage from './pages/AddressBookPage';
 import CodeAccessPage from './pages/CodeAccessPage';
 import MeetingRoomPage from './pages/MeetingRoomPage';
 import MeetingRoomViewPage from './pages/MeetingRoomViewPage';
+import ContactImportPage from './pages/ContactImportPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import "./App.css";
 
