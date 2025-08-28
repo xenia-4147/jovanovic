@@ -261,6 +261,25 @@ const HomePage = () => {
                   {card.phones && card.phones.length > 0 && (
                     <p>{card.phones.find(p => p.is_primary)?.number || card.phones[0].number}</p>
                   )}
+                  {(card.custom_code || card.customCode) && (
+                    <div className="flex items-center space-x-2 bg-blue-50 p-2 rounded-md">
+                      <Key className="w-3 h-3 text-blue-600" />
+                      <span className="text-xs font-mono font-semibold text-blue-700">
+                        Code: {card.custom_code || card.customCode}
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => {
+                          navigator.clipboard.writeText(card.custom_code || card.customCode);
+                          toast({ title: "Code kopiert!", description: `"${card.custom_code || card.customCode}" wurde kopiert.` });
+                        }}
+                        className="h-6 w-6 p-0 hover:bg-blue-100"
+                      >
+                        <Copy className="w-3 h-3 text-blue-600" />
+                      </Button>
+                    </div>
+                  )}
                 </div>
                 <div className="flex space-x-2">
                   <Button
