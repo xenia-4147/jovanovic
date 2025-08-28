@@ -236,6 +236,10 @@ async def create_business_card(
         if card_dict.get('social_media') is None:
             card_dict['social_media'] = SocialMedia()
         
+        # Handle custom_code - remove if None to avoid index conflicts
+        if card_dict.get('custom_code') is None:
+            card_dict.pop('custom_code', None)
+        
         card = BusinessCard(
             user_id=str(current_user.id),
             **card_dict
@@ -243,6 +247,9 @@ async def create_business_card(
         
         # Insert into database
         card_dict = card.dict(by_alias=True, exclude={"id"})
+        # Remove custom_code if it's None to avoid database index conflicts
+        if card_dict.get('custom_code') is None:
+            card_dict.pop('custom_code', None)
         result = await db.businesscards.insert_one(card_dict)
         card.id = str(result.inserted_id)
         
