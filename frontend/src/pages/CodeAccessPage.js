@@ -92,6 +92,20 @@ const CodeAccessPage = () => {
     }
   };
 
+  const handleViewMeetingRoom = () => {
+    if (result && result.room) {
+      navigate(`/meeting-room/${result.room.code}`);
+    }
+  };
+
+  const handleJoinMeetingRoom = () => {
+    if (result && result.room) {
+      // For now, redirect to meeting room view
+      // Later, we could implement a card selection dialog for joining
+      navigate(`/meeting-room/${result.room.code}`);
+    }
+  };
+
   const handleClearResults = () => {
     setResult(null);
     setError('');
