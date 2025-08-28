@@ -299,7 +299,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Express Share Frontend System Testing"
+    - "Messaging Apps Enhancement Testing - COMPLETED"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
