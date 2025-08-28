@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import { Plus, QrCode, Share2, Edit, Eye, Globe, Lock, LogOut, User, Settings, BookOpen } from 'lucide-react';
+import { Plus, QrCode, Share2, Edit, Eye, Globe, Lock, LogOut, User, Settings, BookOpen, Users } from 'lucide-react';
 import { cardsApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
