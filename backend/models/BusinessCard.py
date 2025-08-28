@@ -1,10 +1,26 @@
 from pydantic import BaseModel, Field, validator, EmailStr
 from typing import Optional, List, Dict
 from datetime import datetime
-import uuid
+from bson import ObjectId
+import re
+
+class PyObjectId(ObjectId):
+    @classmethod
+    def __get_validators__(cls):
+        yield cls.validate
+
+    @classmethod
+    def validate(cls, v):
+        if not ObjectId.is_valid(v):
+            raise ValueError('Invalid objectid')
+        return ObjectId(v)
+
+    @classmethod
+    def __modify_schema__(cls, field_schema):
+        field_schema.update(type='string')
 
 class ContactPhone(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str = Field(default_factory=lambda: str(ObjectId()))
     label: str
     number: str
     is_primary: bool = False
@@ -18,13 +34,13 @@ class ContactPhone(BaseModel):
         return v
 
 class ContactEmail(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str = Field(default_factory=lambda: str(ObjectId()))
     label: str
     address: EmailStr
     is_primary: bool = False
 
 class ContactAddress(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str = Field(default_factory=lambda: str(ObjectId()))
     label: str
     street: Optional[str] = None
     house_number: Optional[str] = None
@@ -49,8 +65,8 @@ class SocialMedia(BaseModel):
         return v
 
 class BusinessCard(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), alias="_id")
-    user_id: str = Field(alias="userId")
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    user_id: PyObjectId = Field(alias="userId")
     name: str = Field(..., min_length=1, max_length=100)
     company: Optional[str] = Field(None, max_length=100)
     position: Optional[str] = Field(None, max_length=100)
@@ -62,6 +78,7 @@ class BusinessCard(BaseModel):
     profile_image: Optional[str] = None
     logo: Optional[str] = None
     social_media: SocialMedia = Field(default_factory=SocialMedia)
+    custom_code: Optional[str] = Field(None, min_length=3, max_length=50)
     is_public: bool = True
     background_color: str = "#ffffff"
     text_color: str = "#1f2937"
@@ -73,10 +90,30 @@ class BusinessCard(BaseModel):
     last_updated: datetime = Field(default_factory=datetime.utcnow)
     view_count: int = 0
     share_count: int = 0
+    code_usage_count: int = 0
     
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
+    
+    @validator('custom_code', pre=True)
+    def validate_custom_code(cls, v):
+        if not v:
+            return v
+        
+        # Remove spaces and convert to uppercase
+        code = v.replace(' ', '').upper()
+        
+        # Check if code contains only letters and numbers
+        if not re.match(r'^[A-Z0-9]+$', code):
+            raise ValueError('Code darf nur Buchstaben und Zahlen enthalten')
+        
+        # Must be between 3-50 characters
+        if len(code) < 3 or len(code) > 50:
+            raise ValueError('Code muss zwischen 3 und 50 Zeichen lang sein')
+        
+        return code
     
     @validator('phones')
     def validate_phones(cls, v):
@@ -144,6 +181,7 @@ class BusinessCardCreate(BaseModel):
     profile_image: Optional[str] = None
     logo: Optional[str] = None
     social_media: Optional[SocialMedia] = None
+    custom_code: Optional[str] = Field(None, min_length=3, max_length=50)
     is_public: bool = True
     background_color: str = "#ffffff"
     text_color: str = "#1f2937"
@@ -164,6 +202,7 @@ class BusinessCardUpdate(BaseModel):
     profile_image: Optional[str] = None
     logo: Optional[str] = None
     social_media: Optional[SocialMedia] = None
+    custom_code: Optional[str] = Field(None, min_length=3, max_length=50)
     is_public: Optional[bool] = None
     background_color: Optional[str] = None
     text_color: Optional[str] = None
@@ -185,6 +224,7 @@ class BusinessCardResponse(BaseModel):
     profile_image: Optional[str]
     logo: Optional[str]
     social_media: SocialMedia
+    custom_code: Optional[str]
     is_public: bool
     background_color: str
     text_color: str
@@ -196,34 +236,39 @@ class BusinessCardResponse(BaseModel):
     last_updated: datetime
     view_count: int
     share_count: int
+    code_usage_count: int
     is_owner: bool = False
 
 class CardRecipient(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), alias="_id")
-    card_id: str
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    card_id: PyObjectId
     recipient_email: EmailStr
     recipient_name: Optional[str] = None
     shared_at: datetime = Field(default_factory=datetime.utcnow)
     last_notified: Optional[datetime] = None
     notification_method: str = "email"  # email, sms, push
     is_active: bool = True
+    access_method: str = "link"  # link, code, qr
     
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
 
 class CardAnalytics(BaseModel):
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()), alias="_id")
-    card_id: str
-    action: str  # view, download, share, qr_scan
+    id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
+    card_id: PyObjectId
+    action: str  # view, download, share, qr_scan, code_access
     timestamp: datetime = Field(default_factory=datetime.utcnow)
     user_agent: Optional[str] = None
     country: Optional[str] = None  # IP-derived, no exact location
     referrer: Optional[str] = None
+    access_method: Optional[str] = None  # link, code, qr
     
     class Config:
-        populate_by_name = True
+        allow_population_by_field_name = True
         arbitrary_types_allowed = True
+        json_encoders = {ObjectId: str}
 
 class ShareRequest(BaseModel):
     recipient_emails: List[EmailStr]
@@ -235,3 +280,26 @@ class EmbedOptions(BaseModel):
     height: int = 450
     show_qr: bool = True
     theme: str = "auto"  # auto, light, dark
+
+class CodeAccessRequest(BaseModel):
+    code: str = Field(..., min_length=3, max_length=50)
+    
+    @validator('code', pre=True)
+    def validate_and_clean_code(cls, v):
+        if not v:
+            raise ValueError('Code ist erforderlich')
+        
+        # Remove spaces and convert to uppercase
+        code = v.replace(' ', '').upper()
+        
+        # Check if code contains only letters and numbers
+        if not re.match(r'^[A-Z0-9]+$', code):
+            raise ValueError('Code darf nur Buchstaben und Zahlen enthalten')
+        
+        return code
+
+class CodeAccessResponse(BaseModel):
+    success: bool
+    card: Optional[BusinessCardResponse] = None
+    message: str
+    code_usage_count: Optional[int] = None
