@@ -50,7 +50,8 @@ class MeetingRoom(BaseModel):
         arbitrary_types_allowed = True
         json_encoders = {ObjectId: str}
     
-    @validator('code', pre=True)
+    @field_validator('code', mode='before')
+    @classmethod
     def validate_meeting_code(cls, v):
         if not v:
             return v
