@@ -1454,30 +1454,22 @@ async def create_express_room(
         if not current_user and not card.is_public:
             raise HTTPException(status_code=403, detail="Diese Visitenkarte ist nicht öffentlich")
         
-        # Generate unique 2-digit room code
+        # Generate simple 2-digit room code
         code = ExpressMeetingRoom.generate_express_room_code()
         attempts = 0
-        while attempts < 30:  # Increased attempts
-            # Check express rooms
-            existing_room = await db.expressrooms.find_one({
+        while attempts < 5:  # Simple collision handling
+            existing = await db.expressrooms.find_one({
                 "code": code,
                 "is_active": True,
                 "expires_at": {"$gt": datetime.utcnow()}
             })
-            # Also check express codes to prevent cross-contamination
-            existing_code = await db.expresscodes.find_one({
-                "code": code,
-                "is_active": True,
-                "expires_at": {"$gt": datetime.utcnow()}
-            })
-            
-            if not existing_room and not existing_code:
+            if not existing:
                 break
             code = ExpressMeetingRoom.generate_express_room_code()
             attempts += 1
         
-        if attempts >= 30:
-            raise HTTPException(status_code=500, detail="Fehler beim Generieren des Express Room Codes - zu viele aktive Codes")
+        if attempts >= 5:
+            raise HTTPException(status_code=500, detail="Fehler beim Generieren des Express Room Codes")
         
         # Create express meeting room
         expires_at = datetime.utcnow() + timedelta(seconds=room_data.duration_seconds)
