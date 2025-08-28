@@ -157,7 +157,7 @@ const HomePage = () => {
         </div>
       </header>
 
-      <div className="flex justify-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
         <Button 
           onClick={handleCreateNew}
           size="lg"
@@ -166,6 +166,18 @@ const HomePage = () => {
           <Plus className="mr-2 h-5 w-5" />
           Neue Visitenkarte erstellen
         </Button>
+        
+        {businessCards.length > 0 && (
+          <Button 
+            onClick={() => setShowExpressModal(true)}
+            size="lg"
+            variant="outline"
+            className="bg-gradient-to-r from-yellow-400 to-orange-400 hover:from-yellow-500 hover:to-orange-500 text-white border-0 px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+          >
+            <Zap className="mr-2 h-5 w-5" />
+            Express Share
+          </Button>
+        )}
       </div>
 
       {businessCards.length === 0 ? (
