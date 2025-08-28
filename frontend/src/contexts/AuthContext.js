@@ -18,6 +18,18 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     initializeAuth();
+    
+    // Listen for auth expiration events from API interceptors
+    const handleAuthExpired = () => {
+      setUser(null);
+      setIsAuthenticated(false);
+    };
+    
+    window.addEventListener('auth-expired', handleAuthExpired);
+    
+    return () => {
+      window.removeEventListener('auth-expired', handleAuthExpired);
+    };
   }, []);
 
   const initializeAuth = async () => {
