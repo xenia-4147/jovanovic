@@ -382,10 +382,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Early Adopter Backend Logic Implementation"
     - "EarlyAdopterBadge Component Implementation" 
     - "HomePage Early Adopter Integration"
-    - "Early Adopter Premium Benefits"
+    - "Subscription Status API Integration"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
