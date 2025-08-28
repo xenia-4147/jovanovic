@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 import { Separator } from '../components/ui/separator';
 import { ArrowLeft, Download, QrCode, Share2, Phone, Mail, Globe, MapPin, Instagram, Linkedin, Twitter, Send, MessageCircle, Copy, Code, RefreshCw, Clock, Users, Navigation } from 'lucide-react';
 import CompactBusinessCard from '../components/CompactBusinessCard';
+import MessagingButtons from '../components/MessagingButtons';
 import { cardsApi, downloadVCardFile } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../hooks/use-toast';
