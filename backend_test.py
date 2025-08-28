@@ -3112,6 +3112,20 @@ END:VCARD"""
             self.test_access_card_by_code,
             self.test_code_uniqueness_validation,
             
+            # Contact Import System Tests
+            self.test_list_contact_sources_empty,
+            self.test_import_contacts_contact_picker,
+            self.test_import_contacts_vcf_file,
+            self.test_import_contacts_google_placeholder,
+            self.test_import_contacts_apple_placeholder,
+            self.test_import_contacts_csv_unsupported,
+            self.test_list_contact_sources_with_data,
+            self.test_unified_contacts_list,
+            self.test_unified_contacts_search,
+            self.test_imported_contact_messaging_apps,
+            self.test_contact_type_identification,
+            self.test_contact_import_invalid_data,
+            
             # Messaging Apps Enhancement Tests
             self.test_messaging_apps_default_configuration,
             self.test_messaging_apps_custom_configuration,
