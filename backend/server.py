@@ -1683,6 +1683,395 @@ async def join_express_room(
         raise HTTPException(status_code=500, detail=f"Express Room Beitritt fehlgeschlagen: {str(e)}")
 
 # ============================================================================
+# CONTACT IMPORT & SYNC ENDPOINTS
+# ============================================================================
+
+@api_router.get("/contacts/sources", response_model=List[ContactSourceResponse])
+async def list_contact_sources(current_user: User = Depends(get_current_user)):
+    """Get all configured contact sources for user"""
+    try:
+        sources_cursor = db.contactsources.find({"user_id": str(current_user.id)})
+        sources = []
+        
+        async for source_data in sources_cursor:
+            if "_id" in source_data:
+                source_data["_id"] = str(source_data["_id"])
+            
+            source = ContactSource(**source_data)
+            sources.append(ContactSourceResponse(
+                id=str(source.id),
+                source_type=source.source_type.value,
+                display_name=source.display_name,
+                sync_enabled=source.sync_enabled,
+                sync_status=source.sync_status.value,
+                last_sync_at=source.last_sync_at,
+                next_sync_at=source.next_sync_at,
+                total_contacts_imported=source.total_contacts_imported,
+                last_error_message=source.last_error_message
+            ))
+        
+        return sources
+        
+    except Exception as e:
+        logger.error(f"Failed to list contact sources: {str(e)}")
+        raise HTTPException(status_code=500, detail="Kontaktquellen konnten nicht geladen werden")
+
+@api_router.post("/contacts/import", response_model=ContactImportResponse)
+async def import_contacts(
+    import_request: ContactImportRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Import contacts from various sources"""
+    try:
+        logger.info(f"Starting contact import for user {current_user.email}, source: {import_request.source_type}")
+        
+        # Handle different import types
+        if import_request.source_type == ContactSourceType.CONTACT_PICKER:
+            return await import_from_contact_picker(import_request, current_user)
+        elif import_request.source_type == ContactSourceType.VCF_FILE:
+            return await import_from_vcf_file(import_request, current_user)
+        elif import_request.source_type == ContactSourceType.CSV_FILE:
+            return await import_from_csv_file(import_request, current_user)
+        elif import_request.source_type == ContactSourceType.GOOGLE_CONTACTS:
+            return await import_from_google_contacts(import_request, current_user)
+        elif import_request.source_type == ContactSourceType.APPLE_ICLOUD:
+            return await import_from_apple_icloud(import_request, current_user)
+        else:
+            raise HTTPException(status_code=400, detail=f"Kontaktquelle {import_request.source_type} wird noch nicht unterstützt")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Contact import failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Kontakt-Import fehlgeschlagen: {str(e)}")
+
+async def import_from_contact_picker(request: ContactImportRequest, user: User) -> ContactImportResponse:
+    """Import contacts from browser Contact Picker API"""
+    if not request.contacts_data:
+        raise HTTPException(status_code=400, detail="Keine Kontaktdaten bereitgestellt")
+    
+    # Create contact source
+    source = ContactSource(
+        user_id=str(user.id),
+        source_type=ContactSourceType.CONTACT_PICKER,
+        display_name=request.display_name or "Browser Kontakte",
+        sync_enabled=False,  # Contact picker is one-time only
+        last_sync_at=datetime.utcnow()
+    )
+    
+    source_dict = source.dict(by_alias=True, exclude={"id"})
+    source_result = await db.contactsources.insert_one(source_dict)
+    source.id = str(source_result.inserted_id)
+    
+    contacts_imported = 0
+    
+    for contact_data in request.contacts_data:
+        try:
+            imported_contact = await create_imported_contact_from_data(
+                contact_data, str(user.id), str(source.id)
+            )
+            
+            if imported_contact:
+                contact_dict = imported_contact.dict(by_alias=True, exclude={"id"})
+                await db.importedcontacts.insert_one(contact_dict)
+                contacts_imported += 1
+                
+        except Exception as e:
+            logger.warning(f"Failed to import individual contact: {str(e)}")
+            continue
+    
+    # Update source statistics
+    await db.contactsources.update_one(
+        {"_id": ObjectId(str(source.id))},
+        {"$set": {
+            "total_contacts_imported": contacts_imported,
+            "last_sync_contacts_added": contacts_imported
+        }}
+    )
+    
+    logger.info(f"Imported {contacts_imported} contacts from Contact Picker for user {user.email}")
+    
+    return ContactImportResponse(
+        success=True,
+        message=f"Erfolgreich {contacts_imported} Kontakte importiert",
+        source_id=str(source.id),
+        contacts_imported=contacts_imported
+    )
+
+async def import_from_vcf_file(request: ContactImportRequest, user: User) -> ContactImportResponse:
+    """Import contacts from VCF file"""
+    if not request.file_content:
+        raise HTTPException(status_code=400, detail="Keine Datei bereitgestellt")
+    
+    try:
+        import base64
+        import io
+        
+        # Decode base64 file content
+        file_data = base64.b64decode(request.file_content).decode('utf-8')
+        
+        # Parse VCF content
+        contacts = parse_vcf_content(file_data)
+        
+        # Create contact source
+        source = ContactSource(
+            user_id=str(user.id),
+            source_type=ContactSourceType.VCF_FILE,
+            display_name=request.display_name or f"VCF Import ({request.file_name or 'contacts.vcf'})",
+            sync_enabled=False,  # File imports are one-time only
+            last_sync_at=datetime.utcnow()
+        )
+        
+        source_dict = source.dict(by_alias=True, exclude={"id"})
+        source_result = await db.contactsources.insert_one(source_dict)
+        source.id = str(source_result.inserted_id)
+        
+        contacts_imported = 0
+        
+        for contact_data in contacts:
+            try:
+                imported_contact = await create_imported_contact_from_vcf(
+                    contact_data, str(user.id), str(source.id)
+                )
+                
+                if imported_contact:
+                    contact_dict = imported_contact.dict(by_alias=True, exclude={"id"})
+                    await db.importedcontacts.insert_one(contact_dict)
+                    contacts_imported += 1
+                    
+            except Exception as e:
+                logger.warning(f"Failed to import VCF contact: {str(e)}")
+                continue
+        
+        # Update source statistics
+        await db.contactsources.update_one(
+            {"_id": ObjectId(str(source.id))},
+            {"$set": {
+                "total_contacts_imported": contacts_imported,
+                "last_sync_contacts_added": contacts_imported
+            }}
+        )
+        
+        logger.info(f"Imported {contacts_imported} contacts from VCF file for user {user.email}")
+        
+        return ContactImportResponse(
+            success=True,
+            message=f"Erfolgreich {contacts_imported} Kontakte aus VCF-Datei importiert",
+            source_id=str(source.id),
+            contacts_imported=contacts_imported
+        )
+        
+    except Exception as e:
+        logger.error(f"VCF import failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"VCF-Import fehlgeschlagen: {str(e)}")
+
+async def import_from_google_contacts(request: ContactImportRequest, user: User) -> ContactImportResponse:
+    """Import contacts from Google Contacts API"""
+    # This will require OAuth implementation
+    return ContactImportResponse(
+        success=False,
+        message="Google Contacts Import wird in der nächsten Version implementiert",
+        auth_required=True,
+        auth_url="https://accounts.google.com/oauth/authorize"  # Placeholder
+    )
+
+async def import_from_apple_icloud(request: ContactImportRequest, user: User) -> ContactImportResponse:
+    """Import contacts from Apple iCloud"""
+    # This will require CloudKit Web Services
+    return ContactImportResponse(
+        success=False,
+        message="Apple iCloud Import wird in der nächsten Version implementiert",
+        auth_required=True
+    )
+
+async def create_imported_contact_from_data(contact_data: dict, user_id: str, source_id: str) -> Optional[ImportedContact]:
+    """Create ImportedContact from raw contact data"""
+    try:
+        # Extract basic info
+        name = contact_data.get('name', [''])[0] if isinstance(contact_data.get('name'), list) else contact_data.get('name', '')
+        if not name:
+            return None
+        
+        # Parse phone numbers
+        phones = []
+        tel_numbers = contact_data.get('tel', [])
+        if isinstance(tel_numbers, str):
+            tel_numbers = [tel_numbers]
+        
+        for i, tel in enumerate(tel_numbers):
+            phones.append({
+                "number": tel,
+                "label": "mobile" if i == 0 else "other",
+                "is_primary": i == 0,
+                "messaging_apps": [
+                    {"name": "whatsapp", "enabled": True},
+                    {"name": "sms", "enabled": True}
+                ]
+            })
+        
+        # Parse emails
+        emails = []
+        email_addresses = contact_data.get('email', [])
+        if isinstance(email_addresses, str):
+            email_addresses = [email_addresses]
+        
+        for i, email in enumerate(email_addresses):
+            emails.append({
+                "address": email,
+                "label": "work" if i == 0 else "other",
+                "is_primary": i == 0
+            })
+        
+        imported_contact = ImportedContact(
+            user_id=user_id,
+            source_id=source_id,
+            name=name,
+            phones=phones,
+            emails=emails,
+            last_synced_at=datetime.utcnow()
+        )
+        
+        return imported_contact
+        
+    except Exception as e:
+        logger.error(f"Failed to create imported contact: {str(e)}")
+        return None
+
+def parse_vcf_content(vcf_content: str) -> List[dict]:
+    """Parse VCF file content and extract contacts"""
+    contacts = []
+    current_contact = {}
+    
+    for line in vcf_content.split('\n'):
+        line = line.strip()
+        
+        if line.startswith('BEGIN:VCARD'):
+            current_contact = {}
+        elif line.startswith('END:VCARD'):
+            if current_contact:
+                contacts.append(current_contact)
+        elif ':' in line:
+            key, value = line.split(':', 1)
+            
+            # Handle common VCF fields
+            if key.startswith('FN'):
+                current_contact['name'] = value
+            elif key.startswith('TEL'):
+                if 'tel' not in current_contact:
+                    current_contact['tel'] = []
+                current_contact['tel'].append(value)
+            elif key.startswith('EMAIL'):
+                if 'email' not in current_contact:
+                    current_contact['email'] = []
+                current_contact['email'].append(value)
+            elif key.startswith('ORG'):
+                current_contact['company'] = value
+            elif key.startswith('TITLE'):
+                current_contact['position'] = value
+    
+    return contacts
+
+async def create_imported_contact_from_vcf(contact_data: dict, user_id: str, source_id: str) -> Optional[ImportedContact]:
+    """Create ImportedContact from VCF data"""
+    return await create_imported_contact_from_data(contact_data, user_id, source_id)
+
+@api_router.get("/contacts/unified", response_model=List[UnifiedContact])
+async def get_unified_contacts(
+    search: Optional[str] = None,
+    limit: int = 100,
+    current_user: User = Depends(get_current_user)
+):
+    """Get unified contact list combining business cards and imported contacts"""
+    try:
+        unified_contacts = []
+        
+        # Get business cards
+        business_cards_query = {"userId": str(current_user.id)}
+        if search:
+            business_cards_query["$or"] = [
+                {"name": {"$regex": search, "$options": "i"}},
+                {"company": {"$regex": search, "$options": "i"}}
+            ]
+        
+        cards_cursor = db.businesscards.find(business_cards_query).limit(limit // 2)
+        
+        async for card_data in cards_cursor:
+            if "_id" in card_data:
+                card_data["_id"] = str(card_data["_id"])
+            if "userId" in card_data:
+                card_data["userId"] = str(card_data["userId"])
+            
+            card = BusinessCard(**card_data)
+            
+            unified_contact = UnifiedContact(
+                id=str(card.id),
+                source_type="business_card",
+                name=card.name,
+                company=card.company,
+                position=card.position,
+                phones=[{
+                    "number": phone.number,
+                    "label": phone.label,
+                    "is_primary": phone.is_primary,
+                    "messaging_apps": getattr(phone, 'messaging_apps', [])
+                } for phone in card.phones],
+                emails=[{
+                    "address": email.address,
+                    "label": email.label, 
+                    "is_primary": email.is_primary
+                } for email in card.emails],
+                profile_image=card.profile_image,
+                is_business_card=True,
+                custom_code=card.custom_code,
+                is_public=card.is_public
+            )
+            unified_contacts.append(unified_contact)
+        
+        # Get imported contacts
+        imported_contacts_query = {"user_id": str(current_user.id)}
+        if search:
+            imported_contacts_query["$or"] = [
+                {"name": {"$regex": search, "$options": "i"}},
+                {"company": {"$regex": search, "$options": "i"}}
+            ]
+        
+        contacts_cursor = db.importedcontacts.find(imported_contacts_query).limit(limit // 2)
+        
+        async for contact_data in contacts_cursor:
+            if "_id" in contact_data:
+                contact_data["_id"] = str(contact_data["_id"])
+            
+            contact = ImportedContact(**contact_data)
+            
+            unified_contact = UnifiedContact(
+                id=str(contact.id),
+                source_type="imported_contact", 
+                source_id=contact.source_id,
+                name=contact.name,
+                first_name=contact.first_name,
+                last_name=contact.last_name,
+                company=contact.company,
+                position=contact.position,
+                phones=contact.phones,
+                emails=contact.emails,
+                addresses=contact.addresses,
+                profile_image=contact.profile_image_url or contact.profile_image_data,
+                is_imported_contact=True,
+                external_source=contact.source_id,
+                last_synced=contact.last_synced_at
+            )
+            unified_contacts.append(unified_contact)
+        
+        # Sort by name
+        unified_contacts.sort(key=lambda c: c.name.lower())
+        
+        return unified_contacts[:limit]
+        
+    except Exception as e:
+        logger.error(f"Failed to get unified contacts: {str(e)}")
+        raise HTTPException(status_code=500, detail="Kontakte konnten nicht geladen werden")
+
+# ============================================================================
 # PRIVACY & GDPR ENDPOINTS
 # ============================================================================
 
