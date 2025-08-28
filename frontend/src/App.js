@@ -10,6 +10,8 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import AddressBookPage from './pages/AddressBookPage';
 import CodeAccessPage from './pages/CodeAccessPage';
+import MeetingRoomPage from './pages/MeetingRoomPage';
+import MeetingRoomViewPage from './pages/MeetingRoomViewPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import "./App.css";
 
