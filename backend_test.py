@@ -497,6 +497,424 @@ class BusinessCardAPITester:
             self.log_result("Non-existent Card", False, f"Error: {str(e)}")
             return False
     
+    def test_create_business_card_with_custom_code(self):
+        """Test POST /api/cards with custom_code field"""
+        if not self.access_token:
+            self.log_result("Create Card with Custom Code", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Generate unique custom code
+            custom_code = f"TEST{uuid.uuid4().hex[:6].upper()}"
+            
+            card_data = {
+                "name": "Maria Schmidt",
+                "company": "Digital Innovation GmbH",
+                "position": "Product Manager",
+                "description": "Leading digital transformation initiatives",
+                "phones": [
+                    {
+                        "label": "work",
+                        "number": "+49-30-123-4567",
+                        "is_primary": True
+                    }
+                ],
+                "emails": [
+                    {
+                        "label": "work", 
+                        "address": "maria.schmidt@digitalinnovation.de",
+                        "is_primary": True
+                    }
+                ],
+                "website": "https://digitalinnovation.de",
+                "custom_code": custom_code,
+                "is_public": True,
+                "background_color": "#f8fafc",
+                "text_color": "#1e293b",
+                "accent_color": "#0ea5e9"
+            }
+            
+            response = requests.post(f"{API_BASE}/cards", json=card_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if data.get("custom_code") == custom_code:
+                    # Store this card for code access testing
+                    self.custom_code_card_id = data["id"]
+                    self.custom_code = custom_code
+                    self.log_result("Create Card with Custom Code", True, f"Card created with custom code: {custom_code}")
+                    return True
+                else:
+                    self.log_result("Create Card with Custom Code", False, "Custom code not reflected in response", data)
+                    return False
+            else:
+                self.log_result("Create Card with Custom Code", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Card with Custom Code", False, f"Error: {str(e)}")
+            return False
+    
+    def test_check_code_availability(self):
+        """Test GET /api/cards/check-code/{code}"""
+        try:
+            # Test with available code
+            available_code = f"AVAIL{uuid.uuid4().hex[:4].upper()}"
+            response = requests.get(f"{API_BASE}/cards/check-code/{available_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if data.get("available") == True:
+                    self.log_result("Check Code Availability - Available", True, f"Code {available_code} is available")
+                else:
+                    self.log_result("Check Code Availability - Available", False, "Expected available=true", data)
+                    return False
+            else:
+                self.log_result("Check Code Availability - Available", False, f"HTTP {response.status_code}", response.text)
+                return False
+            
+            # Test with taken code (if we have one)
+            if hasattr(self, 'custom_code'):
+                response = requests.get(f"{API_BASE}/cards/check-code/{self.custom_code}")
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    
+                    if data.get("available") == False:
+                        self.log_result("Check Code Availability - Taken", True, f"Code {self.custom_code} is correctly marked as taken")
+                        return True
+                    else:
+                        self.log_result("Check Code Availability - Taken", False, "Expected available=false for taken code", data)
+                        return False
+                else:
+                    self.log_result("Check Code Availability - Taken", False, f"HTTP {response.status_code}", response.text)
+                    return False
+            
+            return True
+                
+        except Exception as e:
+            self.log_result("Check Code Availability", False, f"Error: {str(e)}")
+            return False
+    
+    def test_access_card_by_code(self):
+        """Test POST /api/cards/access-by-code"""
+        if not hasattr(self, 'custom_code'):
+            self.log_result("Access Card by Code", False, "No custom code available for testing")
+            return False
+            
+        try:
+            code_request = {"code": self.custom_code}
+            response = requests.post(f"{API_BASE}/cards/access-by-code", json=code_request)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "message", "card", "code_usage_count"]
+                
+                if all(field in data for field in required_fields):
+                    if data["success"] == True and "card" in data:
+                        card = data["card"]
+                        if card.get("custom_code") == self.custom_code:
+                            self.log_result("Access Card by Code", True, f"Successfully accessed card using code: {self.custom_code}")
+                            return True
+                        else:
+                            self.log_result("Access Card by Code", False, "Retrieved card doesn't match expected code", data)
+                            return False
+                    else:
+                        self.log_result("Access Card by Code", False, "Success=false or missing card data", data)
+                        return False
+                else:
+                    self.log_result("Access Card by Code", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Access Card by Code", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Access Card by Code", False, f"Error: {str(e)}")
+            return False
+    
+    def test_create_meeting_room(self):
+        """Test POST /api/meeting-rooms"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Create Meeting Room", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            room_data = {
+                "card_id": self.card_id,
+                "description": "Networking Event - Tech Meetup Berlin",
+                "duration_minutes": 15,
+                "max_participants": 10
+            }
+            
+            response = requests.post(f"{API_BASE}/meeting-rooms", json=room_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["id", "code", "created_by_card_name", "participants", "max_participants", "is_active", "can_join", "is_creator"]
+                
+                if all(field in data for field in required_fields):
+                    self.meeting_room_code = data["code"]
+                    self.meeting_room_id = data["id"]
+                    
+                    # Verify creator is in participants
+                    if len(data["participants"]) == 1 and data["is_creator"] == True:
+                        self.log_result("Create Meeting Room", True, f"Meeting room created with code: {data['code']}")
+                        return True
+                    else:
+                        self.log_result("Create Meeting Room", False, "Creator not properly added as participant", data)
+                        return False
+                else:
+                    self.log_result("Create Meeting Room", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Create Meeting Room", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Create Meeting Room", False, f"Error: {str(e)}")
+            return False
+    
+    def test_get_meeting_room(self):
+        """Test GET /api/meeting-rooms/{code}"""
+        if not hasattr(self, 'meeting_room_code'):
+            self.log_result("Get Meeting Room", False, "No meeting room code available")
+            return False
+            
+        try:
+            response = requests.get(f"{API_BASE}/meeting-rooms/{self.meeting_room_code}")
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["id", "code", "created_by_card_name", "participants", "time_remaining_minutes", "can_join"]
+                
+                if all(field in data for field in required_fields):
+                    if data["code"] == self.meeting_room_code:
+                        self.log_result("Get Meeting Room", True, f"Meeting room retrieved: {data['code']}")
+                        return True
+                    else:
+                        self.log_result("Get Meeting Room", False, "Retrieved room code doesn't match", data)
+                        return False
+                else:
+                    self.log_result("Get Meeting Room", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Get Meeting Room", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Meeting Room", False, f"Error: {str(e)}")
+            return False
+    
+    def test_join_meeting_room(self):
+        """Test POST /api/meeting-rooms/join"""
+        if not hasattr(self, 'meeting_room_code') or not hasattr(self, 'custom_code_card_id'):
+            self.log_result("Join Meeting Room", False, "No meeting room code or second card available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            join_data = {
+                "code": self.meeting_room_code,
+                "card_id": self.custom_code_card_id
+            }
+            
+            response = requests.post(f"{API_BASE}/meeting-rooms/join", json=join_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "message", "room", "cards_received"]
+                
+                if all(field in data for field in required_fields):
+                    if data["success"] == True and "room" in data:
+                        room = data["room"]
+                        # Should now have 2 participants
+                        if len(room["participants"]) == 2:
+                            self.log_result("Join Meeting Room", True, f"Successfully joined meeting room: {self.meeting_room_code}")
+                            return True
+                        else:
+                            self.log_result("Join Meeting Room", False, f"Expected 2 participants, got {len(room['participants'])}", data)
+                            return False
+                    else:
+                        self.log_result("Join Meeting Room", False, "Success=false or missing room data", data)
+                        return False
+                else:
+                    self.log_result("Join Meeting Room", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Join Meeting Room", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Join Meeting Room", False, f"Error: {str(e)}")
+            return False
+    
+    def test_list_user_meeting_rooms(self):
+        """Test GET /api/meeting-rooms"""
+        if not self.access_token:
+            self.log_result("List User Meeting Rooms", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/meeting-rooms", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if isinstance(data, list):
+                    if len(data) > 0:
+                        # Check first room structure
+                        room = data[0]
+                        required_fields = ["id", "code", "created_by_card_name", "participant_count", "max_participants", "time_remaining_minutes", "is_creator"]
+                        
+                        if all(field in room for field in required_fields):
+                            self.log_result("List User Meeting Rooms", True, f"Retrieved {len(data)} meeting rooms")
+                            return True
+                        else:
+                            self.log_result("List User Meeting Rooms", False, "Missing required fields in room data", room)
+                            return False
+                    else:
+                        self.log_result("List User Meeting Rooms", True, "No meeting rooms found (empty list)")
+                        return True
+                else:
+                    self.log_result("List User Meeting Rooms", False, "Response is not a list", data)
+                    return False
+            else:
+                self.log_result("List User Meeting Rooms", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("List User Meeting Rooms", False, f"Error: {str(e)}")
+            return False
+    
+    def test_enhanced_code_access_meeting_room(self):
+        """Test POST /api/cards/access-by-code with meeting room code"""
+        if not hasattr(self, 'meeting_room_code'):
+            self.log_result("Enhanced Code Access - Meeting Room", False, "No meeting room code available")
+            return False
+            
+        try:
+            code_request = {"code": self.meeting_room_code}
+            response = requests.post(f"{API_BASE}/cards/access-by-code", json=code_request)
+            
+            # Meeting room codes should not be accessible via card access endpoint
+            # This should return 404 or appropriate error
+            if response.status_code == 404:
+                self.log_result("Enhanced Code Access - Meeting Room", True, "Meeting room code properly rejected by card access endpoint")
+                return True
+            else:
+                # If it returns something else, check if it's handling meeting room codes
+                if response.status_code == 200:
+                    data = response.json()
+                    # If it redirects to meeting room or handles it differently, that's also valid
+                    self.log_result("Enhanced Code Access - Meeting Room", True, "Meeting room code handled by enhanced endpoint")
+                    return True
+                else:
+                    self.log_result("Enhanced Code Access - Meeting Room", False, f"Unexpected response: HTTP {response.status_code}", response.text)
+                    return False
+                
+        except Exception as e:
+            self.log_result("Enhanced Code Access - Meeting Room", False, f"Error: {str(e)}")
+            return False
+    
+    def test_close_meeting_room(self):
+        """Test DELETE /api/meeting-rooms/{code}"""
+        if not self.access_token or not hasattr(self, 'meeting_room_code'):
+            self.log_result("Close Meeting Room", False, "No access token or meeting room code available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.delete(f"{API_BASE}/meeting-rooms/{self.meeting_room_code}", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if "message" in data and self.meeting_room_code in data["message"]:
+                    self.log_result("Close Meeting Room", True, f"Meeting room {self.meeting_room_code} closed successfully")
+                    return True
+                else:
+                    self.log_result("Close Meeting Room", False, "Unexpected response format", data)
+                    return False
+            else:
+                self.log_result("Close Meeting Room", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Close Meeting Room", False, f"Error: {str(e)}")
+            return False
+    
+    def test_code_uniqueness_validation(self):
+        """Test code uniqueness across business cards and meeting rooms"""
+        if not self.access_token or not hasattr(self, 'custom_code'):
+            self.log_result("Code Uniqueness Validation", False, "No access token or custom code available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Try to create another card with the same custom code
+            card_data = {
+                "name": "Duplicate Code Test",
+                "company": "Test Company",
+                "position": "Tester",
+                "custom_code": self.custom_code,  # Same code as existing card
+                "is_public": True
+            }
+            
+            response = requests.post(f"{API_BASE}/cards", json=card_data, headers=headers)
+            
+            # Should fail with conflict or validation error
+            if response.status_code in [400, 409, 422]:
+                self.log_result("Code Uniqueness Validation", True, "Duplicate custom code properly rejected")
+                return True
+            else:
+                self.log_result("Code Uniqueness Validation", False, f"Expected validation error, got HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Code Uniqueness Validation", False, f"Error: {str(e)}")
+            return False
+    
+    def test_invalid_meeting_room_operations(self):
+        """Test various invalid meeting room operations"""
+        try:
+            # Test joining non-existent meeting room
+            join_data = {
+                "code": "NONEXIST",
+                "card_id": self.card_id if self.card_id else "fake_id"
+            }
+            
+            response = requests.post(f"{API_BASE}/meeting-rooms/join", json=join_data)
+            
+            if response.status_code == 404:
+                self.log_result("Invalid Meeting Room Operations - Non-existent", True, "Non-existent meeting room properly rejected")
+            else:
+                self.log_result("Invalid Meeting Room Operations - Non-existent", False, f"Expected 404, got {response.status_code}")
+                return False
+            
+            # Test getting non-existent meeting room
+            response = requests.get(f"{API_BASE}/meeting-rooms/NONEXIST")
+            
+            if response.status_code == 404:
+                self.log_result("Invalid Meeting Room Operations - Get Non-existent", True, "Non-existent meeting room get properly rejected")
+                return True
+            else:
+                self.log_result("Invalid Meeting Room Operations - Get Non-existent", False, f"Expected 404, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Invalid Meeting Room Operations", False, f"Error: {str(e)}")
+            return False
+    
     def run_all_tests(self):
         """Run all tests in sequence"""
         print("=" * 60)
