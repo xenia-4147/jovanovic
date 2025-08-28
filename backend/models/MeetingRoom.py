@@ -136,8 +136,15 @@ class MeetingRoomJoin(BaseModel):
         if not v:
             raise ValueError('Meeting Code ist erforderlich')
         
-        # Remove spaces and convert to uppercase
-        code = v.replace(' ', '').upper()
+        try:
+            # Ensure it's a string
+            if not isinstance(v, str):
+                v = str(v)
+            
+            # Remove spaces and convert to uppercase
+            code = str(v).replace(' ', '').upper()
+        except Exception as e:
+            raise ValueError(f'Invalid meeting code format: {str(e)}')
         
         # Check if code contains only letters and numbers
         if not re.match(r'^[A-Z0-9]+$', code):
