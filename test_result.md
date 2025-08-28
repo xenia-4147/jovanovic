@@ -329,8 +329,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Contact Import System Backend Testing - COMPLETED"
-  stuck_tasks: []
+    - "All-in-One Contact Import & Management Frontend System"
+  stuck_tasks:
+    - "All-in-One Contact Import & Management Frontend System"
   test_all: false
   test_priority: "high_first"
 
