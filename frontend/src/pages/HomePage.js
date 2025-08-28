@@ -140,6 +140,15 @@ const HomePage = () => {
             Meeting Rooms
           </Button>
           
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => navigate('/contacts')}
+          >
+            <Upload className="w-4 h-4 mr-2" />
+            Kontakte verwalten
+          </Button>
+          
           <Button variant="outline" size="sm">
             <User className="w-4 h-4 mr-2" />
             {user?.full_name || user?.email}
