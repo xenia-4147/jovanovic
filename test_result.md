@@ -232,6 +232,21 @@ test_plan:
   test_priority: "high_first"
 
 backend:
+  - task: "Business card creation with custom codes and social_media fix"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Fixed social_media field handling in business card creation. Added logic to ensure social_media defaults to empty SocialMedia object when None or missing."
+        - working: true
+        - agent: "testing"
+        - comment: "✅ TARGETED FIX VERIFIED: Business card creation with custom codes and social_media handling is working perfectly. Tested both scenarios: 1) Missing social_media field - card created successfully with proper social_media object initialization, 2) Explicit social_media: null - card created successfully with proper social_media object initialization. The fix ensures social_media field always defaults to an empty SocialMedia object when not provided or set to null."
+
   - task: "Meeting Room API endpoints"
     implemented: true
     working: "NA"  
@@ -258,15 +273,18 @@ backend:
 
   - task: "Enhanced code access API"
     implemented: true
-    working: "NA"
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: true
     status_history:
         - working: "NA"
         - agent: "main"
         - comment: "Enhanced existing code access API to handle both business card codes and meeting room codes. Updated database indexes for better performance."
+        - working: false
+        - agent: "testing"
+        - comment: "❌ ISSUE FOUND: Code access endpoint POST /api/cards/access-by-code is failing with 500 error 'Code-Zugriff fehlgeschlagen'. The error appears to be in the updated_card_data.get() call where updated_card_data might be None. This is preventing code access functionality from working properly."
 
 frontend:
   - task: "Meeting Room management page"
