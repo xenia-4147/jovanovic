@@ -2077,6 +2077,267 @@ async def get_unified_contacts(
         raise HTTPException(status_code=500, detail="Kontakte konnten nicht geladen werden")
 
 # ============================================================================
+# SUBSCRIPTION & MONETIZATION ENDPOINTS
+# ============================================================================
+
+@api_router.get("/subscription/status", response_model=SubscriptionResponse)
+async def get_subscription_status(current_user: User = Depends(get_current_user)):
+    """Get current user's subscription status and limits"""
+    try:
+        # Get or create user subscription
+        subscription = await get_user_subscription(str(current_user.id))
+        
+        upgrade_benefits = []
+        if subscription.plan_type == PlanType.FREE:
+            upgrade_benefits = [
+                "Unbegrenzte Meeting Room Teilnehmer (50+ statt 15)",
+                "Längere Meeting Rooms (60min statt 15min)",
+                "Google & Apple Kontakte Synchronisation",
+                "Detaillierte Analytics - sehen Sie wer Ihre Codes verwendet",
+                "Prioritäts-Support und schnellere Antworten",
+                "Custom Branding - eigenes Logo, keine 'Made with App' Hinweise"
+            ]
+        
+        return SubscriptionResponse(
+            user_id=str(current_user.id),
+            plan_type=subscription.plan_type.value,
+            plan_name=subscription.plan_name,
+            status=subscription.status.value,
+            limits=subscription.plan_limits,
+            expires_at=subscription.expires_at,
+            trial_ends_at=subscription.trial_ends_at,
+            usage=subscription.monthly_usage,
+            upgrade_available=(subscription.plan_type == PlanType.FREE),
+            upgrade_benefits=upgrade_benefits
+        )
+        
+    except Exception as e:
+        logger.error(f"Failed to get subscription status: {str(e)}")
+        raise HTTPException(status_code=500, detail="Subscription Status konnte nicht geladen werden")
+
+@api_router.post("/subscription/check-feature", response_model=FeatureAccessResponse)
+async def check_feature_access(
+    request: FeatureAccessRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Check if user has access to a specific feature"""
+    try:
+        if request.user_id != str(current_user.id):
+            raise HTTPException(status_code=403, detail="Access denied")
+        
+        subscription = await get_user_subscription(str(current_user.id))
+        
+        # Check feature access based on plan limits
+        allowed = check_feature_allowed(request.feature_name, subscription.plan_limits)
+        
+        response = FeatureAccessResponse(allowed=allowed)
+        
+        if not allowed:
+            response.upgrade_required = True
+            response.suggested_plan = "premium"
+            
+            # Customize upgrade message based on feature
+            if request.feature_name == "detailed_analytics":
+                response.reason = "Detaillierte Analytics sind nur im Premium Plan verfügbar"
+                response.upgrade_benefits = [
+                    "Sehen Sie wann und wie oft Ihre Codes verwendet wurden",
+                    "Kontakt-Insights und Verhaltensmuster",
+                    "Export aller Daten als CSV",
+                    "Erweiterte Meeting Room Statistiken"
+                ]
+            elif request.feature_name == "google_sync":
+                response.reason = "Google Contacts Synchronisation ist nur im Premium Plan verfügbar"
+                response.upgrade_benefits = [
+                    "Automatische Synchronisation mit Google Contacts",
+                    "Immer aktuelle Kontaktdaten",
+                    "Bidirektionale Sync - Änderungen werden übertragen",
+                    "Backup Ihrer Kontakte in der Cloud"
+                ]
+            elif request.feature_name == "custom_branding":
+                response.reason = "Custom Branding ist nur im Premium Plan verfügbar" 
+                response.upgrade_benefits = [
+                    "Entfernung aller 'Made with App' Hinweise",
+                    "Ihr eigenes Logo auf Visitenkarten",
+                    "Custom Themes und Schriftarten",
+                    "Professioneller Auftritt für Ihr Business"
+                ]
+            else:
+                response.reason = f"Feature '{request.feature_name}' ist nur im Premium Plan verfügbar"
+                response.upgrade_benefits = [
+                    "Zugang zu allen Premium Features",
+                    "Prioritäts-Support",
+                    "Erweiterte Limits und Funktionen"
+                ]
+        
+        return response
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Feature access check failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Feature-Zugriff konnte nicht geprüft werden")
+
+@api_router.post("/subscription/track-usage")
+async def track_feature_usage(
+    event_type: str,
+    event_data: dict = {},
+    current_user: User = Depends(get_current_user)
+):
+    """Track user feature usage for analytics and upgrade prompts"""
+    try:
+        subscription = await get_user_subscription(str(current_user.id))
+        
+        # Update usage counters
+        usage_key = get_usage_key_for_event(event_type)
+        if usage_key and usage_key in subscription.monthly_usage:
+            await db.usersubscriptions.update_one(
+                {"user_id": str(current_user.id)},
+                {"$inc": {f"monthly_usage.{usage_key}": 1}}
+            )
+        
+        # Log usage event
+        usage_event = UsageTrackingEvent(
+            user_id=str(current_user.id),
+            event_type=event_type,
+            event_data=event_data,
+            plan_type=subscription.plan_type
+        )
+        
+        event_dict = usage_event.dict()
+        await db.usageevents.insert_one(event_dict)
+        
+        # Check if we should show upgrade prompt
+        await check_and_create_upgrade_prompt(str(current_user.id), event_type, subscription)
+        
+        return {"success": True, "message": "Usage tracked"}
+        
+    except Exception as e:
+        logger.error(f"Usage tracking failed: {str(e)}")
+        return {"success": False, "message": "Usage tracking failed"}
+
+async def get_user_subscription(user_id: str) -> UserSubscription:
+    """Get or create user subscription with default free plan"""
+    try:
+        subscription_data = await db.usersubscriptions.find_one({"user_id": user_id})
+        
+        if not subscription_data:
+            # Create default free subscription
+            free_limits = PLAN_CONFIGS["free"]
+            
+            subscription = UserSubscription(
+                user_id=user_id,
+                plan_type=PlanType.FREE,
+                plan_name="Free Plan - Fast alles kostenlos! 🚀",
+                plan_limits=free_limits,
+                status=SubscriptionStatus.ACTIVE
+            )
+            
+            sub_dict = subscription.dict(by_alias=True, exclude={"id"})
+            result = await db.usersubscriptions.insert_one(sub_dict)
+            subscription.id = str(result.inserted_id)
+            
+            logger.info(f"Created default free subscription for user {user_id}")
+            return subscription
+        else:
+            if "_id" in subscription_data:
+                subscription_data["_id"] = str(subscription_data["_id"])
+            return UserSubscription(**subscription_data)
+            
+    except Exception as e:
+        logger.error(f"Failed to get user subscription: {str(e)}")
+        # Return default free subscription on error
+        return UserSubscription(
+            user_id=user_id,
+            plan_type=PlanType.FREE,
+            plan_name="Free Plan",
+            plan_limits=PLAN_CONFIGS["free"]
+        )
+
+def check_feature_allowed(feature_name: str, limits: PlanLimits) -> bool:
+    """Check if feature is allowed based on plan limits"""
+    feature_map = {
+        "detailed_analytics": limits.detailed_analytics,
+        "contact_insights": limits.contact_insights,
+        "export_analytics": limits.export_analytics,
+        "google_sync": limits.google_contacts_sync,
+        "apple_sync": limits.apple_icloud_sync,
+        "custom_branding": limits.custom_branding,
+        "priority_support": limits.priority_support,
+        "api_access": limits.api_access,
+        "team_management": limits.team_management,
+        "auto_sync": limits.auto_contact_sync
+    }
+    
+    return feature_map.get(feature_name, True)  # Default to allowed
+
+def get_usage_key_for_event(event_type: str) -> Optional[str]:
+    """Map event types to usage counter keys"""
+    event_map = {
+        "business_card_created": "business_cards_created",
+        "custom_code_used": "custom_codes_used", 
+        "meeting_room_created": "meeting_rooms_created",
+        "contact_imported": "contacts_imported",
+        "express_code_generated": "express_codes_generated",
+        "analytics_viewed": "analytics_views"
+    }
+    
+    return event_map.get(event_type)
+
+async def check_and_create_upgrade_prompt(user_id: str, event_type: str, subscription: UserSubscription):
+    """Check if we should show an upgrade prompt and create it"""
+    if subscription.plan_type != PlanType.FREE:
+        return  # Only show prompts to free users
+    
+    # Smart upgrade prompts based on usage
+    prompt_triggers = {
+        "analytics_viewed": {
+            "threshold": 3,  # After 3 analytics views
+            "message": "🔍 Lieben Sie die Analytics? Upgrade für detaillierte Insights - sehen Sie wer wann Ihre Codes verwendet!",
+            "cooldown_hours": 24
+        },
+        "meeting_room_created": {
+            "threshold": 5,  # After 5 meeting rooms
+            "message": "🚀 Sie sind ein Meeting Room Power-User! Upgrade für 50+ Teilnehmer und 60min Rooms.",
+            "cooldown_hours": 48
+        },
+        "contact_imported": {
+            "threshold": 100,  # After 100 imports
+            "message": "📱 Sie importieren viele Kontakte! Upgrade für Google/Apple Sync und unbegrenzte Imports.",
+            "cooldown_hours": 72
+        }
+    }
+    
+    if event_type not in prompt_triggers:
+        return
+    
+    trigger = prompt_triggers[event_type]
+    usage_count = subscription.monthly_usage.get(get_usage_key_for_event(event_type), 0)
+    
+    if usage_count >= trigger["threshold"]:
+        # Check cooldown
+        if subscription.last_upgrade_prompt:
+            hours_since_prompt = (datetime.utcnow() - subscription.last_upgrade_prompt).total_seconds() / 3600
+            if hours_since_prompt < trigger["cooldown_hours"]:
+                return
+        
+        # Create upgrade prompt
+        prompt = UpgradePrompt(
+            user_id=user_id,
+            trigger_event=event_type,
+            prompt_message=trigger["message"],
+            suggested_plan=PlanType.PREMIUM
+        )
+        
+        prompt_dict = prompt.dict(by_alias=True, exclude={"id"})
+        await db.upgradeprompts.insert_one(prompt_dict)
+        
+        # Update last prompt timestamp
+        await db.usersubscriptions.update_one(
+            {"user_id": user_id},
+            {"$set": {"last_upgrade_prompt": datetime.utcnow()}}
+        )
+
+# ============================================================================
 # PRIVACY & GDPR ENDPOINTS
 # ============================================================================
 
