@@ -55,7 +55,9 @@ class MeetingRoom(BaseModel):
         if not v:
             return v
         
-        # Ensure v is a string
+        # Ensure v is a string and handle None case
+        if v is None:
+            return v
         if not isinstance(v, str):
             v = str(v)
         
