@@ -823,7 +823,7 @@ async def create_meeting_room(
         
         logger.info(f"Creating meeting room with code: {code} (type: {type(code)})")
         meeting_room = MeetingRoom(
-            code=code.upper() if code else None,
+            code=code,
             created_by_user_id=str(current_user.id) if current_user else None,
             created_by_card_id=str(card.id),
             created_by_card_name=card.name,
