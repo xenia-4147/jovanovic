@@ -72,6 +72,7 @@ const EditCardPage = () => {
             tiktok: '',
             telegram: ''
           },
+          custom_code: card.custom_code || '',
           is_public: card.is_public !== undefined ? card.is_public : true,
           background_color: card.background_color || '#ffffff',
           text_color: card.text_color || '#1f2937',
