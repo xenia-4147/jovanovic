@@ -68,7 +68,9 @@ class SocialMedia(BaseModel):
     tiktok: Optional[str] = None
     telegram: Optional[str] = None
     
-    @field_validator('instagram', 'linkedin', 'twitter', 'tiktok', 'telegram', mode='before')
+    @field_validator(
+        'instagram', 'linkedin', 'twitter', 'tiktok', 'telegram', mode='before'
+    )
     @classmethod
     def clean_social_handles(cls, v):
         if v and isinstance(v, str):
