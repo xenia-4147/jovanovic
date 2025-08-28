@@ -532,7 +532,7 @@ async def access_card_by_code(
             "message": f"Visitenkarte von {card.name} gefunden",
             "card": BusinessCardResponse(
                 id=str(card.id),
-                **card.dict(exclude={"id", "user_id"}),
+                **card.dict(exclude={"id", "user_id", "code_usage_count"}),
                 code_usage_count=usage_count,
                 is_owner=False
             ),
