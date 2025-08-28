@@ -347,26 +347,11 @@ const ViewCardPage = () => {
                               <p className="text-sm opacity-70">{phone.label}</p>
                             </div>
                           </div>
-                          <div className="flex flex-col sm:flex-row space-y-1 sm:space-y-0 sm:space-x-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleCall(phone)}
-                              className="h-8 text-xs px-2"
-                            >
-                              <Phone className="w-3 h-3 mr-1" />
-                              Anrufen
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleMessage(phone)}
-                              className="h-8 text-xs px-2"
-                            >
-                              <MessageCircle className="w-3 h-3 mr-1" />
-                              {phone.label.toLowerCase().includes('whatsapp') ? 'WhatsApp' : 'SMS'}
-                            </Button>
-                          </div>
+                          <MessagingButtons 
+                            phone={phone}
+                            size="sm"
+                            className="flex-shrink-0"
+                          />
                         </div>
                       ))}
                     </div>
