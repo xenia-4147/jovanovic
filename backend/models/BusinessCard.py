@@ -154,7 +154,8 @@ class BusinessCard(BaseModel):
             
         return v
     
-    @validator('addresses')
+    @field_validator('addresses')
+    @classmethod
     def validate_addresses(cls, v):
         if not v:
             return v
