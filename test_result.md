@@ -385,15 +385,17 @@ frontend:
 
 metadata:
   created_by: "main_agent"
-  version: "1.2"
-  test_sequence: 3
+  version: "1.3"
+  test_sequence: 4
   run_ui: false
 
 test_plan:
   current_focus:
-    - "EarlyAdopterBadge Component Implementation" 
-    - "HomePage Early Adopter Integration"
-    - "Subscription Status API Integration"
+    - "Business Card Studio Homepage Integration"
+    - "Business Card Studio Main Page"
+    - "OCR Scanner Component"
+    - "Print Export Component"
+    - "Game-Changing Features Navigation & Routing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
