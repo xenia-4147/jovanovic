@@ -349,12 +349,25 @@ const HomePage = () => {
                     onKeyPress={(e) => e.key === 'Enter' && joinMeeting()}
                   />
                   <Button 
+                    onClick={copyMeetingLink}
+                    variant="outline"
+                    className="border-green-500 text-green-600 hover:bg-green-50"
+                    title="Meeting-Link kopieren (wie Zoom)"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                  <Button 
                     onClick={joinMeeting}
                     className="bg-blue-600 hover:bg-blue-700"
                   >
                     Beitreten
                   </Button>
                 </div>
+                {meetingCode && (
+                  <div className="text-xs text-gray-500 mt-1">
+                    💡 Tipp: Mit <Copy className="w-3 h-3 inline" /> können Sie den Meeting-Link wie bei Zoom kopieren
+                  </div>
+                )}
               </div>
             </div>
 
