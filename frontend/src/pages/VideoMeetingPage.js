@@ -33,6 +33,10 @@ const VideoMeetingPage = () => {
   useEffect(() => {
     if (meetingCode) {
       loadMeetingInfo();
+      // Auto-initialize camera when joining a meeting
+      setTimeout(() => {
+        initializeCamera();
+      }, 1000);
     }
   }, [meetingCode]);
 
