@@ -5580,7 +5580,13 @@ END:VCARD"""
             self.test_create_business_card,
             
             # 🔥 NEW REVOLUTIONARY FEATURES TESTING (PRIORITY: CRITICAL)
-            # 9-Character Code Generation Tests (FOCUS OF THIS REVIEW)
+            # Camera Connection Issues Testing (FOCUS OF THIS REVIEW)
+            self.test_meeting_join_with_participant_id,
+            self.test_qr_code_endpoint_for_meetings,
+            self.test_complete_meeting_flow_for_camera,
+            self.test_camera_connection_prerequisites,
+            
+            # 9-Character Code Generation Tests
             self.test_9_character_meeting_code_generation,
             self.test_code_collision_resistance_stress,
             self.test_enhanced_meeting_features_with_9char_codes,
