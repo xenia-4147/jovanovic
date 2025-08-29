@@ -17,6 +17,7 @@ import ContactImportPage from './pages/ContactImportPage';
 import BusinessCardStudioPage from './pages/BusinessCardStudioPage';
 import ScannerTestPage from './pages/ScannerTestPage';
 import MeetingDemoPage from './pages/MeetingDemoPage';
+import ScannerDebugPage from './pages/ScannerDebugPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import "./App.css";
 
