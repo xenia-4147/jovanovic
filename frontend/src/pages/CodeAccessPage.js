@@ -357,9 +357,12 @@ const CodeAccessPage = () => {
 
             <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <h3 className="font-medium text-blue-900 mb-2">💡 Wie funktioniert es?</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
-                  <h4 className="font-medium text-blue-900 mb-2">Express Codes ⚡</h4>
+                  <h4 className="font-medium text-blue-900 mb-2 flex items-center">
+                    <Zap className="w-3 h-3 mr-1" />
+                    Express Codes ⚡
+                  </h4>
                   <ul className="text-sm text-blue-800 space-y-1">
                     <li>• Ultra-kurze Codes (2-3 Zeichen)</li>
                     <li>• 30 Sekunden bis 5 Minuten aktiv</li>
@@ -367,7 +370,10 @@ const CodeAccessPage = () => {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-medium text-blue-900 mb-2">Visitenkarten-Codes</h4>
+                  <h4 className="font-medium text-blue-900 mb-2 flex items-center">
+                    <Eye className="w-3 h-3 mr-1" />
+                    Visitenkarten-Codes
+                  </h4>
                   <ul className="text-sm text-blue-800 space-y-1">
                     <li>• Persönliche Codes für einzelne Visitenkarten</li>
                     <li>• Dauerhaft gültig bis geändert</li>
@@ -375,11 +381,25 @@ const CodeAccessPage = () => {
                   </ul>
                 </div>
                 <div>
-                  <h4 className="font-medium text-blue-900 mb-2">Meeting Room Codes</h4>
+                  <h4 className="font-medium text-blue-900 mb-2 flex items-center">
+                    <Users className="w-3 h-3 mr-1" />
+                    Meeting Room Codes
+                  </h4>
                   <ul className="text-sm text-blue-800 space-y-1">
                     <li>• Temporäre Räume für Gruppen-Austausch</li>
                     <li>• Automatischer Ablauf nach 10-60 Minuten</li>
                     <li>• Perfekt für Events und Netzwerken</li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-medium text-blue-900 mb-2 flex items-center">
+                    <Video className="w-3 h-3 mr-1" />
+                    Video Meeting Codes 🎥
+                  </h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• 6-stellige Codes für Videokonferenzen</li>
+                    <li>• Direkter Kamera-Zugriff & Live-Video</li>
+                    <li>• Zoom-ähnliche Meeting-Räume</li>
                   </ul>
                 </div>
               </div>
