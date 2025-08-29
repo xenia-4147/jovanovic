@@ -372,15 +372,7 @@ const CardScanner = ({ onCardCreated }) => {
               </div>
             )}
             
-            {/* Hidden file inputs */}
-            <input
-              ref={cameraInputRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={handleCameraCapture}
-            />
+            {/* Hidden file input */}
             <input
               ref={fileInputRef}
               type="file"
