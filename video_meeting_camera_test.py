@@ -422,7 +422,8 @@ class VideoMeetingCameraTester:
             # This would be done by frontend before getUserMedia()
             join_data = {
                 "meeting_code": self.meeting_code,
-                "participant_name": "Camera Test User"
+                "display_name": "Camera Test User",
+                "share_business_card": True
             }
             
             join_response = requests.post(f"{API_BASE}/video/meeting/join", json=join_data, headers=headers)
