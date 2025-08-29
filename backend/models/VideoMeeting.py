@@ -311,13 +311,31 @@ class MeetingJoinResponse(BaseModel):
 
 # WebRTC Configuration
 DEFAULT_ICE_SERVERS = [
+    # High-quality STUN servers for NAT traversal
     {
-        "urls": ["stun:stun.l.google.com:19302", "stun:stun1.l.google.com:19302"]
+        "urls": [
+            "stun:stun.l.google.com:19302", 
+            "stun:stun1.l.google.com:19302",
+            "stun:stun2.l.google.com:19302",
+            "stun:stun3.l.google.com:19302"
+        ]
     },
+    # Professional TURN servers for enterprise connectivity
     {
         "urls": ["turn:openrelay.metered.ca:80"],
         "username": "openrelayproject", 
         "credential": "openrelayproject"
+    },
+    {
+        "urls": ["turn:openrelay.metered.ca:443"],
+        "username": "openrelayproject", 
+        "credential": "openrelayproject"
+    },
+    # Backup TURN server for reliability
+    {
+        "urls": ["turn:turn.bistri.com:80"],
+        "username": "homeo",
+        "credential": "homeo"
     }
 ]
 
