@@ -3751,8 +3751,8 @@ async def join_video_meeting(
         return MeetingJoinResponse(
             success=True,
             meeting=meeting,
-            webrtc_config=DEFAULT_ICE_SERVERS,
-            ice_servers=DEFAULT_ICE_SERVERS["iceServers"],
+            webrtc_config=WEBRTC_CONFIG,
+            ice_servers=WEBRTC_CONFIG["iceServers"],
             message=f"Erfolgreich dem Meeting '{meeting.title}' beigetreten"
         )
         
