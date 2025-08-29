@@ -42,6 +42,7 @@ function App() {
             } />
             <Route path="/meeting-room/:roomCode" element={<MeetingRoomViewPage />} />
             <Route path="/meeting/:meetingCode" element={<VideoMeetingPage />} />
+            <Route path="/scanner-test" element={<ScannerTestPage />} />
             <Route path="/contacts" element={
               <ProtectedRoute>
                 <ContactImportPage />
