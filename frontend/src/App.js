@@ -40,6 +40,7 @@ function App() {
               </ProtectedRoute>
             } />
             <Route path="/meeting-room/:roomCode" element={<MeetingRoomViewPage />} />
+            <Route path="/meeting/:meetingCode" element={<VideoMeetingPage />} />
             <Route path="/contacts" element={
               <ProtectedRoute>
                 <ContactImportPage />
