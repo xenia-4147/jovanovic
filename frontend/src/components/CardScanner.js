@@ -42,12 +42,20 @@ const CardScanner = ({ onCardCreated }) => {
   const [editingField, setEditingField] = useState(null);
   const [showCameraScanner, setShowCameraScanner] = useState(false);
   
-  // Camera capture
-  const handleCameraCapture = useCallback(async (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      await processImage(file, 'camera');
-    }
+  // Open improved camera scanner
+  const openCameraScanner = useCallback(() => {
+    setShowCameraScanner(true);
+  }, []);
+
+  // Handle camera scan result
+  const handleCameraScanResult = useCallback((scanResult) => {
+    setScanResult(scanResult);
+    setShowCameraScanner(false);
+  }, []);
+
+  // Close camera scanner
+  const closeCameraScanner = useCallback(() => {
+    setShowCameraScanner(false);
   }, []);
   
   // File upload
