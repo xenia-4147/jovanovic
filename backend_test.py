@@ -1510,8 +1510,25 @@ class BusinessCardAPITester:
                 return False
             
             # Check for STUN and TURN servers
-            stun_servers = [server for server in ice_servers if server.get("urls", "").startswith("stun:")]
-            turn_servers = [server for server in ice_servers if server.get("urls", "").startswith("turn:")]
+            stun_servers = []
+            turn_servers = []
+            
+            for server in ice_servers:
+                urls = server.get("urls", [])
+                # Handle both string and list formats
+                if isinstance(urls, str):
+                    urls = [urls]
+                elif isinstance(urls, list):
+                    pass
+                else:
+                    continue
+                    
+                for url in urls:
+                    if isinstance(url, str):
+                        if url.startswith("stun:"):
+                            stun_servers.append(server)
+                        elif url.startswith("turn:"):
+                            turn_servers.append(server)
             
             if not stun_servers:
                 self.log_result("Camera Prerequisites - STUN Servers", False, "No STUN servers found")
