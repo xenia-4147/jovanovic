@@ -11,7 +11,7 @@ import uuid
 
 class ScanProcessingStatus(str, Enum):
     PENDING = "pending"
-    PROCESSING = "processing"  
+    PROCESSING = "processing"
     COMPLETED = "completed"
     FAILED = "failed"
 
@@ -31,14 +31,14 @@ class ScannedField(BaseModel):
     confidence_level: OCRConfidence = Field(..., description="Confidence category")
     bounding_box: Optional[Dict[str, float]] = Field(None, description="Coordinates of text on image")
     manually_corrected: bool = Field(default=False, description="Whether user corrected this field")
-    
+
     @field_validator('confidence')
     @classmethod
     def validate_confidence(cls, v):
         if not 0 <= v <= 100:
             raise ValueError('Confidence must be between 0 and 100')
         return v
-    
+
     @field_validator('confidence_level')
     @classmethod
     def set_confidence_level(cls, v, info):
@@ -57,34 +57,34 @@ class ScannedBusinessCard(BaseModel):
     """Complete scanned business card with extracted data"""
     id: Optional[str] = Field(default_factory=lambda: str(uuid.uuid4()))
     user_id: str = Field(..., description="ID of user who scanned the card")
-    
+
     # Original scan data
     original_image_url: str = Field(..., description="URL to uploaded card image")
     processed_image_url: Optional[str] = Field(None, description="URL to processed/enhanced image")
     scan_timestamp: datetime = Field(default_factory=datetime.utcnow)
-    
+
     # OCR Results
     raw_ocr_data: Optional[Dict[str, Any]] = Field(None, description="Raw OCR response from service")
     extracted_fields: List[ScannedField] = Field(default_factory=list, description="Structured extracted data")
     overall_confidence: float = Field(default=0.0, description="Overall scan quality score")
-    
+
     # Processing status
     status: ScanProcessingStatus = Field(default=ScanProcessingStatus.PENDING)
     processing_started_at: Optional[datetime] = Field(None)
     processing_completed_at: Optional[datetime] = Field(None)
     error_message: Optional[str] = Field(None)
-    
+
     # Smart field mapping (AI suggestions)
     suggested_mapping: Optional[Dict[str, str]] = Field(None, description="AI suggestions for field types")
-    
+
     # Conversion to digital card
     converted_to_card_id: Optional[str] = Field(None, description="ID of created BusinessCard")
     is_converted: bool = Field(default=False)
-    
+
     # Metadata
     scan_method: str = Field(default="camera", description="How card was scanned (camera, upload)")
     device_info: Optional[Dict[str, str]] = Field(None, description="Device used for scanning")
-    
+
     class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
@@ -97,7 +97,7 @@ class CardScanRequest(BaseModel):
     image_url: Optional[str] = Field(None, description="URL to image file")
     scan_method: str = Field(default="camera", description="Scanning method")
     device_info: Optional[Dict[str, str]] = Field(None)
-    
+
     @field_validator('image_url')
     @classmethod
     def at_least_one_image_source(cls, v, info):
@@ -163,15 +163,15 @@ class BusinessCardTemplate(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str = Field(..., description="Template name")
     description: Optional[str] = Field(None)
-    
+
     # Field detection patterns
     field_patterns: Dict[str, List[str]] = Field(..., description="Regex patterns for each field type")
     layout_markers: Optional[Dict[str, Any]] = Field(None, description="Visual layout indicators")
-    
+
     # Usage statistics
     usage_count: int = Field(default=0)
     accuracy_score: float = Field(default=0.0)
-    
+
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -198,7 +198,7 @@ COMMON_FIELD_PATTERNS = {
     ],
     "company": [
         r"GmbH$",
-        r"AG$", 
+        r"AG$",
         r"KG$",
         r"e\.V\.$",
     ]
