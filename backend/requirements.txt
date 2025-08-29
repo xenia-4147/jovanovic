@@ -51,3 +51,4 @@ aiohttp-cors>=0.8.1
 # Community & Networking Features
 geopy>=2.4.1
 scikit-learn>=1.4.0
+geopy
