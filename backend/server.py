@@ -4293,7 +4293,7 @@ async def apply_for_job(
 
 # Get services
 privacy_service = PrivacyService(db)
-auth_service = AuthService(db)
+auth_service = AuthService()
 
 if __name__ == "__main__":
     import uvicorn
