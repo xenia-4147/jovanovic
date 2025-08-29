@@ -253,6 +253,97 @@ const HomePage = () => {
         </div>
       </header>
 
+      {/* Video Meeting Section */}
+      <div className="mb-8">
+        <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-blue-200">
+          <CardHeader>
+            <CardTitle className="flex items-center text-blue-800">
+              <Video className="w-5 h-5 mr-2" />
+              Videokonferenz
+            </CardTitle>
+            <CardDescription>
+              Starten Sie sofort ein Meeting oder treten Sie einem bestehenden Meeting bei
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Sofort Meeting starten */}
+              <div className="space-y-3">
+                <h4 className="font-semibold flex items-center">
+                  <Camera className="w-4 h-4 mr-2 text-green-600" />
+                  Neues Meeting starten
+                </h4>
+                <p className="text-sm text-gray-600">
+                  Erstellt automatisch einen Meeting-Code und verbindet Ihre Kamera
+                </p>
+                <Button 
+                  onClick={createInstantMeeting}
+                  disabled={isCreatingMeeting}
+                  className="w-full bg-green-600 hover:bg-green-700"
+                >
+                  {isCreatingMeeting ? (
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                  ) : (
+                    <Video className="w-4 h-4 mr-2" />
+                  )}
+                  Sofort Meeting starten
+                </Button>
+              </div>
+
+              {/* Meeting beitreten */}
+              <div className="space-y-3">
+                <h4 className="font-semibold flex items-center">
+                  <Phone className="w-4 h-4 mr-2 text-blue-600" />
+                  Meeting beitreten
+                </h4>
+                <p className="text-sm text-gray-600">
+                  Geben Sie den Meeting-Code ein, um einem Meeting beizutreten
+                </p>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Meeting-Code eingeben"
+                    value={meetingCode}
+                    onChange={(e) => setMeetingCode(e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    onKeyPress={(e) => e.key === 'Enter' && joinMeeting()}
+                  />
+                  <Button 
+                    onClick={joinMeeting}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    Beitreten
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {/* Meeting Features */}
+            <div className="mt-4 pt-4 border-t border-blue-200">
+              <h4 className="font-semibold text-sm mb-2">Meeting-Features:</h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs text-gray-600">
+                <div className="flex items-center">
+                  <Camera className="w-3 h-3 mr-1 text-green-500" />
+                  HD Video & Audio
+                </div>
+                <div className="flex items-center">
+                  <Share className="w-3 h-3 mr-1 text-blue-500" />
+                  Visitenkarten-Austausch
+                </div>
+                <div className="flex items-center">
+                  <Globe className="w-3 h-3 mr-1 text-purple-500" />
+                  Live-Übersetzung
+                </div>
+                <div className="flex items-center">
+                  <Clock className="w-3 h-3 mr-1 text-orange-500" />
+                  45 Min kostenlos
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
         <Button 
           onClick={handleCreateNew}
