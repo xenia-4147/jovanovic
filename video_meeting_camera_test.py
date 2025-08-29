@@ -314,7 +314,8 @@ class VideoMeetingCameraTester:
             # Get meeting details to check WebRTC config
             join_data = {
                 "meeting_code": self.meeting_code,
-                "participant_name": "Config Tester"
+                "display_name": "Config Tester",
+                "share_business_card": True
             }
             
             response = requests.post(f"{API_BASE}/video/meeting/join", json=join_data, headers=headers)
