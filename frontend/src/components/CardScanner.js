@@ -229,8 +229,9 @@ const CardScanner = ({ onCardCreated }) => {
         corrected_value: newValue
       });
       
-      // Update local state
-      const updatedFields = scanResult.scanned_card.extracted_fields.map(field => 
+      // Update local state (safe access)
+      const extractedFields = scanResult?.scanned_card?.extracted_fields || [];
+      const updatedFields = extractedFields.map(field => 
         field.field_type === fieldType 
           ? { ...field, value: newValue, manually_corrected: true, confidence_level: 'manual' }
           : field
