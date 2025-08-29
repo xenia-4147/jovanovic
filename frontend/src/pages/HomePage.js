@@ -18,6 +18,8 @@ const HomePage = () => {
   const [loading, setLoading] = useState(true);
   const [showExpressModal, setShowExpressModal] = useState(false);
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [meetingCode, setMeetingCode] = useState('');
+  const [isCreatingMeeting, setIsCreatingMeeting] = useState(false);
 
   useEffect(() => {
     loadBusinessCards();
