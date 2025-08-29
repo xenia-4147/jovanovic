@@ -483,21 +483,46 @@ const CardScanner = ({ onCardCreated }) => {
               
               {/* Action Buttons */}
               {scanResult.conversion_ready && (
-                <div className="flex space-x-4 pt-4">
+                <div className="space-y-3 pt-4">
+                  {/* Quick Auto-Convert Button */}
                   <Button
-                    onClick={convertToCard}
+                    onClick={autoConvertToContact}
                     disabled={converting}
-                    className="flex-1 bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700"
+                    className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-lg py-3"
                   >
                     {converting ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Wird erstellt...
+                        <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                        Wird automatisch hinzugefügt...
                       </>
                     ) : (
                       <>
-                        <Check className="w-4 h-4 mr-2" />
-                        Digitale Visitenkarte erstellen
+                        <Sparkles className="w-5 h-5 mr-2" />
+                        🚀 Automatisch zur Kontaktliste hinzufügen
+                      </>
+                    )}
+                  </Button>
+                  
+                  {/* Manual Convert Button */}
+                  <div className="flex space-x-4">
+                    <Button
+                      onClick={convertToCard}
+                      disabled={converting}
+                      variant="outline"
+                      className="flex-1"
+                    >
+                      {converting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Wird erstellt...
+                        </>
+                      ) : (
+                        <>
+                          <Check className="w-4 h-4 mr-2" />
+                          Als Visitenkarte speichern
+                        </>
+                      )}
+                    </Button>
                       </>
                     )}
                   </Button>
