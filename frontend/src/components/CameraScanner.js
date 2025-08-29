@@ -230,7 +230,7 @@ const CameraScanner = ({ onCardScanned, onClose }) => {
         if (result.status === 'completed') {
           toast({
             title: "Scan abgeschlossen! ✨",
-            description: `${result.scanned_card.extracted_fields.length} Felder erkannt - wird automatisch zur Kontaktliste hinzugefügt...`,
+            description: `${result?.scanned_card?.extracted_fields?.length || 0} Felder erkannt - wird automatisch zur Kontaktliste hinzugefügt...`,
           });
           
           // Automatically convert to contact/business card
@@ -248,10 +248,24 @@ const CameraScanner = ({ onCardScanned, onClose }) => {
         
       } catch (error) {
         console.error('Polling error:', error);
+        
+        // CRITICAL: Stop camera and close on polling error
+        toast({
+          title: "Scan-Fehler",
+          description: "Fehler beim Verarbeiten der Visitenkarte. Kamera wird gestoppt.",
+          variant: "destructive"
+        });
+        
+        stopCamera();
+        if (onClose) {
+          onClose();
+        }
+        
         break;
       }
     }
     
+    // CRITICAL: Always ensure cleanup after polling ends (timeout or completion)
     setScanning(false);
   };
 
