@@ -3200,7 +3200,28 @@ async def get_scan_result(
         from models.CardScanner import ScannedBusinessCard
         scan = ScannedBusinessCard(**scan_data)
         
-        # Check if ready for conversion
+        # Convert to proper JSON structure for frontend (CRITICAL FIX)
+        return ScanResultResponse(
+            scan_id=scan.id,
+            status=scan.status,
+            scanned_card={
+                "overall_confidence": scan.overall_confidence,
+                "extraction_method": scan.extraction_method,
+                "extracted_fields": [
+                    {
+                        "field_type": field.field_type,
+                        "value": field.value,
+                        "confidence": field.confidence,
+                        "confidence_level": field.confidence_level,
+                        "position": field.position,
+                        "manually_corrected": getattr(field, 'manually_corrected', False)
+                    }
+                    for field in scan.extracted_fields
+                ] if scan.extracted_fields else []
+            },
+            conversion_ready=len(scan.extracted_fields) > 0 if scan.extracted_fields else False,
+            created_at=scan.created_at
+        )
         conversion_ready = (
             scan.status == "completed" and 
             scan.overall_confidence >= 60.0 and
