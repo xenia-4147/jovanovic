@@ -6379,6 +6379,9 @@ END:VCARD"""
             self.test_list_scanned_cards,
             
             # 🎯 BUSINESS CARD SCANNER WORKFLOW TESTS (REVIEW REQUEST FOCUS)
+            self.test_business_card_scanner_workflow_complete,  # NEW: Complete end-to-end test
+            self.test_scanner_auto_convert_flow,  # NEW: Auto-convert flow test
+            self.test_scanner_list_and_management,  # NEW: Scanner management test
             self.test_scanner_upload_image,
             self.test_scanner_poll_results,
             self.test_scanner_convert_to_card,
