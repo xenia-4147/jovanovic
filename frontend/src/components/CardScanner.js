@@ -1,6 +1,7 @@
 /**
  * OCR Business Card Scanner Component
  * Game-Changing Feature: Paper → Digital Card Conversion
+ * IMPROVED: Direct laptop camera access
  */
 import React, { useState, useRef, useCallback } from 'react';
 import { Button } from './ui/button';
@@ -22,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useToast } from '../hooks/use-toast';
 import api from '../services/api';
+import CameraScanner from './CameraScanner';
 
 const CONFIDENCE_LEVELS = {
   high: { color: 'bg-green-100 text-green-800 border-green-300', icon: Check },
