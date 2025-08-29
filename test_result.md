@@ -613,7 +613,29 @@ backend:
         - agent: "testing"
         - comment: "🎯 SERVICE FULLY INTEGRATED: CommunityMatchingService is now properly imported and integrated in server.py (lines 3629-3633). The service is actively used in multiple endpoints: community discovery (line 3958-3961), networking feed (line 3997-3999), profile updates (line 3941), and job matching (line 3170-3173). The AI-powered matching algorithms are working excellently and providing personalized recommendations for communities, jobs, and networking opportunities."
 
-  - task: "NEW Revolutionary Meeting Link Generation & Live Translation APIs"
+  - task: "STUN/TURN Server Integration & WebRTC Enhancement"
+    implemented: true
+    working: true
+    file: "/app/backend/models/VideoMeeting.py"
+    stuck_count: 0
+    priority: "high" 
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Enhanced STUN/TURN server configuration with 4 professional servers: Google STUN servers (4 endpoints) + 3 TURN servers (openrelay.metered.ca port 80/443, turn.bistri.com). Improved WebRTC config with unified-plan semantics, iceTransportPolicy, and optimized connection parameters for enterprise-grade video conferencing."
+
+  - task: "Meeting Response Format Enhancement"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Fixed critical MeetingResponse format by adding missing meeting_id and ice_servers fields. This resolves the Response format mismatches that caused API integration issues. Now returns proper meeting_id=meeting.id and ice_servers=WEBRTC_CONFIG['iceServers'] for frontend compatibility."
     implemented: true
     working: true
     file: "/app/backend/server.py"
