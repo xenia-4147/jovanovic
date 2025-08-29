@@ -6375,6 +6375,233 @@ END:VCARD"""
             self.log_result("Focused Scanner Card Retrieval", False, f"Error: {str(e)}")
             return False
 
+    def test_scanned_business_card_debug(self):
+        """DEBUG: Test why scanned business cards don't appear in contact list"""
+        if not self.access_token:
+            self.log_result("Scanned Card Debug", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            print("\n🔍 DEBUGGING SCANNED BUSINESS CARD WORKFLOW")
+            print("=" * 60)
+            
+            # Step 1: Create regular business card and verify it appears
+            print("Step 1: Creating regular business card...")
+            regular_card_data = {
+                "name": "Dr. Emma Mueller",
+                "company": "TechStart Berlin GmbH",
+                "position": "Senior Software Engineer",
+                "description": "Full-stack developer specializing in React and Python",
+                "phones": [
+                    {
+                        "label": "work",
+                        "number": "+49-30-555-7890",
+                        "is_primary": True
+                    }
+                ],
+                "emails": [
+                    {
+                        "label": "work",
+                        "address": "emma.mueller@techstart-berlin.de",
+                        "is_primary": True
+                    }
+                ],
+                "website": "https://techstart-berlin.de",
+                "is_public": True,
+                "background_color": "#ffffff",
+                "text_color": "#1f2937",
+                "accent_color": "#10b981"
+            }
+            
+            response = requests.post(f"{API_BASE}/cards", json=regular_card_data, headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Regular Card Creation", False, f"HTTP {response.status_code}", response.text)
+                return False
+            
+            regular_card = response.json()
+            regular_card_id = regular_card["id"]
+            print(f"✅ Regular card created: {regular_card['name']} (ID: {regular_card_id})")
+            
+            # Step 2: Check if regular card appears in GET /api/cards
+            print("\nStep 2: Checking if regular card appears in contact list...")
+            response = requests.get(f"{API_BASE}/cards", headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Regular Card in List", False, f"HTTP {response.status_code}", response.text)
+                return False
+            
+            cards_list = response.json()
+            regular_found = any(card["id"] == regular_card_id for card in cards_list)
+            
+            if regular_found:
+                print(f"✅ Regular card appears in contact list ({len(cards_list)} total cards)")
+            else:
+                print(f"❌ Regular card NOT found in contact list!")
+                self.log_result("Regular Card in List", False, "Regular card not appearing in GET /api/cards")
+                return False
+            
+            # Step 3: Simulate scanned business card creation
+            print("\nStep 3: Creating scanned business card (simulating OCR conversion)...")
+            scanned_card_data = {
+                "name": "Prof. Dr. Klaus Zimmermann",
+                "company": "Universität Berlin",
+                "position": "Professor für Informatik",
+                "description": "Forschung in Künstlicher Intelligenz und Machine Learning",
+                "phones": [
+                    {
+                        "label": "work",
+                        "number": "+49-30-838-75432",
+                        "is_primary": True
+                    }
+                ],
+                "emails": [
+                    {
+                        "label": "work",
+                        "address": "k.zimmermann@fu-berlin.de",
+                        "is_primary": True
+                    }
+                ],
+                "website": "https://www.fu-berlin.de/informatik",
+                "is_public": True,
+                "background_color": "#f8fafc",
+                "text_color": "#1e293b",
+                "accent_color": "#3b82f6",
+                # Mark as scanned card
+                "source": "scanner",
+                "scan_metadata": {
+                    "scan_method": "camera",
+                    "confidence_score": 0.95,
+                    "scan_timestamp": datetime.now().isoformat()
+                }
+            }
+            
+            response = requests.post(f"{API_BASE}/cards", json=scanned_card_data, headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Scanned Card Creation", False, f"HTTP {response.status_code}", response.text)
+                return False
+            
+            scanned_card = response.json()
+            scanned_card_id = scanned_card["id"]
+            print(f"✅ Scanned card created: {scanned_card['name']} (ID: {scanned_card_id})")
+            
+            # Step 4: Check if scanned card appears in GET /api/cards
+            print("\nStep 4: Checking if scanned card appears in contact list...")
+            response = requests.get(f"{API_BASE}/cards", headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Scanned Card in List", False, f"HTTP {response.status_code}", response.text)
+                return False
+            
+            updated_cards_list = response.json()
+            scanned_found = any(card["id"] == scanned_card_id for card in updated_cards_list)
+            
+            if scanned_found:
+                print(f"✅ Scanned card appears in contact list ({len(updated_cards_list)} total cards)")
+            else:
+                print(f"❌ CRITICAL ISSUE: Scanned card NOT found in contact list!")
+                print(f"   Total cards in list: {len(updated_cards_list)}")
+                print(f"   Expected scanned card ID: {scanned_card_id}")
+                print(f"   Card IDs in list: {[card['id'] for card in updated_cards_list]}")
+                
+                # Debug: Check database storage differences
+                print("\n🔍 DEBUGGING DATABASE STORAGE:")
+                
+                # Get individual cards to compare storage
+                regular_response = requests.get(f"{API_BASE}/cards/{regular_card_id}", headers=headers)
+                scanned_response = requests.get(f"{API_BASE}/cards/{scanned_card_id}", headers=headers)
+                
+                if regular_response.status_code == 200 and scanned_response.status_code == 200:
+                    regular_data = regular_response.json()
+                    scanned_data = scanned_response.json()
+                    
+                    print(f"   Regular card accessible individually: ✅")
+                    print(f"   Scanned card accessible individually: ✅")
+                    
+                    # Compare field structures
+                    regular_fields = set(regular_data.keys())
+                    scanned_fields = set(scanned_data.keys())
+                    
+                    print(f"   Regular card fields: {sorted(regular_fields)}")
+                    print(f"   Scanned card fields: {sorted(scanned_fields)}")
+                    
+                    field_differences = scanned_fields - regular_fields
+                    if field_differences:
+                        print(f"   Extra fields in scanned card: {field_differences}")
+                    
+                    missing_fields = regular_fields - scanned_fields
+                    if missing_fields:
+                        print(f"   Missing fields in scanned card: {missing_fields}")
+                        
+                else:
+                    print(f"   Regular card individual access: {'✅' if regular_response.status_code == 200 else '❌'}")
+                    print(f"   Scanned card individual access: {'✅' if scanned_response.status_code == 200 else '❌'}")
+                
+                self.log_result("Scanned Card in List", False, "Scanned card not appearing in GET /api/cards - CRITICAL BUG CONFIRMED")
+                return False
+            
+            # Step 5: Compare database field structures
+            print("\nStep 5: Comparing database field structures...")
+            
+            # Get both cards individually to compare
+            regular_response = requests.get(f"{API_BASE}/cards/{regular_card_id}", headers=headers)
+            scanned_response = requests.get(f"{API_BASE}/cards/{scanned_card_id}", headers=headers)
+            
+            if regular_response.status_code == 200 and scanned_response.status_code == 200:
+                regular_data = regular_response.json()
+                scanned_data = scanned_response.json()
+                
+                # Compare key fields that might affect listing
+                key_fields = ["id", "user_id", "userId", "name", "is_public", "created_at"]
+                
+                print("   Field comparison:")
+                for field in key_fields:
+                    regular_val = regular_data.get(field, "MISSING")
+                    scanned_val = scanned_data.get(field, "MISSING")
+                    
+                    if regular_val == scanned_val:
+                        print(f"   ✅ {field}: {regular_val}")
+                    else:
+                        print(f"   ❌ {field}: Regular={regular_val}, Scanned={scanned_val}")
+                
+                # Check if both cards have same user association
+                if regular_data.get("user_id") == scanned_data.get("user_id"):
+                    print("   ✅ Both cards have same user_id")
+                else:
+                    print(f"   ❌ Different user_id: Regular={regular_data.get('user_id')}, Scanned={scanned_data.get('user_id')}")
+                
+                self.log_result("Database Field Comparison", True, "Field structures compared - check output for differences")
+            else:
+                self.log_result("Database Field Comparison", False, "Could not retrieve cards for comparison")
+                return False
+            
+            # Step 6: Test frontend API compatibility
+            print("\nStep 6: Testing frontend API compatibility...")
+            
+            # Check response format matches what frontend expects
+            if len(updated_cards_list) >= 2:
+                sample_card = updated_cards_list[0]
+                expected_fields = ["id", "name", "company", "position", "phones", "emails", "is_owner", "is_public"]
+                
+                missing_frontend_fields = [field for field in expected_fields if field not in sample_card]
+                
+                if missing_frontend_fields:
+                    print(f"   ❌ Missing frontend fields: {missing_frontend_fields}")
+                    self.log_result("Frontend API Compatibility", False, f"Missing fields: {missing_frontend_fields}")
+                else:
+                    print(f"   ✅ All expected frontend fields present")
+                    self.log_result("Frontend API Compatibility", True, "Response format matches frontend expectations")
+            
+            self.log_result("Scanned Card Debug", True, "Debug workflow completed - check output for detailed analysis")
+            return True
+            
+        except Exception as e:
+            self.log_result("Scanned Card Debug", False, f"Error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run all tests in sequence - FOCUS: NEW REVOLUTIONARY FEATURES"""
         print("=" * 80)
