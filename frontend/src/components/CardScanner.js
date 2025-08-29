@@ -493,6 +493,16 @@ const CardScanner = ({ onCardCreated }) => {
                 <div className="text-center py-8 text-gray-500">
                   <AlertCircle className="w-12 h-12 mx-auto mb-2" />
                   <p>Keine Informationen erkannt. Bitte versuchen Sie es mit einem anderen Bild.</p>
+                  
+                  {/* DEBUG INFO - Show what we actually received */}
+                  {process.env.NODE_ENV === 'development' && scanResult && (
+                    <details className="mt-4 text-xs text-left">
+                      <summary className="cursor-pointer text-blue-600">Debug Info (Entwicklung)</summary>
+                      <pre className="mt-2 p-2 bg-gray-100 rounded text-black overflow-auto">
+                        {JSON.stringify(scanResult, null, 2)}
+                      </pre>
+                    </details>
+                  )}
                 </div>
               )}
               
