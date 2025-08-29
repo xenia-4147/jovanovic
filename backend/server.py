@@ -3675,8 +3675,19 @@ async def create_video_meeting(
         result = await db.videomeetings.insert_one(meeting_dict)
         meeting.id = str(result.inserted_id)
         
-        # Create join URL
-        join_url = f"/meeting/join/{meeting.meeting_code}"
+        # Generate shareable meeting link (like Zoom)
+        base_url = "https://cardnet-pro.preview.emergentagent.com"
+        join_url = f"{base_url}/meeting/{meeting.meeting_code}"
+        share_link = f"{base_url}/join?code={meeting.meeting_code}"
+        
+        # Add meeting link to business card sharing
+        meeting_link_card = {
+            "meeting_title": meeting.title,
+            "meeting_code": meeting.meeting_code,
+            "join_link": share_link,
+            "qr_code_url": f"{base_url}/api/qr/meeting/{meeting.meeting_code}",
+            "scheduled_for": meeting.scheduled_for.isoformat() if meeting.scheduled_for else None
+        }
         
         logger.info(f"Video meeting created: {meeting.title} by {current_user.email}")
         
@@ -3685,6 +3696,8 @@ async def create_video_meeting(
             participants=[],
             shared_cards=[],
             join_url=join_url,
+            share_link=share_link,  # NEW: Shareable link like Zoom
+            meeting_link_card=meeting_link_card,  # NEW: For business card integration
             webrtc_config=WEBRTC_CONFIG
         )
         
