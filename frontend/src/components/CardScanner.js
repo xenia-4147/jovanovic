@@ -460,7 +460,8 @@ const CardScanner = ({ onCardCreated }) => {
                 variant="outline" 
                 className="bg-green-100 text-green-800 border-green-300"
               >
-                {Math.round(scanResult.scanned_card.overall_confidence)}% Genauigkeit
+                {scanResult?.scanned_card?.overall_confidence ? 
+                  Math.round(scanResult.scanned_card.overall_confidence) : 0}% Genauigkeit
               </Badge>
             </CardTitle>
             <CardDescription>
