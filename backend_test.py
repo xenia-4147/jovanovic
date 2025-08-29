@@ -6738,6 +6738,16 @@ END:VCARD"""
             self.test_express_room_participant_limits,
             self.test_invalid_express_operations,
             
+            # ============================================================================
+            # OCR FUNCTIONALITY TESTS - CRITICAL TESSERACT VERIFICATION
+            # ============================================================================
+            self.test_ocr_service_initialization,
+            self.test_tesseract_availability,
+            self.test_ocr_preprocessing,
+            self.test_business_card_ocr_extraction,
+            self.test_ocr_field_detection,
+            self.test_ocr_confidence_scoring,
+            
             # OCR Business Card Scanner Tests - Game Changing Feature
             self.test_ocr_scan_business_card,
             self.test_get_scan_results,
