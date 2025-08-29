@@ -465,6 +465,14 @@ const CardScanner = ({ onCardCreated }) => {
           </CardContent>
         </Card>
       )}
+      
+      {/* Improved Camera Scanner Modal */}
+      {showCameraScanner && (
+        <CameraScanner
+          onCardScanned={handleCameraScanResult}
+          onClose={closeCameraScanner}
+        />
+      )}
     </div>
   );
 };
