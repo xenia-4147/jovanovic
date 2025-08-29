@@ -175,8 +175,37 @@ const HomePage = () => {
       return;
     }
     
-    // Redirect to meeting room
-    window.open(`/meeting/${meetingCode.trim().toUpperCase()}`, '_blank');
+    const cleanCode = meetingCode.trim().toUpperCase();
+    const meetingLink = `${window.location.origin}/meeting/${cleanCode}`;
+    
+    // Redirect to meeting room with proper link
+    window.open(meetingLink, '_blank');
+  };
+
+  const copyMeetingLink = () => {
+    if (!meetingCode.trim()) {
+      toast({
+        title: "Kein Code eingegeben",
+        description: "Bitte geben Sie zuerst einen Meeting-Code ein.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    const cleanCode = meetingCode.trim().toUpperCase();
+    const meetingLink = `${window.location.origin}/meeting/${cleanCode}`;
+    
+    navigator.clipboard.writeText(meetingLink).then(() => {
+      toast({
+        title: "Meeting-Link kopiert! 📋",
+        description: `Link für Meeting ${cleanCode} wurde in die Zwischenablage kopiert.`,
+      });
+    }).catch(() => {
+      toast({
+        title: "Link erstellt",
+        description: `Meeting-Link: ${meetingLink}`,
+      });
+    });
   };
 
   if (loading) {
