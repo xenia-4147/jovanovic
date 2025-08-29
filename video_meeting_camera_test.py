@@ -202,11 +202,8 @@ class VideoMeetingCameraTester:
             # Join meeting with camera preferences
             join_data = {
                 "meeting_code": self.meeting_code,
-                "participant_name": "Video Meeting Host",
-                "enable_video": True,
-                "enable_audio": True,
-                "video_device_id": "default",
-                "audio_device_id": "default"
+                "display_name": "Video Meeting Host",
+                "share_business_card": True
             }
             
             response = requests.post(f"{API_BASE}/video/meeting/join", json=join_data, headers=headers)
