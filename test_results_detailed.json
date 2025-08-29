@@ -3,370 +3,80 @@
     "test": "Health Check",
     "success": true,
     "message": "API is running - Digital Business Cards API",
-    "timestamp": "2025-08-29T16:02:41.317032"
+    "timestamp": "2025-08-29T16:23:15.352031"
   },
   {
     "test": "User Registration",
     "success": true,
-    "message": "User registered successfully: testuser_33d5c6ea@example.com",
-    "timestamp": "2025-08-29T16:02:41.610899"
+    "message": "User registered successfully: testuser_7d2e1aaf@example.com",
+    "timestamp": "2025-08-29T16:23:15.651159"
   },
   {
     "test": "User Login",
     "success": true,
-    "message": "Login successful for: logintest_5e02457a@example.com",
-    "timestamp": "2025-08-29T16:02:42.196759"
+    "message": "Login successful for: logintest_37a66c12@example.com",
+    "timestamp": "2025-08-29T16:23:16.238972"
   },
   {
     "test": "Protected Endpoint",
     "success": true,
-    "message": "User profile retrieved: testuser_33d5c6ea@example.com",
-    "timestamp": "2025-08-29T16:02:42.262183"
+    "message": "User profile retrieved: testuser_7d2e1aaf@example.com",
+    "timestamp": "2025-08-29T16:23:16.299334"
   },
   {
     "test": "Create Business Card",
     "success": true,
     "message": "Card created: John Doe",
-    "timestamp": "2025-08-29T16:02:42.325161"
+    "timestamp": "2025-08-29T16:23:16.366299"
   },
   {
-    "test": "Get User Cards",
-    "success": true,
-    "message": "No cards found (empty list)",
-    "timestamp": "2025-08-29T16:02:42.376220"
-  },
-  {
-    "test": "Get Specific Card",
-    "success": true,
-    "message": "Card retrieved: John Doe",
-    "timestamp": "2025-08-29T16:02:42.432436"
-  },
-  {
-    "test": "Update Business Card",
-    "success": true,
-    "message": "Card updated successfully",
-    "timestamp": "2025-08-29T16:02:42.488144"
-  },
-  {
-    "test": "Create Card with Custom Code",
-    "success": true,
-    "message": "Card created with custom code: TEST5AEA41",
-    "timestamp": "2025-08-29T16:02:42.545068"
-  },
-  {
-    "test": "Check Code Availability - Available",
-    "success": true,
-    "message": "Code AVAIL7F1B is available",
-    "timestamp": "2025-08-29T16:02:42.596863"
-  },
-  {
-    "test": "Check Code Availability - Taken",
-    "success": true,
-    "message": "Code TEST5AEA41 is correctly marked as taken",
-    "timestamp": "2025-08-29T16:02:42.644438"
-  },
-  {
-    "test": "Access Card by Code",
-    "success": true,
-    "message": "Successfully accessed card using code: TEST5AEA41",
-    "timestamp": "2025-08-29T16:02:42.695192"
-  },
-  {
-    "test": "Code Uniqueness Validation",
+    "test": "Enhanced Video Meeting Create",
     "success": false,
-    "message": "Expected validation error, got HTTP 500",
-    "timestamp": "2025-08-29T16:02:42.750950",
-    "response": "{\"detail\":\"Card creation failed: E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TEST5AEA41\\\" }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TEST5AEA41\\\" }', 'keyPattern': {'custom_code': 1}, 'keyValue': {'custom_code': 'TEST5AEA41'}}\"}"
-  },
-  {
-    "test": "Early Adopter User Registration",
-    "success": true,
-    "message": "Early Adopter #92 created with unlimited premium features: earlyadopter_144554e9@example.com",
-    "timestamp": "2025-08-29T16:02:43.272057"
-  },
-  {
-    "test": "Early Adopter Premium Feature Access",
-    "success": true,
-    "message": "Early Adopter has access to ALL 12 premium features",
-    "timestamp": "2025-08-29T16:02:43.999320"
-  },
-  {
-    "test": "Early Adopter vs Regular User Comparison",
-    "success": false,
-    "message": "No clear difference found between user types",
-    "timestamp": "2025-08-29T16:02:44.594355"
-  },
-  {
-    "test": "User Count API Logic",
-    "success": true,
-    "message": "Sequential Early Adopter numbering verified: [94, 95, 96]",
-    "timestamp": "2025-08-29T16:02:45.800211"
-  },
-  {
-    "test": "Subscription Status Response Format",
-    "success": true,
-    "message": "Early Adopter #92 response format correct for frontend parsing",
-    "timestamp": "2025-08-29T16:02:45.854337"
-  },
-  {
-    "test": "Get Subscription Status",
-    "success": false,
-    "message": "Free plan limits not generous enough for growth-first strategy",
-    "timestamp": "2025-08-29T16:02:45.905610",
-    "response": {
-      "max_business_cards": 999999,
-      "max_custom_codes": 999999,
-      "express_share_enabled": true,
-      "meeting_rooms_enabled": true,
-      "max_meeting_participants": 100,
-      "meeting_room_duration_minutes": 120,
-      "monthly_contact_imports": 999999,
-      "google_contacts_sync": true,
-      "apple_icloud_sync": true,
-      "auto_contact_sync": true,
-      "whatsapp_enabled": true,
-      "telegram_enabled": true,
-      "viber_enabled": true,
-      "signal_enabled": true,
-      "discord_enabled": true,
-      "basic_analytics": true,
-      "detailed_analytics": true,
-      "contact_insights": true,
-      "export_analytics": true,
-      "custom_branding": true,
-      "custom_themes": 999,
-      "custom_colors": true,
-      "custom_fonts": true,
-      "priority_support": true,
-      "api_access": true,
-      "white_label": false,
-      "team_management": true
-    }
-  },
-  {
-    "test": "Check Feature Access - Free User",
-    "success": true,
-    "message": "Growth-first validation passed: 9/12 features free (75.0%), 0 premium features properly restricted",
-    "timestamp": "2025-08-29T16:02:46.588962"
-  },
-  {
-    "test": "Track Usage System",
-    "success": true,
-    "message": "Successfully tracked 5 usage events, total usage: 8",
-    "timestamp": "2025-08-29T16:02:47.020617"
-  },
-  {
-    "test": "Integration with Existing Features",
-    "success": true,
-    "message": "Business card creation tracked usage: 4 \u2192 5",
-    "timestamp": "2025-08-29T16:02:48.184471"
-  },
-  {
-    "test": "Growth-First Validation",
-    "success": false,
-    "message": "Not enough premium restrictions: 0",
-    "timestamp": "2025-08-29T16:02:48.240425"
-  },
-  {
-    "test": "List Contact Sources - Empty",
-    "success": true,
-    "message": "Retrieved 0 contact sources (empty list expected)",
-    "timestamp": "2025-08-29T16:02:48.293367"
-  },
-  {
-    "test": "Import Contacts - Contact Picker",
-    "success": true,
-    "message": "Successfully imported 3 contacts from Contact Picker",
-    "timestamp": "2025-08-29T16:02:48.352365"
-  },
-  {
-    "test": "Import Contacts - VCF File",
-    "success": true,
-    "message": "Successfully imported 2 contacts from VCF file",
-    "timestamp": "2025-08-29T16:02:48.405574"
-  },
-  {
-    "test": "Import Contacts - Google Placeholder",
-    "success": true,
-    "message": "Google Contacts placeholder response working correctly",
-    "timestamp": "2025-08-29T16:02:48.458907"
-  },
-  {
-    "test": "Import Contacts - Apple Placeholder",
-    "success": true,
-    "message": "Apple iCloud placeholder response working correctly",
-    "timestamp": "2025-08-29T16:02:48.509874"
-  },
-  {
-    "test": "Import Contacts - CSV Unsupported",
-    "success": true,
-    "message": "CSV import properly rejected as unsupported",
-    "timestamp": "2025-08-29T16:02:48.559460"
-  },
-  {
-    "test": "List Contact Sources - With Data",
-    "success": true,
-    "message": "Retrieved 2 contact sources with correct data",
-    "timestamp": "2025-08-29T16:02:48.610034"
-  },
-  {
-    "test": "Unified Contacts List",
-    "success": true,
-    "message": "Retrieved 5 unified contacts (0 business cards, 5 imported contacts)",
-    "timestamp": "2025-08-29T16:02:48.664340"
-  },
-  {
-    "test": "Unified Contacts Search",
-    "success": true,
-    "message": "Search found 2 contacts matching 'John'",
-    "timestamp": "2025-08-29T16:02:48.721188"
-  },
-  {
-    "test": "Imported Contact Messaging Apps",
-    "success": true,
-    "message": "Imported contact has correct messaging apps: ['whatsapp', 'sms']",
-    "timestamp": "2025-08-29T16:02:48.779097"
-  },
-  {
-    "test": "Contact Type Identification",
-    "success": true,
-    "message": "Contact type identification working correctly (0 business cards, 5 imported contacts)",
-    "timestamp": "2025-08-29T16:02:48.832371"
-  },
-  {
-    "test": "Contact Import Invalid Data - Missing Data",
-    "success": true,
-    "message": "Missing contacts_data properly rejected",
-    "timestamp": "2025-08-29T16:02:48.884260"
-  },
-  {
-    "test": "Contact Import Invalid Data - Invalid VCF",
-    "success": true,
-    "message": "Invalid VCF content properly rejected",
-    "timestamp": "2025-08-29T16:02:48.933886"
-  },
-  {
-    "test": "Messaging Apps Default Configuration",
-    "success": true,
-    "message": "Default messaging apps configured: WhatsApp and SMS both enabled",
-    "timestamp": "2025-08-29T16:02:48.991945"
-  },
-  {
-    "test": "Messaging Apps Custom Configuration",
-    "success": true,
-    "message": "Custom messaging apps configured correctly",
-    "timestamp": "2025-08-29T16:02:49.051045"
-  },
-  {
-    "test": "Messaging Apps Update Configuration",
-    "success": true,
-    "message": "Messaging apps updated successfully: {'whatsapp': True, 'sms': False, 'telegram': True, 'viber': True, 'signal': False}",
-    "timestamp": "2025-08-29T16:02:49.108074"
-  },
-  {
-    "test": "Messaging Apps API Response Validation",
-    "success": true,
-    "message": "All messaging_apps fields properly formatted in API response",
-    "timestamp": "2025-08-29T16:02:49.159526"
-  },
-  {
-    "test": "Messaging Apps Persistence",
-    "success": true,
-    "message": "Messaging apps persist correctly across requests: {'whatsapp': True, 'sms': False, 'telegram': True, 'signal': True, 'viber': False}",
-    "timestamp": "2025-08-29T16:02:49.331373"
-  },
-  {
-    "test": "Messaging Apps Multiple Phones Independence",
-    "success": true,
-    "message": "Independent configs: Work={'whatsapp': True, 'sms': True, 'telegram': False}, Personal={'whatsapp': False, 'sms': True, 'signal': True, 'viber': True}, Emergency={'sms': True}",
-    "timestamp": "2025-08-29T16:02:49.387062"
-  },
-  {
-    "test": "Social Media Fix with Custom Code - Missing Field",
-    "success": true,
-    "message": "Card created with custom code SOCIALD9BF80, social_media properly initialized",
-    "timestamp": "2025-08-29T16:02:49.441932"
-  },
-  {
-    "test": "Social Media Fix with Custom Code - Null Field",
-    "success": true,
-    "message": "Card created with custom code SOCIALC76797, null social_media properly handled",
-    "timestamp": "2025-08-29T16:02:49.529043"
-  },
-  {
-    "test": "Create Meeting Room",
-    "success": true,
-    "message": "Meeting room created with code: R23KP",
-    "timestamp": "2025-08-29T16:02:49.585727"
-  },
-  {
-    "test": "Get Meeting Room",
-    "success": true,
-    "message": "Meeting room retrieved: R23KP",
-    "timestamp": "2025-08-29T16:02:49.637640"
-  },
-  {
-    "test": "Join Meeting Room",
-    "success": true,
-    "message": "Successfully joined meeting room: R23KP",
-    "timestamp": "2025-08-29T16:02:49.695496"
-  },
-  {
-    "test": "List User Meeting Rooms",
-    "success": true,
-    "message": "No meeting rooms found (empty list)",
-    "timestamp": "2025-08-29T16:02:49.749242"
-  },
-  {
-    "test": "Enhanced Code Access - Meeting Room",
-    "success": true,
-    "message": "Meeting room code properly rejected by card access endpoint",
-    "timestamp": "2025-08-29T16:02:49.801041"
-  },
-  {
-    "test": "Close Meeting Room",
-    "success": true,
-    "message": "Meeting room R23KP closed successfully",
-    "timestamp": "2025-08-29T16:02:49.854730"
-  },
-  {
-    "test": "Video Meeting Create",
-    "success": false,
-    "message": "Missing required fields in response",
-    "timestamp": "2025-08-29T16:02:49.912924",
+    "message": "Missing NEW revolutionary fields: ['meeting_link_card']",
+    "timestamp": "2025-08-29T16:23:16.433704",
     "response": {
       "meeting": {
-        "id": "68b1cf299073449a553f8990",
-        "title": "Tech Networking Session",
-        "description": "Video meeting for business card sharing",
-        "meeting_type": "group",
-        "host_id": "68b1cf219073449a553f8933",
+        "id": "68b1d3f4cf809034f23fc7a7",
+        "title": "Revolutionary Tech Networking Session",
+        "description": "Enhanced video meeting with live translation and business card integration",
+        "meeting_type": "networking_event",
+        "host_id": "68b1d3f3cf809034f23fc79e",
         "host_business_card_id": null,
-        "max_participants": 10,
+        "max_participants": 15,
         "duration_minutes": 60,
         "quality": "standard",
-        "meeting_code": "A434E1",
+        "meeting_code": "534542",
         "password": "meeting123",
-        "is_public": false,
+        "is_public": true,
         "shared_business_cards": [],
         "allow_card_sharing": true,
-        "community_tags": [],
+        "community_tags": [
+          "technology",
+          "networking",
+          "ai"
+        ],
         "target_audience": null,
         "is_job_related": false,
         "job_title": null,
         "company_name": null,
+        "share_link": null,
+        "qr_code_url": null,
+        "translation_enabled": false,
+        "source_language": "auto",
+        "target_languages": [],
+        "translation_participants": {},
         "status": "waiting",
         "started_at": null,
         "ended_at": null,
         "enable_recording": false,
         "enable_screen_share": true,
         "enable_chat": true,
-        "created_at": "2025-08-29T16:02:49.907010",
+        "created_at": "2025-08-29T16:23:16.427280",
         "scheduled_for": null
       },
       "participants": [],
       "shared_cards": [],
-      "join_url": "/meeting/join/A434E1",
+      "join_url": "https://cardnet-pro.preview.emergentagent.com/meeting/534542",
       "webrtc_config": {
         "iceServers": [
           {
@@ -390,45 +100,73 @@
     }
   },
   {
+    "test": "Meeting Share Link Generation",
+    "success": false,
+    "message": "No access token or video meeting ID available",
+    "timestamp": "2025-08-29T16:23:16.435485"
+  },
+  {
+    "test": "Live Translation Enable",
+    "success": false,
+    "message": "No access token or video meeting ID available",
+    "timestamp": "2025-08-29T16:23:16.435539"
+  },
+  {
+    "test": "Participant Translation Preference",
+    "success": false,
+    "message": "No access token or video meeting ID available",
+    "timestamp": "2025-08-29T16:23:16.435549"
+  },
+  {
     "test": "Video Meeting Join",
     "success": false,
     "message": "No access token or video meeting ID available",
-    "timestamp": "2025-08-29T16:02:49.914129"
+    "timestamp": "2025-08-29T16:23:16.435558"
   },
   {
     "test": "Video Meetings List",
     "success": false,
     "message": "Response is not a list",
-    "timestamp": "2025-08-29T16:02:49.967817",
+    "timestamp": "2025-08-29T16:23:16.496919",
     "response": {
       "meetings": [
         {
-          "id": "275de3de-fa79-4a14-bb7c-2a1b8b2755e9",
-          "title": "Tech Networking Session",
-          "description": "Video meeting for business card sharing",
-          "meeting_type": "group",
-          "host_id": "68b1cf219073449a553f8933",
+          "id": "f19e1086-bfa3-4b6e-975c-ee6d8807dbf9",
+          "title": "Revolutionary Tech Networking Session",
+          "description": "Enhanced video meeting with live translation and business card integration",
+          "meeting_type": "networking_event",
+          "host_id": "68b1d3f3cf809034f23fc79e",
           "host_business_card_id": null,
-          "max_participants": 10,
+          "max_participants": 15,
           "duration_minutes": 60,
           "quality": "standard",
-          "meeting_code": "A434E1",
+          "meeting_code": "534542",
           "password": "meeting123",
-          "is_public": false,
+          "is_public": true,
           "shared_business_cards": [],
           "allow_card_sharing": true,
-          "community_tags": [],
+          "community_tags": [
+            "technology",
+            "networking",
+            "ai"
+          ],
           "target_audience": null,
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
+          "share_link": null,
+          "qr_code_url": null,
+          "translation_enabled": false,
+          "source_language": "auto",
+          "target_languages": [],
+          "translation_participants": {},
           "status": "waiting",
           "started_at": null,
           "ended_at": null,
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T16:02:49.907000",
+          "created_at": "2025-08-29T16:23:16.427000",
           "scheduled_for": null
         }
       ],
@@ -441,22 +179,22 @@
     "test": "Video Meeting Share Card",
     "success": false,
     "message": "No access token or video meeting ID available",
-    "timestamp": "2025-08-29T16:02:49.968942"
+    "timestamp": "2025-08-29T16:23:16.498303"
   },
   {
     "test": "Community Profile Get",
     "success": true,
     "message": "Community profile retrieved successfully",
-    "timestamp": "2025-08-29T16:02:50.020464"
+    "timestamp": "2025-08-29T16:23:16.553718"
   },
   {
     "test": "Community Profile Update",
     "success": false,
     "message": "Profile update not reflected",
-    "timestamp": "2025-08-29T16:02:50.078348",
+    "timestamp": "2025-08-29T16:23:16.635937",
     "response": {
-      "id": "a9c2c935-3410-4677-b022-f93839a06c2a",
-      "user_id": "68b1cf219073449a553f8933",
+      "id": "0e6ae5a3-a2b2-4af4-9c59-cf1cdbbf201d",
+      "user_id": "68b1d3f3cf809034f23fc79e",
       "display_name": "John Doe",
       "bio": "Tech enthusiast passionate about digital innovation",
       "location": "Berlin, Germany",
@@ -485,19 +223,19 @@
       "public_profile": true,
       "show_contact_info": false,
       "discoverable": true,
-      "created_at": "2025-08-29T16:02:50.016000",
-      "last_active": "2025-08-29T16:02:50.073000"
+      "created_at": "2025-08-29T16:23:16.548000",
+      "last_active": "2025-08-29T16:23:16.630000"
     }
   },
   {
     "test": "Community Discover",
     "success": false,
     "message": "Invalid response format",
-    "timestamp": "2025-08-29T16:02:50.129246",
+    "timestamp": "2025-08-29T16:23:16.691415",
     "response": {
       "communities": [
         {
-          "id": "fc9342da-467c-4b30-b583-c913b6764bb2",
+          "id": "96e91e49-421f-4548-984a-e661ef9173e9",
           "name": "Berlin Revolutionary Tech",
           "description": "Community for revolutionary technology enthusiasts in Berlin",
           "community_type": "professional",
@@ -535,13 +273,13 @@
     "test": "Community Feed",
     "success": false,
     "message": "Invalid response format",
-    "timestamp": "2025-08-29T16:02:50.188919",
+    "timestamp": "2025-08-29T16:23:16.758916",
     "response": {
       "events": [],
       "job_opportunities": [],
       "community_suggestions": [
         {
-          "id": "c1b071b9-1a9f-4c0d-ba0c-efeed9b88e0c",
+          "id": "3c40cefb-c1bd-49fd-a806-297887096979",
           "name": "Berlin Revolutionary Tech",
           "description": "Community for revolutionary technology enthusiasts in Berlin",
           "community_type": "professional",
@@ -568,7 +306,7 @@
       ],
       "user_matches": [
         {
-          "id": "b4d02e42-6c08-4fb9-9813-7188fddc870e",
+          "id": "6a48e1d0-0f55-4d1f-ac00-26bbf2adc574",
           "user_id": "68b1c5255c1962a7ef172326",
           "display_name": "John Doe",
           "bio": "Tech enthusiast passionate about digital innovation",
@@ -602,13 +340,53 @@
           "last_active": "2025-08-29T15:20:13.879000",
           "match_score": 0.7000000000000001,
           "match_reasons": [
-            "Gemeinsame Interessen: technology, ai, networking",
-            "\u00c4hnliche Skills: MongoDB, React",
+            "Gemeinsame Interessen: ai, technology, startups",
+            "\u00c4hnliche Skills: MongoDB, FastAPI",
             "Gleiche Stadt: Berlin, Germany"
           ]
         },
         {
-          "id": "e2fed332-790c-44b9-9d18-02e0f322b21c",
+          "id": "4a1edd22-12da-46e2-b5fe-8b3ddde89ab3",
+          "user_id": "68b1cf219073449a553f8933",
+          "display_name": "John Doe",
+          "bio": "Tech enthusiast passionate about digital innovation",
+          "location": "Berlin, Germany",
+          "interests": [
+            "technology",
+            "networking",
+            "ai",
+            "startups"
+          ],
+          "industry": null,
+          "skills": [
+            "Python",
+            "FastAPI",
+            "React",
+            "MongoDB"
+          ],
+          "current_position": null,
+          "current_company": null,
+          "experience_level": null,
+          "looking_for_job": false,
+          "job_preferences": null,
+          "is_recruiter": false,
+          "recruiting_for_companies": [],
+          "preferred_meeting_types": [],
+          "max_distance_km": 50,
+          "public_profile": true,
+          "show_contact_info": false,
+          "discoverable": true,
+          "created_at": "2025-08-29T16:02:50.016000",
+          "last_active": "2025-08-29T16:02:50.073000",
+          "match_score": 0.7000000000000001,
+          "match_reasons": [
+            "Gemeinsame Interessen: ai, technology, startups",
+            "\u00c4hnliche Skills: MongoDB, FastAPI",
+            "Gleiche Stadt: Berlin, Germany"
+          ]
+        },
+        {
+          "id": "7c2c0573-3e00-4095-9021-dfd5d9c0f425",
           "user_id": "68b1c5d57db2e9072228c7a8",
           "display_name": "New Features",
           "bio": "Tech innovator passionate about revolutionary digital solutions",
@@ -643,8 +421,8 @@
           "last_active": "2025-08-29T15:23:01.503000",
           "match_score": 0.52,
           "match_reasons": [
-            "Gemeinsame Interessen: technology, ai, networking",
-            "\u00c4hnliche Skills: MongoDB, React",
+            "Gemeinsame Interessen: ai, technology, networking",
+            "\u00c4hnliche Skills: MongoDB, FastAPI",
             "Gleiche Stadt: Berlin, Germany"
           ]
         }
@@ -655,20 +433,20 @@
     "test": "Community Create",
     "success": false,
     "message": "HTTP 422",
-    "timestamp": "2025-08-29T16:02:50.245752",
+    "timestamp": "2025-08-29T16:23:16.821070",
     "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"community_type\"],\"msg\":\"Field required\",\"input\":{\"name\":\"Berlin Tech Entrepreneurs\",\"description\":\"Community for tech entrepreneurs in Berlin\",\"category\":\"Technology\",\"location\":\"Berlin, Germany\",\"privacy\":\"public\",\"tags\":[\"startup\",\"tech\",\"networking\",\"berlin\"]},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"},{\"type\":\"missing\",\"loc\":[\"body\",\"primary_interests\"],\"msg\":\"Field required\",\"input\":{\"name\":\"Berlin Tech Entrepreneurs\",\"description\":\"Community for tech entrepreneurs in Berlin\",\"category\":\"Technology\",\"location\":\"Berlin, Germany\",\"privacy\":\"public\",\"tags\":[\"startup\",\"tech\",\"networking\",\"berlin\"]},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"}]}"
   },
   {
     "test": "Community Join",
     "success": false,
     "message": "No access token or community ID available",
-    "timestamp": "2025-08-29T16:02:50.247003"
+    "timestamp": "2025-08-29T16:23:16.822424"
   },
   {
     "test": "My Communities List",
     "success": false,
     "message": "Response is not a list",
-    "timestamp": "2025-08-29T16:02:50.295215",
+    "timestamp": "2025-08-29T16:23:16.878489",
     "response": {
       "communities": [],
       "my_communities": [],
@@ -680,112 +458,412 @@
     "test": "Jobs Discover",
     "success": false,
     "message": "Invalid response format",
-    "timestamp": "2025-08-29T16:02:50.348714"
+    "timestamp": "2025-08-29T16:23:16.943283"
   },
   {
     "test": "Jobs Post",
     "success": false,
     "message": "HTTP 422",
-    "timestamp": "2025-08-29T16:02:50.405751",
-    "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"company_name\"],\"msg\":\"Field required\",\"input\":{\"title\":\"Senior Python Developer\",\"company\":\"Tech Solutions Inc\",\"description\":\"Looking for experienced Python developer for exciting projects\",\"location\":\"Berlin, Germany\",\"salary_range\":\"70000-90000\",\"requirements\":[\"Python\",\"FastAPI\",\"MongoDB\",\"5+ years experience\"],\"job_type\":\"full-time\",\"remote_allowed\":true,\"business_card_id\":\"68b1cf229073449a553f893b\"},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"},{\"type\":\"enum\",\"loc\":[\"body\",\"job_type\"],\"msg\":\"Input should be 'full_time', 'part_time', 'freelance', 'contract', 'internship' or 'volunteer'\",\"input\":\"full-time\",\"ctx\":{\"expected\":\"'full_time', 'part_time', 'freelance', 'contract', 'internship' or 'volunteer'\"},\"url\":\"https://errors.pydantic.dev/2.11/v/enum\"},{\"type\":\"missing\",\"loc\":[\"body\",\"experience_level\"],\"msg\":\"Field required\",\"input\":{\"title\":\"Senior Python Developer\",\"company\":\"Tech Solutions Inc\",\"description\":\"Looking for experienced Python developer for exciting projects\",\"location\":\"Berlin, Germany\",\"salary_range\":\"70000-90000\",\"requirements\":[\"Python\",\"FastAPI\",\"MongoDB\",\"5+ years experience\"],\"job_type\":\"full-time\",\"remote_allowed\":true,\"business_card_id\":\"68b1cf229073449a553f893b\"},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"}]}"
+    "timestamp": "2025-08-29T16:23:17.002934",
+    "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"company_name\"],\"msg\":\"Field required\",\"input\":{\"title\":\"Senior Python Developer\",\"company\":\"Tech Solutions Inc\",\"description\":\"Looking for experienced Python developer for exciting projects\",\"location\":\"Berlin, Germany\",\"salary_range\":\"70000-90000\",\"requirements\":[\"Python\",\"FastAPI\",\"MongoDB\",\"5+ years experience\"],\"job_type\":\"full-time\",\"remote_allowed\":true,\"business_card_id\":\"68b1d3f4cf809034f23fc7a6\"},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"},{\"type\":\"enum\",\"loc\":[\"body\",\"job_type\"],\"msg\":\"Input should be 'full_time', 'part_time', 'freelance', 'contract', 'internship' or 'volunteer'\",\"input\":\"full-time\",\"ctx\":{\"expected\":\"'full_time', 'part_time', 'freelance', 'contract', 'internship' or 'volunteer'\"},\"url\":\"https://errors.pydantic.dev/2.11/v/enum\"},{\"type\":\"missing\",\"loc\":[\"body\",\"experience_level\"],\"msg\":\"Field required\",\"input\":{\"title\":\"Senior Python Developer\",\"company\":\"Tech Solutions Inc\",\"description\":\"Looking for experienced Python developer for exciting projects\",\"location\":\"Berlin, Germany\",\"salary_range\":\"70000-90000\",\"requirements\":[\"Python\",\"FastAPI\",\"MongoDB\",\"5+ years experience\"],\"job_type\":\"full-time\",\"remote_allowed\":true,\"business_card_id\":\"68b1d3f4cf809034f23fc7a6\"},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"}]}"
   },
   {
     "test": "Jobs Apply",
     "success": false,
     "message": "No access token or job ID available",
-    "timestamp": "2025-08-29T16:02:50.406883"
+    "timestamp": "2025-08-29T16:23:17.004369"
+  },
+  {
+    "test": "Get User Cards",
+    "success": true,
+    "message": "No cards found (empty list)",
+    "timestamp": "2025-08-29T16:23:17.059122"
+  },
+  {
+    "test": "Get Specific Card",
+    "success": true,
+    "message": "Card retrieved: John Doe",
+    "timestamp": "2025-08-29T16:23:17.117902"
+  },
+  {
+    "test": "Update Business Card",
+    "success": true,
+    "message": "Card updated successfully",
+    "timestamp": "2025-08-29T16:23:17.172462"
+  },
+  {
+    "test": "Create Card with Custom Code",
+    "success": true,
+    "message": "Card created with custom code: TEST48551B",
+    "timestamp": "2025-08-29T16:23:17.228730"
+  },
+  {
+    "test": "Check Code Availability - Available",
+    "success": true,
+    "message": "Code AVAIL10C9 is available",
+    "timestamp": "2025-08-29T16:23:17.279503"
+  },
+  {
+    "test": "Check Code Availability - Taken",
+    "success": true,
+    "message": "Code TEST48551B is correctly marked as taken",
+    "timestamp": "2025-08-29T16:23:17.333324"
+  },
+  {
+    "test": "Access Card by Code",
+    "success": true,
+    "message": "Successfully accessed card using code: TEST48551B",
+    "timestamp": "2025-08-29T16:23:17.385280"
+  },
+  {
+    "test": "Code Uniqueness Validation",
+    "success": false,
+    "message": "Expected validation error, got HTTP 500",
+    "timestamp": "2025-08-29T16:23:17.450146",
+    "response": "{\"detail\":\"Card creation failed: E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TEST48551B\\\" }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TEST48551B\\\" }', 'keyPattern': {'custom_code': 1}, 'keyValue': {'custom_code': 'TEST48551B'}}\"}"
+  },
+  {
+    "test": "Early Adopter User Registration",
+    "success": true,
+    "message": "Early Adopter #99 created with unlimited premium features: earlyadopter_050ade6d@example.com",
+    "timestamp": "2025-08-29T16:23:17.792730"
+  },
+  {
+    "test": "Early Adopter Premium Feature Access",
+    "success": true,
+    "message": "Early Adopter has access to ALL 12 premium features",
+    "timestamp": "2025-08-29T16:23:18.445310"
+  },
+  {
+    "test": "Early Adopter vs Regular User Comparison",
+    "success": false,
+    "message": "No clear difference found between user types",
+    "timestamp": "2025-08-29T16:23:19.071436"
+  },
+  {
+    "test": "User Count API Logic",
+    "success": true,
+    "message": "Sequential Early Adopter numbering verified: [101, 102, 103]",
+    "timestamp": "2025-08-29T16:23:20.100483"
+  },
+  {
+    "test": "Subscription Status Response Format",
+    "success": true,
+    "message": "Early Adopter #99 response format correct for frontend parsing",
+    "timestamp": "2025-08-29T16:23:20.155021"
+  },
+  {
+    "test": "Get Subscription Status",
+    "success": false,
+    "message": "Free plan limits not generous enough for growth-first strategy",
+    "timestamp": "2025-08-29T16:23:20.208991",
+    "response": {
+      "max_business_cards": 999999,
+      "max_custom_codes": 999999,
+      "express_share_enabled": true,
+      "meeting_rooms_enabled": true,
+      "max_meeting_participants": 100,
+      "meeting_room_duration_minutes": 120,
+      "monthly_contact_imports": 999999,
+      "google_contacts_sync": true,
+      "apple_icloud_sync": true,
+      "auto_contact_sync": true,
+      "whatsapp_enabled": true,
+      "telegram_enabled": true,
+      "viber_enabled": true,
+      "signal_enabled": true,
+      "discord_enabled": true,
+      "basic_analytics": true,
+      "detailed_analytics": true,
+      "contact_insights": true,
+      "export_analytics": true,
+      "custom_branding": true,
+      "custom_themes": 999,
+      "custom_colors": true,
+      "custom_fonts": true,
+      "priority_support": true,
+      "api_access": true,
+      "white_label": false,
+      "team_management": true
+    }
+  },
+  {
+    "test": "Check Feature Access - Free User",
+    "success": true,
+    "message": "Growth-first validation passed: 9/12 features free (75.0%), 0 premium features properly restricted",
+    "timestamp": "2025-08-29T16:23:21.049049"
+  },
+  {
+    "test": "Track Usage System",
+    "success": true,
+    "message": "Successfully tracked 5 usage events, total usage: 8",
+    "timestamp": "2025-08-29T16:23:21.379516"
+  },
+  {
+    "test": "Integration with Existing Features",
+    "success": true,
+    "message": "Business card creation tracked usage: 4 \u2192 5",
+    "timestamp": "2025-08-29T16:23:22.544288"
+  },
+  {
+    "test": "Growth-First Validation",
+    "success": false,
+    "message": "Not enough premium restrictions: 0",
+    "timestamp": "2025-08-29T16:23:22.599766"
+  },
+  {
+    "test": "List Contact Sources - Empty",
+    "success": true,
+    "message": "Retrieved 0 contact sources (empty list expected)",
+    "timestamp": "2025-08-29T16:23:22.650889"
+  },
+  {
+    "test": "Import Contacts - Contact Picker",
+    "success": true,
+    "message": "Successfully imported 3 contacts from Contact Picker",
+    "timestamp": "2025-08-29T16:23:22.708045"
+  },
+  {
+    "test": "Import Contacts - VCF File",
+    "success": true,
+    "message": "Successfully imported 2 contacts from VCF file",
+    "timestamp": "2025-08-29T16:23:22.762497"
+  },
+  {
+    "test": "Import Contacts - Google Placeholder",
+    "success": true,
+    "message": "Google Contacts placeholder response working correctly",
+    "timestamp": "2025-08-29T16:23:22.815167"
+  },
+  {
+    "test": "Import Contacts - Apple Placeholder",
+    "success": true,
+    "message": "Apple iCloud placeholder response working correctly",
+    "timestamp": "2025-08-29T16:23:22.873236"
+  },
+  {
+    "test": "Import Contacts - CSV Unsupported",
+    "success": true,
+    "message": "CSV import properly rejected as unsupported",
+    "timestamp": "2025-08-29T16:23:22.923384"
+  },
+  {
+    "test": "List Contact Sources - With Data",
+    "success": true,
+    "message": "Retrieved 2 contact sources with correct data",
+    "timestamp": "2025-08-29T16:23:22.979337"
+  },
+  {
+    "test": "Unified Contacts List",
+    "success": true,
+    "message": "Retrieved 5 unified contacts (0 business cards, 5 imported contacts)",
+    "timestamp": "2025-08-29T16:23:23.031963"
+  },
+  {
+    "test": "Unified Contacts Search",
+    "success": true,
+    "message": "Search found 2 contacts matching 'John'",
+    "timestamp": "2025-08-29T16:23:23.091009"
+  },
+  {
+    "test": "Imported Contact Messaging Apps",
+    "success": true,
+    "message": "Imported contact has correct messaging apps: ['whatsapp', 'sms']",
+    "timestamp": "2025-08-29T16:23:23.146779"
+  },
+  {
+    "test": "Contact Type Identification",
+    "success": true,
+    "message": "Contact type identification working correctly (0 business cards, 5 imported contacts)",
+    "timestamp": "2025-08-29T16:23:23.200619"
+  },
+  {
+    "test": "Contact Import Invalid Data - Missing Data",
+    "success": true,
+    "message": "Missing contacts_data properly rejected",
+    "timestamp": "2025-08-29T16:23:23.251222"
+  },
+  {
+    "test": "Contact Import Invalid Data - Invalid VCF",
+    "success": true,
+    "message": "Invalid VCF content properly rejected",
+    "timestamp": "2025-08-29T16:23:23.300994"
+  },
+  {
+    "test": "Messaging Apps Default Configuration",
+    "success": true,
+    "message": "Default messaging apps configured: WhatsApp and SMS both enabled",
+    "timestamp": "2025-08-29T16:23:23.360926"
+  },
+  {
+    "test": "Messaging Apps Custom Configuration",
+    "success": true,
+    "message": "Custom messaging apps configured correctly",
+    "timestamp": "2025-08-29T16:23:23.421169"
+  },
+  {
+    "test": "Messaging Apps Update Configuration",
+    "success": true,
+    "message": "Messaging apps updated successfully: {'whatsapp': True, 'sms': False, 'telegram': True, 'viber': True, 'signal': False}",
+    "timestamp": "2025-08-29T16:23:23.476456"
+  },
+  {
+    "test": "Messaging Apps API Response Validation",
+    "success": true,
+    "message": "All messaging_apps fields properly formatted in API response",
+    "timestamp": "2025-08-29T16:23:23.528389"
+  },
+  {
+    "test": "Messaging Apps Persistence",
+    "success": true,
+    "message": "Messaging apps persist correctly across requests: {'whatsapp': True, 'sms': False, 'telegram': True, 'signal': True, 'viber': False}",
+    "timestamp": "2025-08-29T16:23:23.692939"
+  },
+  {
+    "test": "Messaging Apps Multiple Phones Independence",
+    "success": true,
+    "message": "Independent configs: Work={'whatsapp': True, 'sms': True, 'telegram': False}, Personal={'whatsapp': False, 'sms': True, 'signal': True, 'viber': True}, Emergency={'sms': True}",
+    "timestamp": "2025-08-29T16:23:23.752552"
+  },
+  {
+    "test": "Social Media Fix with Custom Code - Missing Field",
+    "success": true,
+    "message": "Card created with custom code SOCIALD79930, social_media properly initialized",
+    "timestamp": "2025-08-29T16:23:23.822064"
+  },
+  {
+    "test": "Social Media Fix with Custom Code - Null Field",
+    "success": true,
+    "message": "Card created with custom code SOCIALA0956B, null social_media properly handled",
+    "timestamp": "2025-08-29T16:23:23.879524"
+  },
+  {
+    "test": "Create Meeting Room",
+    "success": true,
+    "message": "Meeting room created with code: NBTLF",
+    "timestamp": "2025-08-29T16:23:23.941774"
+  },
+  {
+    "test": "Get Meeting Room",
+    "success": true,
+    "message": "Meeting room retrieved: NBTLF",
+    "timestamp": "2025-08-29T16:23:23.997495"
+  },
+  {
+    "test": "Join Meeting Room",
+    "success": true,
+    "message": "Successfully joined meeting room: NBTLF",
+    "timestamp": "2025-08-29T16:23:24.059407"
+  },
+  {
+    "test": "List User Meeting Rooms",
+    "success": true,
+    "message": "No meeting rooms found (empty list)",
+    "timestamp": "2025-08-29T16:23:24.116518"
+  },
+  {
+    "test": "Enhanced Code Access - Meeting Room",
+    "success": true,
+    "message": "Meeting room code properly rejected by card access endpoint",
+    "timestamp": "2025-08-29T16:23:24.168074"
+  },
+  {
+    "test": "Close Meeting Room",
+    "success": true,
+    "message": "Meeting room NBTLF closed successfully",
+    "timestamp": "2025-08-29T16:23:24.295301"
   },
   {
     "test": "Express Code Collision Prevention - Simultaneous",
     "success": true,
-    "message": "Successfully created 10 unique express codes: ['YM', '3R', 'XJ', '6J', 'RF', 'SY', '7Y', '9V', 'HS', 'AN']",
-    "timestamp": "2025-08-29T16:02:51.052930"
+    "message": "Successfully created 10 unique express codes: ['9P', 'WM', 'Q6', 'P6', 'CY', 'CS', 'UU', 'RP', 'PB', '2S']",
+    "timestamp": "2025-08-29T16:23:24.897678"
   },
   {
     "test": "Express Cross-Contamination Prevention",
     "success": true,
-    "message": "No cross-contamination detected. Room code: 49, Express codes: ['SF', 'BC', 'TS', '9J', '3S']...",
-    "timestamp": "2025-08-29T16:02:52.042295"
+    "message": "No cross-contamination detected. Room code: 75, Express codes: ['4Y', 'LA', '5M', 'S5', 'AS']...",
+    "timestamp": "2025-08-29T16:23:25.873489"
   },
   {
     "test": "User Context Seeding Uniqueness",
     "success": true,
-    "message": "All 10 codes unique across batches. Batch 1: ['T6M', 'A3W', '5XH', 'URQ', 'WQU'], Batch 2: ['RDC', '46N', 'PPF', 'DYK', 'HDZ']",
-    "timestamp": "2025-08-29T16:02:53.651068"
+    "message": "All 10 codes unique across batches. Batch 1: ['44L', '644', 'ZFJ', 'JB8', '2GJ'], Batch 2: ['YDF', 'LZ6', 'K6U', 'PR5', 'XBT']",
+    "timestamp": "2025-08-29T16:23:27.477722"
   },
   {
     "test": "Rapid Code Creation Edge Case",
     "success": true,
     "message": "Rapid creation handled well: 20/20 successful, no duplicates",
-    "timestamp": "2025-08-29T16:02:54.919174"
+    "timestamp": "2025-08-29T16:23:28.727578"
   },
   {
     "test": "Many Active Codes Scenario",
     "success": true,
     "message": "Successfully created 30 unique codes without collision",
-    "timestamp": "2025-08-29T16:02:56.922556"
+    "timestamp": "2025-08-29T16:23:30.621489"
   },
   {
     "test": "Global Uniqueness Verification",
     "success": true,
-    "message": "Global uniqueness maintained. Express: ['RP', 'NW', 'WA', 'SW', '9N'], Rooms: ['40', '34', '70', '71', '76']",
-    "timestamp": "2025-08-29T16:02:57.515461"
+    "message": "Global uniqueness maintained. Express: ['38', 'ZE', 'FV', 'HB', 'BE'], Rooms: ['23', '67', '60', '77', '47']",
+    "timestamp": "2025-08-29T16:23:31.214007"
   },
   {
     "test": "Berlin-Munich User Scenario",
     "success": true,
-    "message": "Scenario successful: Person A code 4S, Person B codes ['GN', 'T3', 'DR']..., Person C correctly accessed Person A's card",
-    "timestamp": "2025-08-29T16:02:58.217090"
+    "message": "Scenario successful: Person A code H7, Person B codes ['82', 'LW', 'WR']..., Person C correctly accessed Person A's card",
+    "timestamp": "2025-08-29T16:23:31.948522"
   },
   {
     "test": "Code Expiry and Reuse",
     "success": true,
     "message": "Code generation working properly with expiry. Created 15 codes, 15 unique",
-    "timestamp": "2025-08-29T16:02:59.540309"
+    "timestamp": "2025-08-29T16:23:32.994565"
   },
   {
     "test": "Collision Error Handling",
     "success": true,
     "message": "System handled 50 codes without collision or error",
-    "timestamp": "2025-08-29T16:03:22.296963"
+    "timestamp": "2025-08-29T16:24:14.187131"
   },
   {
     "test": "Create Express Code (2-char)",
     "success": true,
-    "message": "Express code created: CG (expires in 59s)",
-    "timestamp": "2025-08-29T16:03:22.355721"
+    "message": "Express code created: CB (expires in 59s)",
+    "timestamp": "2025-08-29T16:24:14.247299"
   },
   {
     "test": "Create Express Code (3-char)",
     "success": true,
-    "message": "Express code created: SL9 (expires in 179s)",
-    "timestamp": "2025-08-29T16:03:22.417578"
+    "message": "Express code created: JZF (expires in 179s)",
+    "timestamp": "2025-08-29T16:24:14.312457"
   },
   {
     "test": "Access by Express Code",
     "success": true,
-    "message": "Successfully accessed card using express code: CG",
-    "timestamp": "2025-08-29T16:03:22.521954"
+    "message": "Successfully accessed card using express code: CB",
+    "timestamp": "2025-08-29T16:24:14.373798"
   },
   {
     "test": "Express Code Expiry",
     "success": true,
-    "message": "Express code BK works immediately after creation and will expire in 30s",
-    "timestamp": "2025-08-29T16:03:22.638901"
+    "message": "Express code VV works immediately after creation and will expire in 30s",
+    "timestamp": "2025-08-29T16:24:14.486459"
   },
   {
     "test": "Create Express Room",
     "success": true,
-    "message": "Express room created with code: 90 (expires in 119s)",
-    "timestamp": "2025-08-29T16:03:22.698802"
+    "message": "Express room created with code: 71 (expires in 119s)",
+    "timestamp": "2025-08-29T16:24:14.545040"
   },
   {
     "test": "Join Express Room",
     "success": false,
     "message": "Missing fields in received card data",
-    "timestamp": "2025-08-29T16:03:22.758061",
+    "timestamp": "2025-08-29T16:24:14.603763",
     "response": {
-      "id": "68b1cf229073449a553f893b",
+      "id": "68b1d3f4cf809034f23fc7a6",
       "name": "John Doe",
       "company": "Tech Solutions Inc",
       "position": "Lead Developer",
@@ -810,168 +888,168 @@
   {
     "test": "Express Code Uniqueness",
     "success": true,
-    "message": "Generated unique codes: ['FU', 'E5', 'TD'] and room codes: ['38', '56']",
-    "timestamp": "2025-08-29T16:03:23.057881"
+    "message": "Generated unique codes: ['55', 'KK', 'AV'] and room codes: ['45', '54']",
+    "timestamp": "2025-08-29T16:24:14.895004"
   },
   {
     "test": "Express Integration",
     "success": false,
     "message": "Express code accessible via regular endpoint: HTTP 400",
-    "timestamp": "2025-08-29T16:03:23.108568"
+    "timestamp": "2025-08-29T16:24:14.941789"
   },
   {
     "test": "Express Room Limits",
     "success": true,
-    "message": "Express room 41 properly handles participant limits",
-    "timestamp": "2025-08-29T16:03:23.225038"
+    "message": "Express room 84 properly handles participant limits",
+    "timestamp": "2025-08-29T16:24:15.054933"
   },
   {
     "test": "Invalid Express Operations - Code",
     "success": true,
     "message": "Non-existent express code properly rejected",
-    "timestamp": "2025-08-29T16:03:23.281446"
+    "timestamp": "2025-08-29T16:24:15.107575"
   },
   {
     "test": "Invalid Express Operations - Room",
     "success": true,
     "message": "Non-existent express room properly rejected",
-    "timestamp": "2025-08-29T16:03:23.334495"
+    "timestamp": "2025-08-29T16:24:15.160008"
   },
   {
     "test": "OCR Scan Business Card",
     "success": true,
-    "message": "Scan initiated successfully: 68b1cf4b9073449a553f8bad",
-    "timestamp": "2025-08-29T16:03:23.394208"
+    "message": "Scan initiated successfully: 68b1d42fcf809034f23fca18",
+    "timestamp": "2025-08-29T16:24:15.226114"
   },
   {
     "test": "Get Scan Results",
     "success": true,
-    "message": "Scan results retrieved for: 68b1cf4b9073449a553f8bad",
-    "timestamp": "2025-08-29T16:03:23.446019"
+    "message": "Scan results retrieved for: 68b1d42fcf809034f23fca18",
+    "timestamp": "2025-08-29T16:24:15.282490"
   },
   {
     "test": "Correct OCR Field",
     "success": false,
     "message": "HTTP 422",
-    "timestamp": "2025-08-29T16:03:23.501144",
+    "timestamp": "2025-08-29T16:24:15.334321",
     "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"scan_id\"],\"msg\":\"Field required\",\"input\":{\"field_type\":\"name\",\"corrected_value\":\"John Doe Corrected\"},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"}]}"
   },
   {
     "test": "Convert Scan to Card",
     "success": false,
     "message": "HTTP 422",
-    "timestamp": "2025-08-29T16:03:23.552941",
+    "timestamp": "2025-08-29T16:24:15.387426",
     "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"scan_id\"],\"msg\":\"Field required\",\"input\":{\"card_name\":\"Scanned Business Card\",\"auto_map_fields\":true},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"}]}"
   },
   {
     "test": "List Scanned Cards",
     "success": true,
     "message": "Retrieved 1 scans, 0 converted",
-    "timestamp": "2025-08-29T16:03:23.605446"
+    "timestamp": "2025-08-29T16:24:15.442124"
   },
   {
     "test": "Get Print Templates",
     "success": true,
     "message": "Retrieved 3 templates in 3 categories",
-    "timestamp": "2025-08-29T16:03:23.660367"
+    "timestamp": "2025-08-29T16:24:15.499989"
   },
   {
     "test": "Export for Printing",
     "success": false,
     "message": "HTTP 404",
-    "timestamp": "2025-08-29T16:03:23.716897",
+    "timestamp": "2025-08-29T16:24:15.555887",
     "response": "{\"detail\":\"Visitenkarte nicht gefunden\"}"
   },
   {
     "test": "Quick Print Export",
     "success": false,
     "message": "HTTP 404",
-    "timestamp": "2025-08-29T16:03:23.774025",
+    "timestamp": "2025-08-29T16:24:15.611095",
     "response": "{\"detail\":\"Visitenkarte nicht gefunden\"}"
   },
   {
     "test": "Print Preview",
     "success": false,
     "message": "HTTP 404",
-    "timestamp": "2025-08-29T16:03:23.829807",
+    "timestamp": "2025-08-29T16:24:15.666616",
     "response": "{\"detail\":\"Visitenkarte nicht gefunden\"}"
   },
   {
     "test": "Print Job Status",
     "success": false,
     "message": "No print job ID or access token available",
-    "timestamp": "2025-08-29T16:03:23.831239"
+    "timestamp": "2025-08-29T16:24:15.667994"
   },
   {
     "test": "OCR Authentication Required",
     "success": false,
     "message": "Expected 401, got 500",
-    "timestamp": "2025-08-29T16:03:23.887909"
+    "timestamp": "2025-08-29T16:24:15.722752"
   },
   {
     "test": "Print Authentication Required",
     "success": false,
     "message": "Expected 401, got 500",
-    "timestamp": "2025-08-29T16:03:23.947189"
+    "timestamp": "2025-08-29T16:24:15.771122"
   },
   {
     "test": "User Data Isolation - Scans",
     "success": false,
     "message": "Expected 404, got 500",
-    "timestamp": "2025-08-29T16:03:24.052357"
+    "timestamp": "2025-08-29T16:24:15.823305"
   },
   {
     "test": "User Data Isolation - Print Jobs",
     "success": false,
     "message": "Expected 404, got 500",
-    "timestamp": "2025-08-29T16:03:24.103552"
+    "timestamp": "2025-08-29T16:24:15.877844"
   },
   {
     "test": "QR Code Generation",
     "success": true,
-    "message": "QR code generated (size: 678 bytes)",
-    "timestamp": "2025-08-29T16:03:24.172468"
+    "message": "QR code generated (size: 687 bytes)",
+    "timestamp": "2025-08-29T16:24:15.939804"
   },
   {
     "test": "vCard Generation",
     "success": true,
     "message": "vCard generated successfully",
-    "timestamp": "2025-08-29T16:03:24.227546"
+    "timestamp": "2025-08-29T16:24:15.989299"
   },
   {
     "test": "Privacy Report",
     "success": true,
     "message": "Privacy report generated successfully",
-    "timestamp": "2025-08-29T16:03:24.280259"
+    "timestamp": "2025-08-29T16:24:16.044280"
   },
   {
     "test": "Data Export",
     "success": true,
     "message": "GDPR data export completed successfully",
-    "timestamp": "2025-08-29T16:03:24.333461"
+    "timestamp": "2025-08-29T16:24:16.097137"
   },
   {
     "test": "Invalid Authentication",
     "success": true,
     "message": "Properly rejected invalid token",
-    "timestamp": "2025-08-29T16:03:24.382236"
+    "timestamp": "2025-08-29T16:24:16.144271"
   },
   {
     "test": "Non-existent Card",
     "success": true,
     "message": "Properly returned 404 for non-existent card",
-    "timestamp": "2025-08-29T16:03:24.433322"
+    "timestamp": "2025-08-29T16:24:16.327671"
   },
   {
     "test": "Invalid Meeting Room Operations - Non-existent",
     "success": true,
     "message": "Non-existent meeting room properly rejected",
-    "timestamp": "2025-08-29T16:03:24.483490"
+    "timestamp": "2025-08-29T16:24:16.378335"
   },
   {
     "test": "Invalid Meeting Room Operations - Get Non-existent",
     "success": true,
     "message": "Non-existent meeting room get properly rejected",
-    "timestamp": "2025-08-29T16:03:24.533768"
+    "timestamp": "2025-08-29T16:24:16.433900"
   }
 ]
