@@ -218,6 +218,85 @@ const HomePage = () => {
         )}
       </div>
 
+      {/* Game-Changing Features Showcase */}
+      <Card className="mb-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 shadow-xl">
+        <CardContent className="p-6">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-bold mb-2 flex items-center justify-center">
+              <Sparkles className="mr-2 h-6 w-6" />
+              Business Card Studio - Game-Changing Features
+            </h2>
+            <p className="text-purple-100">Revolutionäre Tools für moderne Visitenkarten</p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* OCR Scanner Feature */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
+              <div className="flex items-center mb-4">
+                <div className="bg-white/20 p-3 rounded-full mr-4">
+                  <Camera className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">KI Visitenkarten Scanner</h3>
+                  <p className="text-purple-100 text-sm">Papier → Digital in Sekunden</p>
+                </div>
+              </div>
+              <p className="text-purple-100 text-sm mb-4">
+                Fotografieren Sie Papier-Visitenkarten und unsere KI wandelt sie automatisch in digitale Karten um. 
+                90%+ Genauigkeit bei der Texterkennung.
+              </p>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="bg-white/20 hover:bg-white/30 text-white border-0"
+                onClick={() => navigate('/studio?tab=scanner')}
+              >
+                <Scan className="w-4 h-4 mr-2" />
+                Scanner öffnen
+              </Button>
+            </div>
+            
+            {/* Print Export Feature */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 hover:bg-white/20 transition-all duration-300">
+              <div className="flex items-center mb-4">
+                <div className="bg-white/20 p-3 rounded-full mr-4">
+                  <Printer className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-lg">Professioneller Druck Export</h3>
+                  <p className="text-purple-100 text-sm">Digital → Druckerei-bereit</p>
+                </div>
+              </div>
+              <p className="text-purple-100 text-sm mb-4">
+                Exportieren Sie Visitenkarten als druckfertige PDF, PNG oder SVG Dateien. 
+                Verschiedene Vorlagen und Qualitätsstufen verfügbar.
+              </p>
+              <Button
+                variant="secondary"
+                size="sm"
+                className="bg-white/20 hover:bg-white/30 text-white border-0"
+                onClick={() => navigate('/studio?tab=print')}
+              >
+                <FileImage className="w-4 h-4 mr-2" />
+                Druck Export
+              </Button>
+            </div>
+          </div>
+          
+          <div className="text-center mt-6">
+            <Button
+              variant="secondary"
+              size="lg"
+              className="bg-white text-purple-600 hover:bg-gray-100 px-8"
+              onClick={() => navigate('/studio')}
+            >
+              <Sparkles className="w-5 h-5 mr-2" />
+              Business Card Studio öffnen
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       {businessCards.length === 0 ? (
         <Card className="max-w-md mx-auto text-center border-dashed border-2 border-gray-300">
           <CardContent className="pt-6 pb-6">
