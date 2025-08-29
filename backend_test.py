@@ -1044,49 +1044,296 @@ class BusinessCardAPITester:
             return False
     
     # ============================================================================
-    # VIDEO MEETING SYSTEM TESTS - NEW CLAIMED ENDPOINTS
+    # NEW REVOLUTIONARY FEATURES TESTING - MEETING LINK GENERATION & LIVE TRANSLATION
     # ============================================================================
     
-    def test_video_meeting_create(self):
-        """Test POST /api/video/meeting/create - Create video meetings"""
-        if not self.access_token or not self.card_id:
-            self.log_result("Video Meeting Create", False, "No access token or card ID available")
+    def test_enhanced_video_meeting_create(self):
+        """Test POST /api/video/meeting/create - Enhanced meeting creation with NEW features"""
+        if not self.access_token:
+            self.log_result("Enhanced Video Meeting Create", False, "No access token available")
             return False
             
         try:
             headers = {"Authorization": f"Bearer {self.access_token}"}
             
+            # Test enhanced meeting creation with translation settings
             meeting_data = {
-                "title": "Tech Networking Session",
-                "description": "Video meeting for business card sharing",
+                "title": "Revolutionary Tech Networking Session",
+                "description": "Enhanced video meeting with live translation and business card integration",
+                "meeting_type": "networking_event",
                 "duration_minutes": 60,
-                "max_participants": 10,
+                "max_participants": 15,
                 "password": "meeting123",
-                "business_card_id": self.card_id
+                "share_host_card": True,
+                "allow_card_sharing": True,
+                "community_tags": ["technology", "networking", "ai"],
+                "is_public": True,
+                # NEW: Translation settings
+                "translation_enabled": True,
+                "source_language": "de",
+                "target_languages": ["en", "fr", "es"]
             }
             
             response = requests.post(f"{API_BASE}/video/meeting/create", json=meeting_data, headers=headers)
             
             if response.status_code == 200:
                 data = response.json()
-                required_fields = ["meeting_id", "webrtc_config", "ice_servers", "meeting_url"]
                 
-                if all(field in data for field in required_fields):
-                    self.video_meeting_id = data["meeting_id"]
-                    self.log_result("Video Meeting Create", True, f"Video meeting created: {data['meeting_id']}")
+                # Check for NEW revolutionary fields
+                meeting = data.get("meeting", {})
+                expected_new_fields = ["share_link", "qr_code_url", "meeting_link_card", "translation_enabled"]
+                
+                if all(field in meeting for field in expected_new_fields):
+                    self.video_meeting_id = meeting.get("id")
+                    self.meeting_code = meeting.get("meeting_code")
+                    
+                    # Verify share_link format (like zoom.us/j/123456)
+                    share_link = meeting.get("share_link")
+                    if share_link and "cardnet-pro.preview.emergentagent.com/join?code=" in share_link:
+                        self.log_result("Enhanced Video Meeting Create - Share Link", True, f"Professional share link generated: {share_link}")
+                    else:
+                        self.log_result("Enhanced Video Meeting Create - Share Link", False, f"Invalid share link format: {share_link}")
+                        return False
+                    
+                    # Verify QR code URL
+                    qr_code_url = meeting.get("qr_code_url")
+                    if qr_code_url and "/api/qr/meeting/" in qr_code_url:
+                        self.log_result("Enhanced Video Meeting Create - QR Code", True, f"QR code URL generated: {qr_code_url}")
+                    else:
+                        self.log_result("Enhanced Video Meeting Create - QR Code", False, f"Invalid QR code URL: {qr_code_url}")
+                        return False
+                    
+                    # Verify meeting_link_card for business card integration
+                    meeting_link_card = meeting.get("meeting_link_card", {})
+                    if meeting_link_card and "meeting_info" in meeting_link_card and "qr_code_url" in meeting_link_card:
+                        self.log_result("Enhanced Video Meeting Create - Business Card Integration", True, "Meeting link card data complete")
+                    else:
+                        self.log_result("Enhanced Video Meeting Create - Business Card Integration", False, "Missing meeting_link_card data", meeting_link_card)
+                        return False
+                    
+                    # Verify translation settings
+                    if meeting.get("translation_enabled") == True and meeting.get("target_languages") == ["en", "fr", "es"]:
+                        self.log_result("Enhanced Video Meeting Create - Translation Settings", True, "Translation settings properly configured")
+                    else:
+                        self.log_result("Enhanced Video Meeting Create - Translation Settings", False, "Translation settings not properly set", meeting)
+                        return False
+                    
+                    # Verify WebRTC config
+                    webrtc_config = data.get("webrtc_config", {})
+                    if webrtc_config and "iceServers" in webrtc_config:
+                        self.log_result("Enhanced Video Meeting Create - WebRTC Config", True, "WebRTC configuration provided")
+                    else:
+                        self.log_result("Enhanced Video Meeting Create - WebRTC Config", False, "Missing WebRTC configuration", webrtc_config)
+                        return False
+                    
+                    self.log_result("Enhanced Video Meeting Create", True, f"Revolutionary meeting created with ID: {self.video_meeting_id}")
                     return True
                 else:
-                    self.log_result("Video Meeting Create", False, "Missing required fields in response", data)
+                    missing_fields = [field for field in expected_new_fields if field not in meeting]
+                    self.log_result("Enhanced Video Meeting Create", False, f"Missing NEW revolutionary fields: {missing_fields}", data)
                     return False
             elif response.status_code == 404:
-                self.log_result("Video Meeting Create", False, "Endpoint not implemented - returns 404")
+                self.log_result("Enhanced Video Meeting Create", False, "Endpoint not implemented - returns 404")
                 return False
             else:
-                self.log_result("Video Meeting Create", False, f"HTTP {response.status_code}", response.text)
+                self.log_result("Enhanced Video Meeting Create", False, f"HTTP {response.status_code}", response.text)
                 return False
                 
         except Exception as e:
-            self.log_result("Video Meeting Create", False, f"Error: {str(e)}")
+            self.log_result("Enhanced Video Meeting Create", False, f"Error: {str(e)}")
+            return False
+    
+    def test_meeting_share_link_generation(self):
+        """Test GET /api/video/meeting/{meeting_id}/share-link - Revolutionary share link generation"""
+        if not self.access_token or not hasattr(self, 'video_meeting_id'):
+            self.log_result("Meeting Share Link Generation", False, "No access token or video meeting ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/video/meeting/{self.video_meeting_id}/share-link", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify professional share link format
+                share_link = data.get("share_link")
+                if share_link and "cardnet-pro.preview.emergentagent.com/join?code=" in share_link:
+                    self.log_result("Share Link Format", True, f"Professional Zoom-like format: {share_link}")
+                else:
+                    self.log_result("Share Link Format", False, f"Invalid share link format: {share_link}")
+                    return False
+                
+                # Verify QR code URL for easy joining
+                qr_code_url = data.get("qr_code_url")
+                if qr_code_url and "/api/qr/meeting/" in qr_code_url:
+                    self.log_result("QR Code URL", True, f"QR code URL for easy joining: {qr_code_url}")
+                else:
+                    self.log_result("QR Code URL", False, f"Invalid QR code URL: {qr_code_url}")
+                    return False
+                
+                # Verify share_card_data for business card integration
+                share_card_data = data.get("share_card_data", {})
+                if share_card_data and "meeting_info" in share_card_data:
+                    meeting_info = share_card_data["meeting_info"]
+                    required_info = ["title", "host_name", "meeting_time", "features"]
+                    if all(field in meeting_info for field in required_info):
+                        self.log_result("Business Card Integration Data", True, "Complete share_card_data for business cards")
+                    else:
+                        self.log_result("Business Card Integration Data", False, "Incomplete meeting_info", meeting_info)
+                        return False
+                else:
+                    self.log_result("Business Card Integration Data", False, "Missing share_card_data", share_card_data)
+                    return False
+                
+                # Verify meeting features info (translation, business cards)
+                features = share_card_data.get("meeting_info", {}).get("features", {})
+                if "translation" in features and "business_cards" in features and "languages" in features:
+                    self.log_result("Meeting Features Info", True, f"Features info complete: {features}")
+                else:
+                    self.log_result("Meeting Features Info", False, "Missing features info", features)
+                    return False
+                
+                # Verify host information
+                host_info = data.get("host_info", {})
+                if host_info and "name" in host_info:
+                    self.log_result("Host Information", True, f"Host info provided: {host_info['name']}")
+                else:
+                    self.log_result("Host Information", False, "Missing host information", host_info)
+                    return False
+                
+                self.log_result("Meeting Share Link Generation", True, "Revolutionary share link generation working perfectly!")
+                return True
+            elif response.status_code == 404:
+                self.log_result("Meeting Share Link Generation", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Meeting Share Link Generation", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Meeting Share Link Generation", False, f"Error: {str(e)}")
+            return False
+    
+    def test_live_translation_enable(self):
+        """Test POST /api/video/meeting/{meeting_id}/translation/enable - Revolutionary live translation"""
+        if not self.access_token or not hasattr(self, 'video_meeting_id'):
+            self.log_result("Live Translation Enable", False, "No access token or video meeting ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Test translation activation with multiple languages
+            translation_data = {
+                "source_language": "de",  # German as source
+                "target_languages": ["en", "fr", "es", "auto"]  # Multiple target languages
+            }
+            
+            response = requests.post(f"{API_BASE}/video/meeting/{self.video_meeting_id}/translation/enable", 
+                                   json=translation_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify German success message
+                message = data.get("message", "")
+                if "Übersetzung" in message or "aktiviert" in message:
+                    self.log_result("German Localization", True, f"German success message: {message}")
+                else:
+                    self.log_result("German Localization", False, f"Missing German localization: {message}")
+                    return False
+                
+                # Verify translation settings confirmation
+                if data.get("translation_enabled") == True:
+                    self.log_result("Translation Activation", True, "Translation successfully enabled")
+                else:
+                    self.log_result("Translation Activation", False, "Translation not enabled", data)
+                    return False
+                
+                # Verify language configuration
+                source_lang = data.get("source_language")
+                target_langs = data.get("target_languages", [])
+                if source_lang == "de" and "en" in target_langs and "fr" in target_langs:
+                    self.log_result("Language Configuration", True, f"Languages configured: {source_lang} -> {target_langs}")
+                else:
+                    self.log_result("Language Configuration", False, f"Invalid language config: {source_lang} -> {target_langs}")
+                    return False
+                
+                # Verify WebSocket broadcast indication
+                if "broadcast" in message.lower() or "teilnehmer" in message.lower():
+                    self.log_result("WebSocket Broadcast", True, "WebSocket broadcast to participants indicated")
+                else:
+                    self.log_result("WebSocket Broadcast", False, "No WebSocket broadcast indication")
+                    return False
+                
+                self.log_result("Live Translation Enable", True, "Revolutionary live translation system activated!")
+                return True
+            elif response.status_code == 404:
+                self.log_result("Live Translation Enable", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Live Translation Enable", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Live Translation Enable", False, f"Error: {str(e)}")
+            return False
+    
+    def test_participant_translation_preference(self):
+        """Test POST /api/video/meeting/{meeting_id}/translation/participant - Individual language preferences"""
+        if not self.access_token or not hasattr(self, 'video_meeting_id'):
+            self.log_result("Participant Translation Preference", False, "No access token or video meeting ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Test individual participant language setting
+            preference_data = {
+                "preferred_language": "en"  # English preference
+            }
+            
+            response = requests.post(f"{API_BASE}/video/meeting/{self.video_meeting_id}/translation/participant", 
+                                   json=preference_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                # Verify German localized response
+                message = data.get("message", "")
+                if "Sprache" in message or "eingestellt" in message:
+                    self.log_result("German Participant Response", True, f"German localized response: {message}")
+                else:
+                    self.log_result("German Participant Response", False, f"Missing German localization: {message}")
+                    return False
+                
+                # Verify participant preference storage
+                if data.get("preferred_language") == "en":
+                    self.log_result("Preference Storage", True, "Participant language preference stored")
+                else:
+                    self.log_result("Preference Storage", False, "Preference not properly stored", data)
+                    return False
+                
+                # Verify participant management
+                participant_id = data.get("participant_id")
+                if participant_id:
+                    self.log_result("Participant Management", True, f"Participant ID managed: {participant_id}")
+                else:
+                    self.log_result("Participant Management", False, "Missing participant ID", data)
+                    return False
+                
+                self.log_result("Participant Translation Preference", True, "Individual language preferences working perfectly!")
+                return True
+            elif response.status_code == 404:
+                self.log_result("Participant Translation Preference", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Participant Translation Preference", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Participant Translation Preference", False, f"Error: {str(e)}")
             return False
     
     def test_video_meeting_join(self):
