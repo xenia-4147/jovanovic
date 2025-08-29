@@ -523,16 +523,15 @@ const CardScanner = ({ onCardCreated }) => {
                         </>
                       )}
                     </Button>
-                      </>
-                    )}
-                  </Button>
                   
-                  <Button
-                    variant="outline"
-                    onClick={() => setScanResult(null)}
-                  >
-                    Neu scannen
-                  </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setScanResult(null)}
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Neu scannen
+                    </Button>
+                  </div>
                 </div>
               )}
               
