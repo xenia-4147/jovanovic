@@ -490,12 +490,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "NEW Revolutionary Meeting Link Generation & Live Translation APIs"
-    - "Video Meeting API Endpoints"
     - "Community Networking API Endpoints"
     - "Job Board API Endpoints"
   stuck_tasks: 
-    - "NEW Revolutionary Meeting Link Generation & Live Translation APIs"
+    - "Community Networking API Endpoints"
+    - "Job Board API Endpoints"
   test_all: false
   test_priority: "critical_first"
 
