@@ -45,6 +45,7 @@ function App() {
             <Route path="/meeting-room/:roomCode" element={<MeetingRoomViewPage />} />
             <Route path="/meeting/:meetingCode" element={<VideoMeetingPage />} />
             <Route path="/scanner-test" element={<ScannerTestPage />} />
+            <Route path="/scanner-debug" element={<ScannerDebugPage />} />
             <Route path="/meeting-demo" element={<MeetingDemoPage />} />
             <Route path="/contacts" element={
               <ProtectedRoute>
