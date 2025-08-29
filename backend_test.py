@@ -4882,6 +4882,26 @@ END:VCARD"""
             self.test_enhanced_code_access_meeting_room,
             self.test_close_meeting_room,
             
+            # Video Meeting System Tests - NEW CLAIMED ENDPOINTS
+            self.test_video_meeting_create,
+            self.test_video_meeting_join,
+            self.test_video_meetings_list,
+            self.test_video_meeting_share_card,
+            
+            # Community Networking Tests - NEW CLAIMED ENDPOINTS
+            self.test_community_profile_get,
+            self.test_community_profile_update,
+            self.test_community_discover,
+            self.test_community_feed,
+            self.test_community_create,
+            self.test_community_join,
+            self.test_community_my_communities,
+            
+            # Job Board Tests - NEW CLAIMED ENDPOINTS
+            self.test_jobs_discover,
+            self.test_jobs_post,
+            self.test_jobs_apply,
+            
             # Express Share Collision Prevention Tests (CRITICAL)
             self.test_express_code_collision_prevention_simultaneous,
             self.test_express_cross_contamination_prevention,
