@@ -7060,6 +7060,10 @@ END:VCARD"""
             # 🔥 CRITICAL BUSINESS CARD SCANNER DEBUG (PRIORITY: CRITICAL)
             self.test_scanned_business_card_debug,
             
+            # 🎯 SCANNER API RESPONSE FORMAT TESTING (CRITICAL DEBUG)
+            self.test_scanner_api_direct_call,
+            self.test_scanner_response_structure_debug,
+            
             # 🔥 NEW REVOLUTIONARY FEATURES TESTING (PRIORITY: CRITICAL)
             # Camera Connection Issues Testing (FOCUS OF THIS REVIEW)
             self.test_meeting_join_with_participant_id,
