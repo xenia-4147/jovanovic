@@ -6394,6 +6394,9 @@ END:VCARD"""
             # Business card tests (required for meeting integration)
             self.test_create_business_card,
             
+            # 🔥 CRITICAL BUSINESS CARD SCANNER DEBUG (PRIORITY: CRITICAL)
+            self.test_scanned_business_card_debug,
+            
             # 🔥 NEW REVOLUTIONARY FEATURES TESTING (PRIORITY: CRITICAL)
             # Camera Connection Issues Testing (FOCUS OF THIS REVIEW)
             self.test_meeting_join_with_participant_id,
