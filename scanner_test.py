@@ -231,24 +231,9 @@ class ScannerWorkflowTester:
             
             # Step 2: Convert scan to business card
             convert_request = {
-                "name": "Scanned Contact",
-                "company": "Scanned Company",
-                "position": "Scanned Position",
-                "phones": [
-                    {
-                        "label": "work",
-                        "number": "+49-30-123-4567",
-                        "is_primary": True
-                    }
-                ],
-                "emails": [
-                    {
-                        "label": "work",
-                        "address": "scanned@example.com",
-                        "is_primary": True
-                    }
-                ],
-                "is_public": True
+                "scan_id": self.scan_id,
+                "card_name": "Scanned Contact",
+                "auto_map_fields": True
             }
             
             response = requests.post(f"{API_BASE}/scanner/scan/{self.scan_id}/convert", json=convert_request, headers=headers)
