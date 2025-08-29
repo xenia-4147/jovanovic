@@ -16,6 +16,8 @@ load_dotenv('/app/frontend/.env')
 
 # Get backend URL from environment
 BACKEND_URL = os.getenv('REACT_APP_BACKEND_URL', 'http://localhost:8001')
+if not BACKEND_URL or BACKEND_URL == "":
+    BACKEND_URL = 'http://localhost:8001'  # Fallback to local backend
 API_BASE = f"{BACKEND_URL}/api"
 
 class BusinessCardAPITester:
