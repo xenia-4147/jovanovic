@@ -250,6 +250,11 @@ class CreateMeetingRequest(BaseModel):
     
     # Scheduling
     scheduled_for: Optional[datetime] = Field(None)
+    
+    # NEW: Translation Features
+    translation_enabled: Optional[bool] = Field(False, description="Enable live translation")
+    source_language: Optional[str] = Field("auto", description="Source language")
+    target_languages: Optional[List[str]] = Field([], description="Target languages for translation")
 
 
 class JoinMeetingRequest(BaseModel):
