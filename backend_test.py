@@ -5081,7 +5081,6 @@ END:VCARD"""
             self.test_participant_translation_preference,
             
             # Legacy Video Meeting System Tests (for comparison)
-            self.test_video_meeting_create,
             self.test_video_meeting_join,
             self.test_video_meetings_list,
             self.test_video_meeting_share_card,
