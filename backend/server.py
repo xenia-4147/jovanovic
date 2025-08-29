@@ -4294,7 +4294,7 @@ app.include_router(api_router)
 
 # Get services
 privacy_service = PrivacyService(db)
-auth_service = AuthService(db)
+auth_service = AuthService()
 
 if __name__ == "__main__":
     import uvicorn
