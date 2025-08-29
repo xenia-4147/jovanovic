@@ -472,7 +472,7 @@ const CardScanner = ({ onCardCreated }) => {
           <CardContent>
             <div className="space-y-4">
               {/* Extracted Fields */}
-              {scanResult.scanned_card.extracted_fields.length > 0 ? (
+              {scanResult?.scanned_card?.extracted_fields?.length > 0 ? (
                 <div className="space-y-3">
                   {scanResult.scanned_card.extracted_fields.map(renderField)}
                 </div>
