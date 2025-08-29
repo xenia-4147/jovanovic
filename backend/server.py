@@ -3664,7 +3664,7 @@ async def create_video_meeting(
             meeting.meeting_code = f"{uuid.uuid4().hex[:6].upper()}"
         
         # Generate shareable meeting link (like Zoom)
-        base_url = "https://cardnet-pro.preview.emergentagent.com"
+        base_url = "https://netlink-3.preview.emergentagent.com"
         join_url = f"{base_url}/meeting/{meeting.meeting_code}"
         share_link = f"{base_url}/join?code={meeting.meeting_code}"
         qr_code_url = f"{base_url}/api/qr/meeting/{meeting.meeting_code}"
@@ -4426,7 +4426,7 @@ async def generate_meeting_share_link(
         meeting = VideoMeetingRoom(**meeting_data)
         
         # Generate shareable links
-        base_url = "https://cardnet-pro.preview.emergentagent.com"
+        base_url = "https://netlink-3.preview.emergentagent.com"
         share_link = f"{base_url}/join?code={meeting.meeting_code}"
         qr_code_url = f"{base_url}/api/qr/meeting/{meeting.meeting_code}"
         

@@ -59,8 +59,8 @@
         "is_job_related": false,
         "job_title": null,
         "company_name": null,
-        "share_link": "https://cardnet-pro.preview.emergentagent.com/join?code=D4A67F",
-        "qr_code_url": "https://cardnet-pro.preview.emergentagent.com/api/qr/meeting/D4A67F",
+        "share_link": "https://netlink-3.preview.emergentagent.com/join?code=D4A67F",
+        "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/D4A67F",
         "translation_enabled": true,
         "source_language": "de",
         "target_languages": [
@@ -80,7 +80,7 @@
       },
       "participants": [],
       "shared_cards": [],
-      "join_url": "https://cardnet-pro.preview.emergentagent.com/meeting/D4A67F",
+      "join_url": "https://netlink-3.preview.emergentagent.com/meeting/D4A67F",
       "webrtc_config": {
         "iceServers": [
           {
@@ -101,16 +101,16 @@
         "bundlePolicy": "balanced",
         "rtcpMuxPolicy": "require"
       },
-      "share_link": "https://cardnet-pro.preview.emergentagent.com/join?code=D4A67F",
-      "qr_code_url": "https://cardnet-pro.preview.emergentagent.com/api/qr/meeting/D4A67F",
+      "share_link": "https://netlink-3.preview.emergentagent.com/join?code=D4A67F",
+      "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/D4A67F",
       "meeting_link_card": {
         "type": "video_meeting",
         "meeting_title": "Revolutionary Tech Networking Session",
         "meeting_code": "D4A67F",
         "host_name": "John Doe",
         "company_name": "Business Card Studio",
-        "share_link": "https://cardnet-pro.preview.emergentagent.com/join?code=D4A67F",
-        "qr_code_url": "https://cardnet-pro.preview.emergentagent.com/api/qr/meeting/D4A67F",
+        "share_link": "https://netlink-3.preview.emergentagent.com/join?code=D4A67F",
+        "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/D4A67F",
         "scheduled_for": null,
         "duration_minutes": 60,
         "meeting_info": {
@@ -185,8 +185,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://cardnet-pro.preview.emergentagent.com/join?code=D4A67F",
-          "qr_code_url": "https://cardnet-pro.preview.emergentagent.com/api/qr/meeting/D4A67F",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=D4A67F",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/D4A67F",
           "translation_enabled": true,
           "source_language": "de",
           "target_languages": [
