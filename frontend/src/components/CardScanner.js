@@ -352,12 +352,12 @@ const CardScanner = ({ onCardCreated }) => {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Button
-                  onClick={() => cameraInputRef.current?.click()}
+                  onClick={openCameraScanner}
                   className="h-32 flex flex-col space-y-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 >
                   <Camera className="w-8 h-8" />
                   <span>Mit Kamera fotografieren</span>
-                  <span className="text-xs opacity-90">Empfohlen für beste Ergebnisse</span>
+                  <span className="text-xs opacity-90">Verbessert für Laptop-Kameras</span>
                 </Button>
                 
                 <Button
