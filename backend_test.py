@@ -1044,6 +1044,460 @@ class BusinessCardAPITester:
             return False
     
     # ============================================================================
+    # OCR BUSINESS CARD SCANNER TESTS - GAME CHANGING FEATURE
+    # ============================================================================
+    
+    def test_ocr_scan_business_card(self):
+        """Test POST /api/scanner/scan - OCR business card scanning"""
+        if not self.access_token:
+            self.log_result("OCR Scan Business Card", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create a simple test image (base64 encoded 1x1 pixel PNG)
+            test_image_base64 = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI9jU77mgAAAABJRU5ErkJggg=="
+            
+            scan_request = {
+                "image_data": test_image_base64,
+                "scan_method": "camera",
+                "device_info": {"type": "mobile", "os": "android"}
+            }
+            
+            response = requests.post(f"{API_BASE}/scanner/scan", json=scan_request, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "scan_id", "status", "message"]
+                
+                if all(field in data for field in required_fields):
+                    if data["success"] == True and data["scan_id"]:
+                        self.scan_id = data["scan_id"]
+                        self.log_result("OCR Scan Business Card", True, f"Scan initiated successfully: {data['scan_id']}")
+                        return True
+                    else:
+                        self.log_result("OCR Scan Business Card", False, "Scan not successful", data)
+                        return False
+                else:
+                    self.log_result("OCR Scan Business Card", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("OCR Scan Business Card", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("OCR Scan Business Card", False, f"Error: {str(e)}")
+            return False
+    
+    def test_get_scan_results(self):
+        """Test GET /api/scanner/scan/{scan_id} - Get OCR scan results"""
+        if not hasattr(self, 'scan_id') or not self.access_token:
+            self.log_result("Get Scan Results", False, "No scan ID or access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/scanner/scan/{self.scan_id}", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["scan_id", "status", "scanned_card"]
+                
+                if all(field in data for field in required_fields):
+                    if data["scan_id"] == self.scan_id:
+                        self.log_result("Get Scan Results", True, f"Scan results retrieved for: {self.scan_id}")
+                        return True
+                    else:
+                        self.log_result("Get Scan Results", False, "Scan ID mismatch", data)
+                        return False
+                else:
+                    self.log_result("Get Scan Results", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Get Scan Results", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Scan Results", False, f"Error: {str(e)}")
+            return False
+    
+    def test_correct_ocr_field(self):
+        """Test POST /api/scanner/scan/{scan_id}/correct - Correct OCR field"""
+        if not hasattr(self, 'scan_id') or not self.access_token:
+            self.log_result("Correct OCR Field", False, "No scan ID or access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            correction_request = {
+                "field_type": "name",
+                "corrected_value": "John Doe Corrected"
+            }
+            
+            response = requests.post(f"{API_BASE}/scanner/scan/{self.scan_id}/correct", 
+                                   json=correction_request, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if data.get("success") == True:
+                    self.log_result("Correct OCR Field", True, "Field correction applied successfully")
+                    return True
+                else:
+                    self.log_result("Correct OCR Field", False, "Field correction failed", data)
+                    return False
+            else:
+                self.log_result("Correct OCR Field", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Correct OCR Field", False, f"Error: {str(e)}")
+            return False
+    
+    def test_convert_scan_to_card(self):
+        """Test POST /api/scanner/scan/{scan_id}/convert - Convert scan to digital card"""
+        if not hasattr(self, 'scan_id') or not self.access_token:
+            self.log_result("Convert Scan to Card", False, "No scan ID or access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            convert_request = {
+                "card_name": "Scanned Business Card",
+                "auto_map_fields": True
+            }
+            
+            response = requests.post(f"{API_BASE}/scanner/scan/{self.scan_id}/convert", 
+                                   json=convert_request, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["id", "name", "is_owner"]
+                
+                if all(field in data for field in required_fields):
+                    self.scanned_card_id = data["id"]
+                    self.log_result("Convert Scan to Card", True, f"Scan converted to card: {data['id']}")
+                    return True
+                else:
+                    self.log_result("Convert Scan to Card", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Convert Scan to Card", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Convert Scan to Card", False, f"Error: {str(e)}")
+            return False
+    
+    def test_list_scanned_cards(self):
+        """Test GET /api/scanner/scans - List all scanned cards"""
+        if not self.access_token:
+            self.log_result("List Scanned Cards", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/scanner/scans", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["scans", "total_count", "pending_count", "converted_count"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_result("List Scanned Cards", True, 
+                                  f"Retrieved {data['total_count']} scans, {data['converted_count']} converted")
+                    return True
+                else:
+                    self.log_result("List Scanned Cards", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("List Scanned Cards", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("List Scanned Cards", False, f"Error: {str(e)}")
+            return False
+    
+    # ============================================================================
+    # PRINT EXPORT TESTS - GAME CHANGING FEATURE
+    # ============================================================================
+    
+    def test_get_print_templates(self):
+        """Test GET /api/print/templates - Get available print templates"""
+        if not self.access_token:
+            self.log_result("Get Print Templates", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/print/templates", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["templates", "categories", "total_count"]
+                
+                if all(field in data for field in required_fields):
+                    if len(data["templates"]) > 0:
+                        # Store first template ID for subsequent tests
+                        self.print_template_id = data["templates"][0]["id"]
+                        self.log_result("Get Print Templates", True, 
+                                      f"Retrieved {data['total_count']} templates in {len(data['categories'])} categories")
+                        return True
+                    else:
+                        self.log_result("Get Print Templates", False, "No templates available")
+                        return False
+                else:
+                    self.log_result("Get Print Templates", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Get Print Templates", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Get Print Templates", False, f"Error: {str(e)}")
+            return False
+    
+    def test_export_for_printing(self):
+        """Test POST /api/print/export - Export business card for printing"""
+        if not self.access_token or not self.card_id or not hasattr(self, 'print_template_id'):
+            self.log_result("Export for Printing", False, "Missing access token, card ID, or template ID")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            export_request = {
+                "business_card_id": self.card_id,
+                "template_id": self.print_template_id,
+                "format": "pdf",
+                "quality": "print",
+                "size": "85x55mm",
+                "include_bleed": True,
+                "include_crop_marks": True,
+                "quantity": 1
+            }
+            
+            response = requests.post(f"{API_BASE}/print/export", json=export_request, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "job_id", "status", "message"]
+                
+                if all(field in data for field in required_fields):
+                    if data["success"] == True and data["job_id"]:
+                        self.print_job_id = data["job_id"]
+                        self.log_result("Export for Printing", True, f"Print job created: {data['job_id']}")
+                        return True
+                    else:
+                        self.log_result("Export for Printing", False, "Print job creation failed", data)
+                        return False
+                else:
+                    self.log_result("Export for Printing", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Export for Printing", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Export for Printing", False, f"Error: {str(e)}")
+            return False
+    
+    def test_quick_print_export(self):
+        """Test POST /api/print/quick - Quick print export"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Quick Print Export", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            quick_print_request = {
+                "business_card_id": self.card_id,
+                "format": "pdf",
+                "size": "85x55mm",
+                "quality": "print"
+            }
+            
+            response = requests.post(f"{API_BASE}/print/quick", json=quick_print_request, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "job_id", "status"]
+                
+                if all(field in data for field in required_fields):
+                    if data["success"] == True:
+                        self.log_result("Quick Print Export", True, f"Quick print job created: {data['job_id']}")
+                        return True
+                    else:
+                        self.log_result("Quick Print Export", False, "Quick print job failed", data)
+                        return False
+                else:
+                    self.log_result("Quick Print Export", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Quick Print Export", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Quick Print Export", False, f"Error: {str(e)}")
+            return False
+    
+    def test_print_preview(self):
+        """Test POST /api/print/preview - Generate print preview"""
+        if not self.access_token or not self.card_id or not hasattr(self, 'print_template_id'):
+            self.log_result("Print Preview", False, "Missing access token, card ID, or template ID")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            preview_request = {
+                "business_card_id": self.card_id,
+                "template_id": self.print_template_id,
+                "size": "85x55mm",
+                "orientation": "landscape"
+            }
+            
+            response = requests.post(f"{API_BASE}/print/preview", json=preview_request, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                if "preview_url" in data and data["preview_url"]:
+                    self.log_result("Print Preview", True, "Print preview generated successfully")
+                    return True
+                else:
+                    self.log_result("Print Preview", False, "No preview URL in response", data)
+                    return False
+            else:
+                self.log_result("Print Preview", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Print Preview", False, f"Error: {str(e)}")
+            return False
+    
+    def test_print_job_status(self):
+        """Test GET /api/print/jobs/{job_id} - Get print job status"""
+        if not hasattr(self, 'print_job_id') or not self.access_token:
+            self.log_result("Print Job Status", False, "No print job ID or access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/print/jobs/{self.print_job_id}", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["job_id", "status", "progress_percentage"]
+                
+                if all(field in data for field in required_fields):
+                    if data["job_id"] == self.print_job_id:
+                        self.log_result("Print Job Status", True, 
+                                      f"Job status: {data['status']} ({data['progress_percentage']}%)")
+                        return True
+                    else:
+                        self.log_result("Print Job Status", False, "Job ID mismatch", data)
+                        return False
+                else:
+                    self.log_result("Print Job Status", False, "Missing required fields in response", data)
+                    return False
+            else:
+                self.log_result("Print Job Status", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Print Job Status", False, f"Error: {str(e)}")
+            return False
+    
+    def test_ocr_authentication_required(self):
+        """Test OCR endpoints require authentication"""
+        try:
+            # Test without authentication
+            scan_request = {
+                "image_data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChAI9jU77mgAAAABJRU5ErkJggg=="
+            }
+            
+            response = requests.post(f"{API_BASE}/scanner/scan", json=scan_request)
+            
+            if response.status_code == 401:
+                self.log_result("OCR Authentication Required", True, "OCR endpoints properly require authentication")
+                return True
+            else:
+                self.log_result("OCR Authentication Required", False, f"Expected 401, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("OCR Authentication Required", False, f"Error: {str(e)}")
+            return False
+    
+    def test_print_authentication_required(self):
+        """Test Print endpoints require authentication"""
+        try:
+            # Test without authentication
+            response = requests.get(f"{API_BASE}/print/templates")
+            
+            if response.status_code == 401:
+                self.log_result("Print Authentication Required", True, "Print endpoints properly require authentication")
+                return True
+            else:
+                self.log_result("Print Authentication Required", False, f"Expected 401, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Print Authentication Required", False, f"Error: {str(e)}")
+            return False
+    
+    def test_user_data_isolation_scans(self):
+        """Test users can only access their own scans"""
+        if not self.access_token:
+            self.log_result("User Data Isolation - Scans", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Try to access a non-existent scan ID (should return 404, not 403)
+            fake_scan_id = str(uuid.uuid4())
+            response = requests.get(f"{API_BASE}/scanner/scan/{fake_scan_id}", headers=headers)
+            
+            if response.status_code == 404:
+                self.log_result("User Data Isolation - Scans", True, "Proper isolation: non-existent scan returns 404")
+                return True
+            else:
+                self.log_result("User Data Isolation - Scans", False, f"Expected 404, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("User Data Isolation - Scans", False, f"Error: {str(e)}")
+            return False
+    
+    def test_user_data_isolation_print_jobs(self):
+        """Test users can only access their own print jobs"""
+        if not self.access_token:
+            self.log_result("User Data Isolation - Print Jobs", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Try to access a non-existent print job ID (should return 404, not 403)
+            fake_job_id = str(uuid.uuid4())
+            response = requests.get(f"{API_BASE}/print/jobs/{fake_job_id}", headers=headers)
+            
+            if response.status_code == 404:
+                self.log_result("User Data Isolation - Print Jobs", True, "Proper isolation: non-existent job returns 404")
+                return True
+            else:
+                self.log_result("User Data Isolation - Print Jobs", False, f"Expected 404, got {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("User Data Isolation - Print Jobs", False, f"Error: {str(e)}")
+            return False
+
+    # ============================================================================
     # SUBSCRIPTION & MONETIZATION SYSTEM TESTS
     # ============================================================================
     
