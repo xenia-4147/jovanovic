@@ -31,8 +31,8 @@ const CodeAccessPage = () => {
     try {
       const cleanCode = code.trim().toUpperCase();
       
-      // Check if it's a video meeting code (6 characters, alphanumeric)
-      if (/^[A-Z0-9]{6}$/.test(cleanCode)) {
+      // Check if it's a video meeting code (9 characters, alphanumeric)
+      if (/^[A-Z0-9]{9}$/.test(cleanCode)) {
         // Redirect directly to video meeting
         navigate(`/meeting/${cleanCode}`);
         return;
