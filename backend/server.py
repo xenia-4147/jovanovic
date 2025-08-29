@@ -4302,6 +4302,148 @@ async def apply_for_job(
         logger.error(f"Job application failed: {str(e)}")
         raise HTTPException(status_code=500, detail="Bewerbung fehlgeschlagen")
 
+@api_router.post("/video/meeting/{meeting_id}/translation/enable")
+async def enable_meeting_translation(
+    meeting_id: str,
+    source_language: str = "auto",
+    target_languages: List[str] = ["de", "en", "fr", "es"],
+    current_user: User = Depends(get_current_user)
+):
+    """Enable live translation for meeting"""
+    try:
+        from bson import ObjectId
+        
+        # Update meeting with translation settings
+        result = await db.videomeetings.update_one(
+            {"_id": ObjectId(meeting_id)},
+            {
+                "$set": {
+                    "translation_enabled": True,
+                    "source_language": source_language,
+                    "target_languages": target_languages
+                }
+            }
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Meeting nicht gefunden")
+        
+        # Send translation settings to all participants via WebSocket
+        await video_socket_service.broadcast_translation_settings(
+            meeting_id=meeting_id,
+            source_language=source_language,
+            target_languages=target_languages
+        )
+        
+        return {
+            "success": True,
+            "message": f"Live-Übersetzung aktiviert: {source_language} → {', '.join(target_languages)}",
+            "source_language": source_language,
+            "target_languages": target_languages
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Translation enable failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Übersetzung konnte nicht aktiviert werden")
+
+@api_router.post("/video/meeting/{meeting_id}/translation/participant")
+async def set_participant_translation(
+    meeting_id: str,
+    preferred_language: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Set participant's preferred translation language"""
+    try:
+        from bson import ObjectId
+        
+        # Update participant's language preference
+        result = await db.videomeetings.update_one(
+            {"_id": ObjectId(meeting_id)},
+            {
+                "$set": {
+                    f"translation_participants.{str(current_user.id)}": preferred_language
+                }
+            }
+        )
+        
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="Meeting nicht gefunden")
+        
+        return {
+            "success": True,
+            "message": f"Übersetzungssprache auf {preferred_language} gesetzt",
+            "participant_language": preferred_language
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Participant translation setting failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Spracheinstellung konnte nicht gespeichert werden")
+
+@api_router.get("/video/meeting/{meeting_id}/share-link")
+async def generate_meeting_share_link(
+    meeting_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Generate shareable meeting link (like Zoom)"""
+    try:
+        from bson import ObjectId
+        
+        # Get meeting details
+        meeting_data = await db.videomeetings.find_one({"_id": ObjectId(meeting_id)})
+        if not meeting_data:
+            raise HTTPException(status_code=404, detail="Meeting nicht gefunden")
+        
+        meeting = VideoMeetingRoom(**meeting_data)
+        
+        # Generate shareable links
+        base_url = "https://cardnet-pro.preview.emergentagent.com"
+        share_link = f"{base_url}/join?code={meeting.meeting_code}"
+        qr_code_url = f"{base_url}/api/qr/meeting/{meeting.meeting_code}"
+        
+        # Create business card compatible sharing data
+        share_card_data = {
+            "type": "video_meeting",
+            "meeting_title": meeting.title,
+            "meeting_code": meeting.meeting_code,
+            "host_name": current_user.full_name or current_user.email,
+            "company_name": meeting.company_name,
+            "share_link": share_link,
+            "qr_code_url": qr_code_url,
+            "scheduled_for": meeting.scheduled_for.isoformat() if meeting.scheduled_for else None,
+            "duration_minutes": meeting.duration_minutes,
+            "allow_card_sharing": meeting.allow_card_sharing,
+            "translation_enabled": meeting.translation_enabled,
+            "available_languages": meeting.target_languages if meeting.translation_enabled else []
+        }
+        
+        return {
+            "success": True,
+            "share_link": share_link,
+            "qr_code_url": qr_code_url,
+            "share_card_data": share_card_data,
+            "meeting_info": {
+                "title": meeting.title,
+                "code": meeting.meeting_code,
+                "host": current_user.full_name or current_user.email,
+                "scheduled_for": meeting.scheduled_for,
+                "features": {
+                    "business_cards": meeting.allow_card_sharing,
+                    "translation": meeting.translation_enabled,
+                    "languages": meeting.target_languages if meeting.translation_enabled else []
+                }
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Share link generation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Share-Link konnte nicht generiert werden")
+
 # Include the API router
 app.include_router(api_router)
 
