@@ -44,6 +44,11 @@ function App() {
                 <ContactImportPage />
               </ProtectedRoute>
             } />
+            <Route path="/studio" element={
+              <ProtectedRoute>
+                <BusinessCardStudioPage />
+              </ProtectedRoute>
+            } />
             <Route path="/" element={
               <ProtectedRoute>
                 <HomePage />
