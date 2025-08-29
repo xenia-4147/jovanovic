@@ -329,34 +329,9 @@ class ScannerWorkflowTester:
             
             # Step 3: Convert to digital card with realistic data
             convert_request = {
-                "name": "Alexander Müller",
-                "company": "TechStart Berlin GmbH",
-                "position": "Senior Software Engineer",
-                "description": "Full-stack developer specializing in React and Node.js",
-                "phones": [
-                    {
-                        "label": "work",
-                        "number": "+49-30-987-6543",
-                        "is_primary": True
-                    },
-                    {
-                        "label": "mobile", 
-                        "number": "+49-172-987-6543",
-                        "is_primary": False
-                    }
-                ],
-                "emails": [
-                    {
-                        "label": "work",
-                        "address": "alexander.mueller@techstart-berlin.de",
-                        "is_primary": True
-                    }
-                ],
-                "website": "https://techstart-berlin.de",
-                "is_public": True,
-                "background_color": "#f8fafc",
-                "text_color": "#1e293b",
-                "accent_color": "#0ea5e9"
+                "scan_id": workflow_scan_id,
+                "card_name": "Alexander Müller",
+                "auto_map_fields": True
             }
             
             response = requests.post(f"{API_BASE}/scanner/scan/{workflow_scan_id}/convert", json=convert_request, headers=headers)
