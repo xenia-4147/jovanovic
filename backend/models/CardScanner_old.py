@@ -2,7 +2,7 @@
 Card Scanner Models for OCR and Image Processing
 Game-Changing Feature: Paper Business Cards → Digital
 """
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, validator
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 from enum import Enum
@@ -32,25 +32,23 @@ class ScannedField(BaseModel):
     bounding_box: Optional[Dict[str, float]] = Field(None, description="Coordinates of text on image")
     manually_corrected: bool = Field(default=False, description="Whether user corrected this field")
     
-    @field_validator('confidence')
-    @classmethod
+    @validator('confidence')
     def validate_confidence(cls, v):
         if not 0 <= v <= 100:
             raise ValueError('Confidence must be between 0 and 100')
         return v
     
-    @field_validator('confidence_level')
-    @classmethod
-    def set_confidence_level(cls, v, info):
-        if hasattr(info, 'data') and 'confidence' in info.data:
-            confidence = info.data['confidence']
-            if confidence >= 90:
-                return OCRConfidence.HIGH
-            elif confidence >= 60:
-                return OCRConfidence.MEDIUM
-            else:
-                return OCRConfidence.LOW
-        return v
+    @validator('confidence_level', always=True)
+    def set_confidence_level(cls, v, values):
+        if 'confidence' not in values:
+            return v
+        confidence = values['confidence']
+        if confidence >= 90:
+            return OCRConfidence.HIGH
+        elif confidence >= 60:
+            return OCRConfidence.MEDIUM
+        else:
+            return OCRConfidence.LOW
 
 
 class ScannedBusinessCard(BaseModel):
@@ -98,10 +96,9 @@ class CardScanRequest(BaseModel):
     scan_method: str = Field(default="camera", description="Scanning method")
     device_info: Optional[Dict[str, str]] = Field(None)
     
-    @field_validator('image_url')
-    @classmethod
-    def at_least_one_image_source(cls, v, info):
-        if not v and not info.data.get('image_data'):
+    @validator('image_url')
+    def at_least_one_image_source(cls, v, values):
+        if not v and not values.get('image_data'):
             raise ValueError('Either image_data or image_url must be provided')
         return v
 
