@@ -3021,6 +3021,505 @@ async def get_print_job_status(
         logger.error(f"Failed to get print job status: {str(e)}")
         raise HTTPException(status_code=500, detail="Druckauftrags-Status konnte nicht geladen werden")
 
+# ============================================================================
+# OCR BUSINESS CARD SCANNER ENDPOINTS - GAME CHANGING FEATURE 
+# ============================================================================
+
+from models.CardScanner import (
+    CardScanRequest, ScanResponse, ScanResultResponse, ScanListResponse,
+    FieldCorrectionRequest, ConvertToCardRequest, ScanBatchRequest
+)
+from services.OCRService import ocr_service
+
+@api_router.post("/scanner/scan", response_model=ScanResponse)
+async def scan_business_card(
+    scan_request: CardScanRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Scan business card image using OCR - Paper → Digital"""
+    try:
+        logger.info(f"Starting business card scan for user {current_user.email}")
+        
+        # Process the scan
+        scan_result = await ocr_service.scan_business_card(
+            image_data=scan_request.image_data,
+            user_id=str(current_user.id),
+            scan_method=scan_request.scan_method
+        )
+        
+        # Save scan to database
+        scan_dict = scan_result.dict(by_alias=True, exclude={"id"})
+        result = await db.scannedcards.insert_one(scan_dict)
+        scan_result.id = str(result.inserted_id)
+        
+        return ScanResponse(
+            success=True,
+            scan_id=str(scan_result.id),
+            status=scan_result.status,
+            message="Visitenkarte erfolgreich gescannt! ✨",
+            estimated_completion_seconds=3 if scan_result.status == "pending" else None
+        )
+        
+    except Exception as e:
+        logger.error(f"Business card scan failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Scan fehlgeschlagen: {str(e)}")
+
+@api_router.get("/scanner/scan/{scan_id}", response_model=ScanResultResponse)
+async def get_scan_result(
+    scan_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get OCR scan results"""
+    try:
+        # Find scan
+        from bson import ObjectId
+        scan_data = await db.scannedcards.find_one({
+            "_id": ObjectId(scan_id),
+            "user_id": str(current_user.id)
+        })
+        
+        if not scan_data:
+            raise HTTPException(status_code=404, detail="Scan nicht gefunden")
+        
+        # Convert ObjectId to string
+        if "_id" in scan_data:
+            scan_data["_id"] = str(scan_data["_id"])
+        
+        from models.CardScanner import ScannedBusinessCard
+        scan = ScannedBusinessCard(**scan_data)
+        
+        # Check if ready for conversion
+        conversion_ready = (
+            scan.status == "completed" and 
+            scan.overall_confidence >= 60.0 and
+            len(scan.extracted_fields) >= 2  # At least name + one contact
+        )
+        
+        return ScanResultResponse(
+            scan_id=scan_id,
+            status=scan.status,
+            scanned_card=scan,
+            conversion_ready=conversion_ready
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get scan result: {str(e)}")
+        raise HTTPException(status_code=500, detail="Scan-Ergebnis konnte nicht geladen werden")
+
+@api_router.post("/scanner/scan/{scan_id}/correct")
+async def correct_scan_field(
+    scan_id: str,
+    correction: FieldCorrectionRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Correct OCR field extraction"""
+    try:
+        # Apply correction
+        success = await ocr_service.correct_field(
+            scan_id=scan_id,
+            field_type=correction.field_type,
+            corrected_value=correction.corrected_value
+        )
+        
+        if success:
+            return {"success": True, "message": "Korrektur angewendet"}
+        else:
+            raise HTTPException(status_code=500, detail="Korrektur fehlgeschlagen")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Field correction failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Korrektur fehlgeschlagen")
+
+@api_router.post("/scanner/scan/{scan_id}/convert", response_model=BusinessCardResponse)
+async def convert_scan_to_card(
+    scan_id: str,
+    convert_request: ConvertToCardRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Convert scanned card to digital business card"""
+    try:
+        # Get scan
+        from bson import ObjectId
+        scan_data = await db.scannedcards.find_one({
+            "_id": ObjectId(scan_id),
+            "user_id": str(current_user.id)
+        })
+        
+        if not scan_data:
+            raise HTTPException(status_code=404, detail="Scan nicht gefunden")
+        
+        from models.CardScanner import ScannedBusinessCard
+        scan = ScannedBusinessCard(**scan_data)
+        
+        if scan.status != "completed":
+            raise HTTPException(status_code=400, detail="Scan noch nicht abgeschlossen")
+        
+        # Create business card from scan
+        card_data = {
+            "name": convert_request.card_name,
+            "phones": [],
+            "emails": [],
+            "social_media": SocialMedia(),
+            "is_public": True,
+            "accent_color": "#3B82F6"
+        }
+        
+        # Map fields from scan
+        field_mapping = convert_request.field_mapping or scan.suggested_mapping or {}
+        
+        for field in scan.extracted_fields:
+            if field.field_type == "company" and "company" in field_mapping:
+                card_data["company"] = field.value
+            elif field.field_type == "position" and "position" in field_mapping:
+                card_data["position"] = field.value
+            elif field.field_type == "phone" and field.confidence >= 70:
+                card_data["phones"].append({
+                    "label": "Business",
+                    "number": field.value,
+                    "is_primary": True,
+                    "messaging_apps": [
+                        {"name": "whatsapp", "enabled": True},
+                        {"name": "sms", "enabled": True}
+                    ]
+                })
+            elif field.field_type == "email" and field.confidence >= 80:
+                card_data["emails"].append({
+                    "label": "Business", 
+                    "address": field.value,
+                    "is_primary": True
+                })
+            elif field.field_type == "website" and field.confidence >= 85:
+                card_data["website"] = field.value
+        
+        # Create business card
+        card = BusinessCard(
+            user_id=str(current_user.id),
+            **card_data
+        )
+        
+        # Insert into database
+        card_dict = card.dict(by_alias=True, exclude={"id"})
+        result = await db.businesscards.insert_one(card_dict)
+        card.id = str(result.inserted_id)
+        
+        # Update scan with conversion info
+        await db.scannedcards.update_one(
+            {"_id": ObjectId(scan_id)},
+            {
+                "$set": {
+                    "converted_to_card_id": str(card.id),
+                    "is_converted": True
+                }
+            }
+        )
+        
+        logger.info(f"Successfully converted scan {scan_id} to business card {card.id}")
+        
+        return BusinessCardResponse(
+            id=str(card.id),
+            **card.dict(exclude={"id", "user_id"}),
+            is_owner=True
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Scan conversion failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Konvertierung fehlgeschlagen: {str(e)}")
+
+@api_router.get("/scanner/scans", response_model=ScanListResponse)
+async def list_scanned_cards(
+    current_user: User = Depends(get_current_user)
+):
+    """List all scanned business cards for user"""
+    try:
+        scans_cursor = db.scannedcards.find({"user_id": str(current_user.id)})
+        scans = []
+        pending_count = 0
+        converted_count = 0
+        
+        from models.CardScanner import ScannedBusinessCard
+        async for scan_data in scans_cursor:
+            if "_id" in scan_data:
+                scan_data["_id"] = str(scan_data["_id"])
+            
+            scan = ScannedBusinessCard(**scan_data)
+            scans.append(scan)
+            
+            if scan.status == "pending":
+                pending_count += 1
+            if scan.is_converted:
+                converted_count += 1
+        
+        return ScanListResponse(
+            scans=scans,
+            total_count=len(scans),
+            pending_count=pending_count,
+            converted_count=converted_count
+        )
+        
+    except Exception as e:
+        logger.error(f"Failed to list scanned cards: {str(e)}")
+        raise HTTPException(status_code=500, detail="Gescannte Karten konnten nicht geladen werden")
+
+# ============================================================================
+# PRINT EXPORT ENDPOINTS - GAME CHANGING FEATURE
+# ============================================================================
+
+from models.PrintExport import (
+    PrintExportRequest, QuickPrintRequest, PrintPreviewRequest,
+    PrintJobResponse, PrintTemplateResponse, PrintJobStatusResponse
+)
+from services.PrintService import print_service
+
+@api_router.get("/print/templates", response_model=PrintTemplateResponse)
+async def get_print_templates(
+    category: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Get available print templates"""
+    try:
+        templates = await print_service.get_templates(category)
+        categories = await print_service.get_template_categories()
+        
+        return PrintTemplateResponse(
+            templates=templates,
+            categories=categories,
+            total_count=len(templates)
+        )
+        
+    except Exception as e:
+        logger.error(f"Failed to get print templates: {str(e)}")
+        raise HTTPException(status_code=500, detail="Druckvorlagen konnten nicht geladen werden")
+
+@api_router.post("/print/export", response_model=PrintJobResponse)
+async def export_for_printing(
+    export_request: PrintExportRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Export business card for professional printing"""
+    try:
+        # Get business card
+        from bson import ObjectId
+        card_data = await db.businesscards.find_one({
+            "_id": export_request.business_card_id,
+            "userId": str(current_user.id)
+        })
+        
+        if not card_data:
+            try:
+                card_data = await db.businesscards.find_one({
+                    "_id": ObjectId(export_request.business_card_id),
+                    "userId": str(current_user.id)
+                })
+            except:
+                pass
+        
+        if not card_data:
+            raise HTTPException(status_code=404, detail="Visitenkarte nicht gefunden")
+        
+        # Convert ObjectId to string
+        if "_id" in card_data:
+            card_data["_id"] = str(card_data["_id"])
+        if "userId" in card_data:
+            card_data["userId"] = str(card_data["userId"])
+        
+        card = BusinessCard(**card_data)
+        
+        # Create print job
+        print_job = await print_service.create_print_job(
+            business_card=card,
+            template_id=export_request.template_id,
+            format=export_request.format,
+            quality=export_request.quality,
+            size=export_request.size,
+            orientation=export_request.orientation,
+            custom_colors=export_request.custom_colors,
+            include_bleed=export_request.include_bleed,
+            include_crop_marks=export_request.include_crop_marks,
+            double_sided=export_request.double_sided,
+            quantity=export_request.quantity,
+            printer_id=export_request.printer_id
+        )
+        
+        # Save print job to database
+        job_dict = print_job.dict(by_alias=True, exclude={"id"})
+        result = await db.printjobs.insert_one(job_dict)
+        print_job.id = str(result.inserted_id)
+        
+        logger.info(f"Print job created: {print_job.id} for card {card.name}")
+        
+        return PrintJobResponse(
+            success=True,
+            job_id=str(print_job.id),
+            status=print_job.status,
+            preview_url=print_job.preview_url,
+            estimated_completion_minutes=2 if print_job.status == "pending" else None,
+            message="Druckdatei wird erstellt... 🖨️"
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Print export failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Druckexport fehlgeschlagen: {str(e)}")
+
+@api_router.post("/print/quick", response_model=PrintJobResponse)
+async def quick_print_export(
+    quick_request: QuickPrintRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Quick print export with default settings"""
+    try:
+        # Use first available template
+        templates = await print_service.get_templates()
+        if not templates:
+            raise HTTPException(status_code=500, detail="Keine Druckvorlagen verfügbar")
+        
+        default_template = templates[0]  # Use first template
+        
+        export_request = PrintExportRequest(
+            business_card_id=quick_request.business_card_id,
+            template_id=default_template.id,
+            format=quick_request.format,
+            size=quick_request.size,
+            quality=quick_request.quality
+        )
+        
+        return await export_for_printing(export_request, current_user)
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Quick print failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Schnelldruck fehlgeschlagen")
+
+@api_router.post("/print/preview", response_model=Dict[str, str])
+async def generate_print_preview(
+    preview_request: PrintPreviewRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Generate print preview"""
+    try:
+        # Get business card
+        from bson import ObjectId
+        card_data = await db.businesscards.find_one({
+            "_id": preview_request.business_card_id,
+            "userId": str(current_user.id)
+        })
+        
+        if not card_data:
+            try:
+                card_data = await db.businesscards.find_one({
+                    "_id": ObjectId(preview_request.business_card_id),
+                    "userId": str(current_user.id)
+                })
+            except:
+                pass
+        
+        if not card_data:
+            raise HTTPException(status_code=404, detail="Visitenkarte nicht gefunden")
+        
+        # Convert ObjectId to string
+        if "_id" in card_data:
+            card_data["_id"] = str(card_data["_id"])
+        if "userId" in card_data:
+            card_data["userId"] = str(card_data["userId"])
+        
+        card = BusinessCard(**card_data)
+        
+        # Get template
+        templates = await print_service.get_templates()
+        template = next((t for t in templates if t.id == preview_request.template_id), None)
+        
+        if not template:
+            raise HTTPException(status_code=404, detail="Druckvorlage nicht gefunden")
+        
+        # Generate preview
+        from models.PrintExport import PrintJob, PrintFormat, PrintQuality
+        preview_job = PrintJob(
+            user_id=str(current_user.id),
+            business_card_id=str(card.id),
+            template_id=template.id,
+            format=PrintFormat.PNG,
+            quality=PrintQuality.WEB,
+            size=preview_request.size,
+            orientation=preview_request.orientation
+        )
+        
+        preview_url = await print_service._generate_preview(card, template, preview_job)
+        
+        return {
+            "preview_url": preview_url,
+            "template_name": template.name,
+            "size": preview_request.size.value,
+            "orientation": preview_request.orientation.value
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Preview generation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Vorschau-Erstellung fehlgeschlagen")
+
+@api_router.get("/print/jobs/{job_id}", response_model=PrintJobStatusResponse)
+async def get_print_job_status(
+    job_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get print job status and download URLs"""
+    try:
+        from bson import ObjectId
+        job_data = await db.printjobs.find_one({
+            "_id": ObjectId(job_id),
+            "user_id": str(current_user.id)
+        })
+        
+        if not job_data:
+            raise HTTPException(status_code=404, detail="Druckauftrag nicht gefunden")
+        
+        if "_id" in job_data:
+            job_data["_id"] = str(job_data["_id"])
+        
+        from models.PrintExport import PrintJob
+        job = PrintJob(**job_data)
+        
+        # Calculate progress
+        progress = 0
+        if job.status == "pending":
+            progress = 10
+        elif job.status == "processing":
+            progress = 50
+        elif job.status == "completed":
+            progress = 100
+        elif job.status == "failed":
+            progress = 0
+        
+        # Get download URL if completed
+        download_url = None
+        if job.status == "completed" and job.generated_files:
+            # In a real implementation, this would be a proper file URL
+            download_url = job.generated_files[0].get("url")
+        
+        return PrintJobStatusResponse(
+            job_id=job_id,
+            status=job.status,
+            progress_percentage=progress,
+            download_url=download_url,
+            preview_url=job.preview_url,
+            error_message=job.error_message
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to get print job status: {str(e)}")
+        raise HTTPException(status_code=500, detail="Druckauftrags-Status konnte nicht geladen werden")
+
 # Include the router in the main app
 app.include_router(api_router)
 
