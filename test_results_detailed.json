@@ -3,199 +3,199 @@
     "test": "Health Check",
     "success": true,
     "message": "API is running - Digital Business Cards API",
-    "timestamp": "2025-08-29T20:31:47.972384"
+    "timestamp": "2025-08-29T20:51:18.957819"
   },
   {
     "test": "User Registration",
     "success": true,
-    "message": "User registered successfully: testuser_cfc3723b@example.com",
-    "timestamp": "2025-08-29T20:31:48.446488"
+    "message": "User registered successfully: testuser_bcd0c4f8@example.com",
+    "timestamp": "2025-08-29T20:51:19.258838"
   },
   {
     "test": "User Login",
     "success": true,
-    "message": "Login successful for: logintest_491de47e@example.com",
-    "timestamp": "2025-08-29T20:31:49.023067"
+    "message": "Login successful for: logintest_15489bf8@example.com",
+    "timestamp": "2025-08-29T20:51:19.833029"
   },
   {
     "test": "Protected Endpoint",
     "success": true,
-    "message": "User profile retrieved: testuser_cfc3723b@example.com",
-    "timestamp": "2025-08-29T20:31:49.079342"
+    "message": "User profile retrieved: testuser_bcd0c4f8@example.com",
+    "timestamp": "2025-08-29T20:51:19.915385"
   },
   {
     "test": "Create Business Card",
     "success": true,
     "message": "Card created: John Doe",
-    "timestamp": "2025-08-29T20:31:49.143818"
+    "timestamp": "2025-08-29T20:51:19.978616"
   },
   {
     "test": "Meeting Join with Participant ID",
     "success": true,
-    "message": "participant object with ID returned: 9424a048-64ad-4e08-911f-acbc582d0831",
-    "timestamp": "2025-08-29T20:31:49.255242"
+    "message": "participant object with ID returned: b61b04b5-f93f-4ada-9131-4da18b36d231",
+    "timestamp": "2025-08-29T20:51:20.093404"
   },
   {
     "test": "QR Code Endpoint for Meetings",
     "success": true,
-    "message": "QR code generated for meeting CD5A96LCM (base64 format)",
-    "timestamp": "2025-08-29T20:31:49.316072"
+    "message": "QR code generated for meeting 2WDS4BI0F (base64 format)",
+    "timestamp": "2025-08-29T20:51:20.179463"
   },
   {
     "test": "Complete Meeting Flow - Create",
     "success": true,
-    "message": "Meeting created: XA73TNSNU",
-    "timestamp": "2025-08-29T20:31:49.374520"
+    "message": "Meeting created: XBBKLIIAY",
+    "timestamp": "2025-08-29T20:51:20.233945"
   },
   {
     "test": "Complete Meeting Flow - Join",
     "success": true,
-    "message": "Joined with participant ID: 05afa268-5aa4-4a36-8f8a-a40448dd1a9f",
-    "timestamp": "2025-08-29T20:31:49.429446"
+    "message": "Joined with participant ID: 1d984162-f307-4a5f-b24d-ccbe39bab39f",
+    "timestamp": "2025-08-29T20:51:20.289129"
   },
   {
     "test": "Complete Meeting Flow - WebRTC Config",
     "success": true,
     "message": "WebRTC config with 4 ICE servers",
-    "timestamp": "2025-08-29T20:31:49.429491"
+    "timestamp": "2025-08-29T20:51:20.289176"
   },
   {
     "test": "Complete Meeting Flow - QR Code",
     "success": true,
     "message": "QR code generated for mobile access",
-    "timestamp": "2025-08-29T20:31:49.485297"
+    "timestamp": "2025-08-29T20:51:20.348056"
   },
   {
     "test": "Complete Meeting Flow for Camera",
     "success": true,
     "message": "All camera connection prerequisites verified",
-    "timestamp": "2025-08-29T20:31:49.485335"
+    "timestamp": "2025-08-29T20:51:20.348096"
   },
   {
     "test": "Camera Prerequisites - WebRTC Config",
     "success": true,
     "message": "WebRTC config with 4 ICE servers",
-    "timestamp": "2025-08-29T20:31:49.542439"
+    "timestamp": "2025-08-29T20:51:20.410766"
   },
   {
     "test": "Camera Prerequisites - STUN Servers",
     "success": true,
     "message": "4 STUN servers configured",
-    "timestamp": "2025-08-29T20:31:49.542479"
+    "timestamp": "2025-08-29T20:51:20.410803"
   },
   {
     "test": "Camera Prerequisites - TURN Servers",
     "success": true,
     "message": "3 TURN servers configured",
-    "timestamp": "2025-08-29T20:31:49.542487"
+    "timestamp": "2025-08-29T20:51:20.410811"
   },
   {
     "test": "Camera Prerequisites - Participant Tracking",
     "success": true,
-    "message": "Participant tracking working: cfa9d07c-00f5-46d2-a14e-ac615bedb72d",
-    "timestamp": "2025-08-29T20:31:49.595079"
+    "message": "Participant tracking working: bed25641-d752-45b8-bbc7-95139b2c44d1",
+    "timestamp": "2025-08-29T20:51:20.468146"
   },
   {
     "test": "Camera Prerequisites - Mobile QR Access",
     "success": true,
     "message": "QR code generation working",
-    "timestamp": "2025-08-29T20:31:49.651551"
+    "timestamp": "2025-08-29T20:51:20.525654"
   },
   {
     "test": "Camera Connection Prerequisites",
     "success": true,
     "message": "All camera connection prerequisites verified",
-    "timestamp": "2025-08-29T20:31:49.651592"
+    "timestamp": "2025-08-29T20:51:20.525690"
   },
   {
     "test": "9-Character Code Length",
     "success": true,
     "message": "All 5 codes are exactly 9 characters",
-    "timestamp": "2025-08-29T20:31:49.931506"
+    "timestamp": "2025-08-29T20:51:20.814798"
   },
   {
     "test": "9-Character Code Format",
     "success": true,
-    "message": "All codes use valid format (A-Z, 0-9): ['XC2916A99', 'MHBN1WXR5', 'EMQSWWRZ9', 'CHBPHO1W6', 'GIWCTNAVF']",
-    "timestamp": "2025-08-29T20:31:49.931557"
+    "message": "All codes use valid format (A-Z, 0-9): ['AZYNQXXVJ', '252685TET', '61BW6XZVY', 'XGD1YCDSW', 'N7LU4SXMI']",
+    "timestamp": "2025-08-29T20:51:20.814846"
   },
   {
     "test": "Code Collision Resistance",
     "success": true,
     "message": "All 5 codes are unique - no collisions detected",
-    "timestamp": "2025-08-29T20:31:49.931565"
+    "timestamp": "2025-08-29T20:51:20.814855"
   },
   {
     "test": "9-Character Meeting Code Generation",
     "success": true,
     "message": "Successfully generated 5 unique 9-character codes",
-    "timestamp": "2025-08-29T20:31:49.931572"
+    "timestamp": "2025-08-29T20:51:20.814867"
   },
   {
     "test": "Code Collision Stress Test",
     "success": true,
     "message": "Generated 20 codes with 0% collision rate",
-    "timestamp": "2025-08-29T20:31:51.052240"
+    "timestamp": "2025-08-29T20:51:21.935342"
   },
   {
     "test": "9-Character Code Format",
     "success": true,
-    "message": "Code: G3E0HAQM0 (9 characters)",
-    "timestamp": "2025-08-29T20:31:51.105074"
+    "message": "Code: GY7A5IVRU (9 characters)",
+    "timestamp": "2025-08-29T20:51:21.991382"
   },
   {
     "test": "Share Link with 9-Char Code",
     "success": true,
-    "message": "Share link: https://netlink-3.preview.emergentagent.com/join?code=G3E0HAQM0",
-    "timestamp": "2025-08-29T20:31:51.105116"
+    "message": "Share link: https://netlink-3.preview.emergentagent.com/join?code=GY7A5IVRU",
+    "timestamp": "2025-08-29T20:51:21.991419"
   },
   {
     "test": "QR Code with 9-Char Code",
     "success": true,
-    "message": "QR code URL: https://netlink-3.preview.emergentagent.com/api/qr/meeting/G3E0HAQM0",
-    "timestamp": "2025-08-29T20:31:51.105124"
+    "message": "QR code URL: https://netlink-3.preview.emergentagent.com/api/qr/meeting/GY7A5IVRU",
+    "timestamp": "2025-08-29T20:51:21.991428"
   },
   {
     "test": "Business Card Integration with 9-Char Code",
     "success": true,
     "message": "Meeting link card data complete",
-    "timestamp": "2025-08-29T20:31:51.105131"
+    "timestamp": "2025-08-29T20:51:21.991434"
   },
   {
     "test": "Translation with 9-Char Code",
     "success": true,
     "message": "Translation: de -> ['en', 'fr', 'es', 'it']",
-    "timestamp": "2025-08-29T20:31:51.105142"
+    "timestamp": "2025-08-29T20:51:21.991445"
   },
   {
     "test": "WebRTC Config with 9-Char Code",
     "success": true,
     "message": "WebRTC config with 4 ICE servers",
-    "timestamp": "2025-08-29T20:31:51.105150"
+    "timestamp": "2025-08-29T20:51:21.991455"
   },
   {
     "test": "Enhanced Features with 9-Char Codes",
     "success": true,
     "message": "All revolutionary features working with 9-character codes",
-    "timestamp": "2025-08-29T20:31:51.105156"
+    "timestamp": "2025-08-29T20:51:21.991463"
   },
   {
     "test": "Enhanced Video Meeting Create",
     "success": false,
     "message": "Missing NEW revolutionary fields: ['meeting_link_card']",
-    "timestamp": "2025-08-29T20:31:51.157963",
+    "timestamp": "2025-08-29T20:51:22.050452",
     "response": {
       "meeting": {
-        "id": "68b20e37c0efc79794ec5616",
+        "id": "68b212ca59338b337ddce3e6",
         "title": "Revolutionary Tech Networking Session",
         "description": "Enhanced video meeting with live translation and business card integration",
         "meeting_type": "networking_event",
-        "host_id": "68b20e34c0efc79794ec55f0",
+        "host_id": "68b212c759338b337ddce3c0",
         "host_business_card_id": null,
         "max_participants": 15,
         "duration_minutes": 60,
         "quality": "standard",
-        "meeting_code": "2RIVHIGQA",
+        "meeting_code": "6X3G2M02V",
         "password": "meeting123",
         "is_public": true,
         "shared_business_cards": [],
@@ -209,8 +209,8 @@
         "is_job_related": false,
         "job_title": null,
         "company_name": null,
-        "share_link": "https://netlink-3.preview.emergentagent.com/join?code=2RIVHIGQA",
-        "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/2RIVHIGQA",
+        "share_link": "https://netlink-3.preview.emergentagent.com/join?code=6X3G2M02V",
+        "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/6X3G2M02V",
         "translation_enabled": true,
         "source_language": "de",
         "target_languages": [
@@ -225,12 +225,12 @@
         "enable_recording": false,
         "enable_screen_share": true,
         "enable_chat": true,
-        "created_at": "2025-08-29T20:31:51.153709",
+        "created_at": "2025-08-29T20:51:22.044573",
         "scheduled_for": null
       },
       "participants": [],
       "shared_cards": [],
-      "join_url": "https://netlink-3.preview.emergentagent.com/meeting/2RIVHIGQA",
+      "join_url": "https://netlink-3.preview.emergentagent.com/meeting/6X3G2M02V",
       "webrtc_config": {
         "iceServers": [
           {
@@ -269,16 +269,16 @@
         "iceTransportPolicy": "all",
         "sdpSemantics": "unified-plan"
       },
-      "share_link": "https://netlink-3.preview.emergentagent.com/join?code=2RIVHIGQA",
-      "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/2RIVHIGQA",
+      "share_link": "https://netlink-3.preview.emergentagent.com/join?code=6X3G2M02V",
+      "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/6X3G2M02V",
       "meeting_link_card": {
         "type": "video_meeting",
         "meeting_title": "Revolutionary Tech Networking Session",
-        "meeting_code": "2RIVHIGQA",
+        "meeting_code": "6X3G2M02V",
         "host_name": "John Doe",
         "company_name": "Business Card Studio",
-        "share_link": "https://netlink-3.preview.emergentagent.com/join?code=2RIVHIGQA",
-        "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/2RIVHIGQA",
+        "share_link": "https://netlink-3.preview.emergentagent.com/join?code=6X3G2M02V",
+        "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/6X3G2M02V",
         "scheduled_for": null,
         "duration_minutes": 60,
         "meeting_info": {
@@ -302,44 +302,44 @@
     "test": "Meeting Share Link Generation",
     "success": false,
     "message": "No access token or video meeting ID available",
-    "timestamp": "2025-08-29T20:31:51.159156"
+    "timestamp": "2025-08-29T20:51:22.051968"
   },
   {
     "test": "Live Translation Enable",
     "success": false,
     "message": "No access token or video meeting ID available",
-    "timestamp": "2025-08-29T20:31:51.159197"
+    "timestamp": "2025-08-29T20:51:22.052013"
   },
   {
     "test": "Participant Translation Preference",
     "success": false,
     "message": "No access token or video meeting ID available",
-    "timestamp": "2025-08-29T20:31:51.159206"
+    "timestamp": "2025-08-29T20:51:22.052026"
   },
   {
     "test": "Video Meeting Join",
     "success": false,
     "message": "No access token or video meeting ID available",
-    "timestamp": "2025-08-29T20:31:51.159216"
+    "timestamp": "2025-08-29T20:51:22.052037"
   },
   {
     "test": "Video Meetings List",
     "success": false,
     "message": "Response is not a list",
-    "timestamp": "2025-08-29T20:31:51.212690",
+    "timestamp": "2025-08-29T20:51:22.104682",
     "response": {
       "meetings": [
         {
-          "id": "54c3d8b7-5655-4cc8-9fef-058b8ee5f39a",
+          "id": "17d8e99e-10fb-43ef-bc1b-ad0938a88d69",
           "title": "Camera Connection Test Meeting",
           "description": "Testing participant_id for camera connections",
           "meeting_type": "networking_event",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 10,
           "duration_minutes": 30,
           "quality": "standard",
-          "meeting_code": "CD5A96LCM",
+          "meeting_code": "2WDS4BI0F",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -349,8 +349,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=CD5A96LCM",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/CD5A96LCM",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=2WDS4BI0F",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/2WDS4BI0F",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -361,20 +361,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:49.194000",
+          "created_at": "2025-08-29T20:51:20.028000",
           "scheduled_for": null
         },
         {
-          "id": "e4317e12-76fa-451c-bfb4-52e77a603299",
+          "id": "f57376d8-2d97-4f9e-83da-afc2345e5a74",
           "title": "Complete Camera Flow Test",
           "description": "Testing complete flow for camera connection",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 8,
           "duration_minutes": 45,
           "quality": "standard",
-          "meeting_code": "XA73TNSNU",
+          "meeting_code": "XBBKLIIAY",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -384,8 +384,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=XA73TNSNU",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/XA73TNSNU",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=XBBKLIIAY",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/XBBKLIIAY",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -396,20 +396,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:49.369000",
+          "created_at": "2025-08-29T20:51:20.229000",
           "scheduled_for": null
         },
         {
-          "id": "b215896c-c9ee-44b5-9e22-4fb9e0659a93",
+          "id": "f1bfe1db-3bb5-4683-b85b-2eb01eb4378d",
           "title": "Camera Prerequisites Test",
           "description": "Testing all camera connection prerequisites",
           "meeting_type": "networking_event",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 12,
           "duration_minutes": 30,
           "quality": "standard",
-          "meeting_code": "SI2MCEZKL",
+          "meeting_code": "SJVJW436K",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -419,8 +419,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=SI2MCEZKL",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/SI2MCEZKL",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=SJVJW436K",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/SJVJW436K",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -431,20 +431,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:49.537000",
+          "created_at": "2025-08-29T20:51:20.406000",
           "scheduled_for": null
         },
         {
-          "id": "d318db10-b892-429d-a57f-e6d6eecaaef6",
+          "id": "3fcc77e7-6a33-4aef-90a1-fa6963e1a1bb",
           "title": "Code Test Meeting 1",
           "description": "Testing 9-character code generation - Meeting 1",
           "meeting_type": "networking_event",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 10,
           "duration_minutes": 30,
           "quality": "standard",
-          "meeting_code": "XC2916A99",
+          "meeting_code": "AZYNQXXVJ",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -454,8 +454,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=XC2916A99",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/XC2916A99",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=AZYNQXXVJ",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/AZYNQXXVJ",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -466,20 +466,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:49.705000",
+          "created_at": "2025-08-29T20:51:20.579000",
           "scheduled_for": null
         },
         {
-          "id": "d0b8bbd3-e3c8-42a2-9294-6e838be92a6d",
+          "id": "0721907d-f45c-4efe-a473-4cc3d0f9c8d9",
           "title": "Code Test Meeting 2",
           "description": "Testing 9-character code generation - Meeting 2",
           "meeting_type": "networking_event",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 10,
           "duration_minutes": 30,
           "quality": "standard",
-          "meeting_code": "MHBN1WXR5",
+          "meeting_code": "252685TET",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -489,8 +489,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=MHBN1WXR5",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/MHBN1WXR5",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=252685TET",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/252685TET",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -501,20 +501,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:49.760000",
+          "created_at": "2025-08-29T20:51:20.630000",
           "scheduled_for": null
         },
         {
-          "id": "60f6103f-dc33-42a4-876d-c922a8ae332a",
+          "id": "087f48b0-5d49-4a22-9529-039810c1f3e2",
           "title": "Code Test Meeting 3",
           "description": "Testing 9-character code generation - Meeting 3",
           "meeting_type": "networking_event",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 10,
           "duration_minutes": 30,
           "quality": "standard",
-          "meeting_code": "EMQSWWRZ9",
+          "meeting_code": "61BW6XZVY",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -524,8 +524,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=EMQSWWRZ9",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/EMQSWWRZ9",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=61BW6XZVY",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/61BW6XZVY",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -536,20 +536,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:49.816000",
+          "created_at": "2025-08-29T20:51:20.682000",
           "scheduled_for": null
         },
         {
-          "id": "1ea93ac2-62fc-4180-a33a-c7507d6aa818",
+          "id": "94b8341a-b770-4172-bdc6-51cf125226b3",
           "title": "Code Test Meeting 4",
           "description": "Testing 9-character code generation - Meeting 4",
           "meeting_type": "networking_event",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 10,
           "duration_minutes": 30,
           "quality": "standard",
-          "meeting_code": "CHBPHO1W6",
+          "meeting_code": "XGD1YCDSW",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -559,8 +559,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=CHBPHO1W6",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/CHBPHO1W6",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=XGD1YCDSW",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/XGD1YCDSW",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -571,20 +571,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:49.869000",
+          "created_at": "2025-08-29T20:51:20.742000",
           "scheduled_for": null
         },
         {
-          "id": "73344cf3-f4e8-48f9-b339-32d2312c15b8",
+          "id": "c829fd3d-d774-448d-bb47-e6ee921852cd",
           "title": "Code Test Meeting 5",
           "description": "Testing 9-character code generation - Meeting 5",
           "meeting_type": "networking_event",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 10,
           "duration_minutes": 30,
           "quality": "standard",
-          "meeting_code": "GIWCTNAVF",
+          "meeting_code": "N7LU4SXMI",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -594,8 +594,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=GIWCTNAVF",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/GIWCTNAVF",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=N7LU4SXMI",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/N7LU4SXMI",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -606,20 +606,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:49.924000",
+          "created_at": "2025-08-29T20:51:20.808000",
           "scheduled_for": null
         },
         {
-          "id": "e17033e7-71ab-407e-9cb4-63110bfc3612",
+          "id": "f7d548bd-d1a6-4a02-ac35-72bdfb1320fc",
           "title": "Stress Test Meeting 1",
           "description": "Collision resistance stress test - Meeting 1",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "3QTKUQ08W",
+          "meeting_code": "KRZDA66P6",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -629,8 +629,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=3QTKUQ08W",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/3QTKUQ08W",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=KRZDA66P6",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/KRZDA66P6",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -641,20 +641,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:49.981000",
+          "created_at": "2025-08-29T20:51:20.867000",
           "scheduled_for": null
         },
         {
-          "id": "72cc5485-40ca-44d8-ad3d-a0874270e894",
+          "id": "1a56fea0-51b0-40ef-9ddc-66791cc394a2",
           "title": "Stress Test Meeting 2",
           "description": "Collision resistance stress test - Meeting 2",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "CGGH5ZXG2",
+          "meeting_code": "KH7F0VEM1",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -664,8 +664,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=CGGH5ZXG2",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/CGGH5ZXG2",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=KH7F0VEM1",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/KH7F0VEM1",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -676,20 +676,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.038000",
+          "created_at": "2025-08-29T20:51:20.921000",
           "scheduled_for": null
         },
         {
-          "id": "544563f6-07b0-4d65-b572-ca5c5eb82db1",
+          "id": "b4052806-60a4-4cf8-81e1-678971d689f0",
           "title": "Stress Test Meeting 3",
           "description": "Collision resistance stress test - Meeting 3",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "A89MW2300",
+          "meeting_code": "AGMPVTBBA",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -699,8 +699,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=A89MW2300",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/A89MW2300",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=AGMPVTBBA",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/AGMPVTBBA",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -711,20 +711,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.097000",
+          "created_at": "2025-08-29T20:51:20.977000",
           "scheduled_for": null
         },
         {
-          "id": "cded2cff-6a72-4c62-87b2-9e1195e2e9fb",
+          "id": "94b03c87-ca3f-4e68-a3ab-c3bd6f1bdfd4",
           "title": "Stress Test Meeting 4",
           "description": "Collision resistance stress test - Meeting 4",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "CQ70D65OY",
+          "meeting_code": "ZJVECL1HQ",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -734,8 +734,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=CQ70D65OY",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/CQ70D65OY",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=ZJVECL1HQ",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/ZJVECL1HQ",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -746,20 +746,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.152000",
+          "created_at": "2025-08-29T20:51:21.032000",
           "scheduled_for": null
         },
         {
-          "id": "a5e2db6b-e055-499f-bbef-6a5ec92c631c",
+          "id": "fb15e0b7-1eea-4613-8f2a-1d090ed7cd8e",
           "title": "Stress Test Meeting 5",
           "description": "Collision resistance stress test - Meeting 5",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "Z7XBG0YIY",
+          "meeting_code": "6RJJRKSRB",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -769,8 +769,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=Z7XBG0YIY",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/Z7XBG0YIY",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=6RJJRKSRB",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/6RJJRKSRB",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -781,20 +781,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.211000",
+          "created_at": "2025-08-29T20:51:21.087000",
           "scheduled_for": null
         },
         {
-          "id": "a87cae50-d21e-4fc5-b543-e7fdd992529d",
+          "id": "f13d00e7-344a-4d82-892a-9c1f8416ed89",
           "title": "Stress Test Meeting 6",
           "description": "Collision resistance stress test - Meeting 6",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "SLOW0CLHG",
+          "meeting_code": "BMWP8MQPG",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -804,8 +804,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=SLOW0CLHG",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/SLOW0CLHG",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=BMWP8MQPG",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/BMWP8MQPG",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -816,20 +816,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.265000",
+          "created_at": "2025-08-29T20:51:21.140000",
           "scheduled_for": null
         },
         {
-          "id": "3906b7de-45f0-4c81-8697-991d08e2081e",
+          "id": "2a045de8-ed2b-4711-b4e0-7cd8c3e9a136",
           "title": "Stress Test Meeting 7",
           "description": "Collision resistance stress test - Meeting 7",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "LEQH024FB",
+          "meeting_code": "GE302NKCB",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -839,8 +839,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=LEQH024FB",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/LEQH024FB",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=GE302NKCB",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/GE302NKCB",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -851,20 +851,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.321000",
+          "created_at": "2025-08-29T20:51:21.193000",
           "scheduled_for": null
         },
         {
-          "id": "6185dadc-7135-4c09-bc67-2f6e2bb9f845",
+          "id": "8fe8eb7f-68e6-4b53-85a2-546fe82b7077",
           "title": "Stress Test Meeting 8",
           "description": "Collision resistance stress test - Meeting 8",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "VJNCPJVEO",
+          "meeting_code": "DCU2H4KJL",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -874,8 +874,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=VJNCPJVEO",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/VJNCPJVEO",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=DCU2H4KJL",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/DCU2H4KJL",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -886,20 +886,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.374000",
+          "created_at": "2025-08-29T20:51:21.247000",
           "scheduled_for": null
         },
         {
-          "id": "197a9c88-e67e-49f1-8abc-3d14393701f9",
+          "id": "15d1d1c2-e6f5-4fd5-804e-24b80b89645c",
           "title": "Stress Test Meeting 9",
           "description": "Collision resistance stress test - Meeting 9",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "51TLVGWDF",
+          "meeting_code": "IAYS2LQF7",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -909,8 +909,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=51TLVGWDF",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/51TLVGWDF",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=IAYS2LQF7",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/IAYS2LQF7",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -921,20 +921,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.430000",
+          "created_at": "2025-08-29T20:51:21.309000",
           "scheduled_for": null
         },
         {
-          "id": "f2365c14-73e7-4a3c-b55b-9dba546fa5d3",
+          "id": "ad99a8cc-0df2-449f-888c-6cfa182a9416",
           "title": "Stress Test Meeting 10",
           "description": "Collision resistance stress test - Meeting 10",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "C84ZUA2QJ",
+          "meeting_code": "C4UWUPSTC",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -944,8 +944,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=C84ZUA2QJ",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/C84ZUA2QJ",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=C4UWUPSTC",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/C4UWUPSTC",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -956,20 +956,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.483000",
+          "created_at": "2025-08-29T20:51:21.365000",
           "scheduled_for": null
         },
         {
-          "id": "987dde67-69cc-4146-9c5c-329891b812fd",
+          "id": "207d93f1-95d2-4bec-b570-109c14e437f9",
           "title": "Stress Test Meeting 11",
           "description": "Collision resistance stress test - Meeting 11",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "YNA2RF3EB",
+          "meeting_code": "A2YRXH5KY",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -979,8 +979,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=YNA2RF3EB",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/YNA2RF3EB",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=A2YRXH5KY",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/A2YRXH5KY",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -991,20 +991,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.545000",
+          "created_at": "2025-08-29T20:51:21.418000",
           "scheduled_for": null
         },
         {
-          "id": "008a3b6d-bd2a-418c-a849-9dee1026d74f",
+          "id": "0b194da7-3f5c-4c06-9358-31d92d05e1e0",
           "title": "Stress Test Meeting 12",
           "description": "Collision resistance stress test - Meeting 12",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "F8ND1OASY",
+          "meeting_code": "IS38S9COO",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -1014,8 +1014,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=F8ND1OASY",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/F8ND1OASY",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=IS38S9COO",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/IS38S9COO",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -1026,20 +1026,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.599000",
+          "created_at": "2025-08-29T20:51:21.470000",
           "scheduled_for": null
         },
         {
-          "id": "660847d3-4ecb-4a16-bf0c-a2e5cb508644",
+          "id": "9b19a1ba-412e-42c7-a3c0-13c211cc67fd",
           "title": "Stress Test Meeting 13",
           "description": "Collision resistance stress test - Meeting 13",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "S0Z1MHVGW",
+          "meeting_code": "IE8NWEL1V",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -1049,8 +1049,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=S0Z1MHVGW",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/S0Z1MHVGW",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=IE8NWEL1V",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/IE8NWEL1V",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -1061,20 +1061,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.653000",
+          "created_at": "2025-08-29T20:51:21.526000",
           "scheduled_for": null
         },
         {
-          "id": "c144d70c-c700-43f1-81a5-6bfda1726a5e",
+          "id": "a49a0f6d-8914-4f3a-8e47-7dad0e7be1ac",
           "title": "Stress Test Meeting 14",
           "description": "Collision resistance stress test - Meeting 14",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "ODT8I4YQS",
+          "meeting_code": "YXQP7A7M6",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -1084,8 +1084,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=ODT8I4YQS",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/ODT8I4YQS",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=YXQP7A7M6",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/YXQP7A7M6",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -1096,20 +1096,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.712000",
+          "created_at": "2025-08-29T20:51:21.581000",
           "scheduled_for": null
         },
         {
-          "id": "3056034b-bfb0-4e4a-a29c-bf00b89031e1",
+          "id": "1d53d4b2-bcaf-40e9-9a1d-d4b1f293b741",
           "title": "Stress Test Meeting 15",
           "description": "Collision resistance stress test - Meeting 15",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "6EGOZI5HH",
+          "meeting_code": "0XE9DI67H",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -1119,8 +1119,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=6EGOZI5HH",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/6EGOZI5HH",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=0XE9DI67H",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/0XE9DI67H",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -1131,20 +1131,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.766000",
+          "created_at": "2025-08-29T20:51:21.641000",
           "scheduled_for": null
         },
         {
-          "id": "2232cc28-7fd9-4b3a-a6a7-41184aa78e3b",
+          "id": "5a496276-5db3-4e61-ac0b-93bd9e6168de",
           "title": "Stress Test Meeting 16",
           "description": "Collision resistance stress test - Meeting 16",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "O3E2NZHLU",
+          "meeting_code": "9ALT12PYT",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -1154,8 +1154,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=O3E2NZHLU",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/O3E2NZHLU",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=9ALT12PYT",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/9ALT12PYT",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -1166,20 +1166,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.821000",
+          "created_at": "2025-08-29T20:51:21.699000",
           "scheduled_for": null
         },
         {
-          "id": "dc824e29-bccc-46cd-83a0-14cd56284871",
+          "id": "81dacbfb-2eb0-4080-997a-f2b6025ad204",
           "title": "Stress Test Meeting 17",
           "description": "Collision resistance stress test - Meeting 17",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "0PPH7MCZM",
+          "meeting_code": "3HTPC8EX7",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -1189,8 +1189,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=0PPH7MCZM",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/0PPH7MCZM",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=3HTPC8EX7",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/3HTPC8EX7",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -1201,20 +1201,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.877000",
+          "created_at": "2025-08-29T20:51:21.754000",
           "scheduled_for": null
         },
         {
-          "id": "76e036b4-fa12-48f3-a78e-63ec8f4803a5",
+          "id": "43fbf8a6-8ec2-45f6-ad83-3c965add639f",
           "title": "Stress Test Meeting 18",
           "description": "Collision resistance stress test - Meeting 18",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "WEAVOMOH8",
+          "meeting_code": "UNYZW45DB",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -1224,8 +1224,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=WEAVOMOH8",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/WEAVOMOH8",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=UNYZW45DB",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/UNYZW45DB",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -1236,20 +1236,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.932000",
+          "created_at": "2025-08-29T20:51:21.807000",
           "scheduled_for": null
         },
         {
-          "id": "3582844d-3cab-420b-b84e-c3590cebb474",
+          "id": "c36880f0-37c6-4eba-8c8d-e1f1d5594edc",
           "title": "Stress Test Meeting 19",
           "description": "Collision resistance stress test - Meeting 19",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "XRTF2PR6X",
+          "meeting_code": "EZW9027OP",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -1259,8 +1259,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=XRTF2PR6X",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/XRTF2PR6X",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=EZW9027OP",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/EZW9027OP",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -1271,20 +1271,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:50.990000",
+          "created_at": "2025-08-29T20:51:21.862000",
           "scheduled_for": null
         },
         {
-          "id": "ea9d77b1-8960-4688-8fb0-d0e043b5168a",
+          "id": "39dc3fcc-7bad-4a9c-9259-c192f88dcec9",
           "title": "Stress Test Meeting 20",
           "description": "Collision resistance stress test - Meeting 20",
           "meeting_type": "group",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 5,
           "duration_minutes": 15,
           "quality": "standard",
-          "meeting_code": "1K88MZEMN",
+          "meeting_code": "0TV770JXZ",
           "password": null,
           "is_public": true,
           "shared_business_cards": [],
@@ -1294,8 +1294,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=1K88MZEMN",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/1K88MZEMN",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=0TV770JXZ",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/0TV770JXZ",
           "translation_enabled": false,
           "source_language": "auto",
           "target_languages": [],
@@ -1306,20 +1306,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:51.046000",
+          "created_at": "2025-08-29T20:51:21.928000",
           "scheduled_for": null
         },
         {
-          "id": "67463f90-9da2-48d7-9bd0-f5a4cbf0bd10",
+          "id": "30f58a1a-7e01-4d14-ab55-242bf166dd73",
           "title": "Revolutionary Features Test with 9-Char Code",
           "description": "Testing all enhanced features with 9-character meeting codes",
           "meeting_type": "networking_event",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 15,
           "duration_minutes": 60,
           "quality": "standard",
-          "meeting_code": "G3E0HAQM0",
+          "meeting_code": "GY7A5IVRU",
           "password": "test123",
           "is_public": true,
           "shared_business_cards": [],
@@ -1333,8 +1333,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=G3E0HAQM0",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/G3E0HAQM0",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=GY7A5IVRU",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/GY7A5IVRU",
           "translation_enabled": true,
           "source_language": "de",
           "target_languages": [
@@ -1350,20 +1350,20 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:51.100000",
+          "created_at": "2025-08-29T20:51:21.986000",
           "scheduled_for": null
         },
         {
-          "id": "cf0c7ee8-27b7-4458-b45b-e46d24fba1b0",
+          "id": "b869fc5c-bf5b-4432-9e16-0ca6ae78f15a",
           "title": "Revolutionary Tech Networking Session",
           "description": "Enhanced video meeting with live translation and business card integration",
           "meeting_type": "networking_event",
-          "host_id": "68b20e34c0efc79794ec55f0",
+          "host_id": "68b212c759338b337ddce3c0",
           "host_business_card_id": null,
           "max_participants": 15,
           "duration_minutes": 60,
           "quality": "standard",
-          "meeting_code": "2RIVHIGQA",
+          "meeting_code": "6X3G2M02V",
           "password": "meeting123",
           "is_public": true,
           "shared_business_cards": [],
@@ -1377,8 +1377,8 @@
           "is_job_related": false,
           "job_title": null,
           "company_name": null,
-          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=2RIVHIGQA",
-          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/2RIVHIGQA",
+          "share_link": "https://netlink-3.preview.emergentagent.com/join?code=6X3G2M02V",
+          "qr_code_url": "https://netlink-3.preview.emergentagent.com/api/qr/meeting/6X3G2M02V",
           "translation_enabled": true,
           "source_language": "de",
           "target_languages": [
@@ -1393,7 +1393,7 @@
           "enable_recording": false,
           "enable_screen_share": true,
           "enable_chat": true,
-          "created_at": "2025-08-29T20:31:51.153000",
+          "created_at": "2025-08-29T20:51:22.044000",
           "scheduled_for": null
         }
       ],
@@ -1406,22 +1406,22 @@
     "test": "Video Meeting Share Card",
     "success": false,
     "message": "No access token or video meeting ID available",
-    "timestamp": "2025-08-29T20:31:51.214077"
+    "timestamp": "2025-08-29T20:51:22.106442"
   },
   {
     "test": "Community Profile Get",
     "success": true,
     "message": "Community profile retrieved successfully",
-    "timestamp": "2025-08-29T20:31:51.300323"
+    "timestamp": "2025-08-29T20:51:22.157384"
   },
   {
     "test": "Community Profile Update",
     "success": false,
     "message": "Profile update not reflected",
-    "timestamp": "2025-08-29T20:31:51.356235",
+    "timestamp": "2025-08-29T20:51:22.213600",
     "response": {
-      "id": "53eaf445-e12f-42d3-9cdc-1ff64f40c5ed",
-      "user_id": "68b20e34c0efc79794ec55f0",
+      "id": "05b9b345-9618-4019-b935-644dcde33b4e",
+      "user_id": "68b212c759338b337ddce3c0",
       "display_name": "John Doe",
       "bio": "Tech enthusiast passionate about digital innovation",
       "location": "Berlin, Germany",
@@ -1450,19 +1450,19 @@
       "public_profile": true,
       "show_contact_info": false,
       "discoverable": true,
-      "created_at": "2025-08-29T20:31:51.295000",
-      "last_active": "2025-08-29T20:31:51.351000"
+      "created_at": "2025-08-29T20:51:22.154000",
+      "last_active": "2025-08-29T20:51:22.208000"
     }
   },
   {
     "test": "Community Discover",
     "success": false,
     "message": "Invalid response format",
-    "timestamp": "2025-08-29T20:31:51.411540",
+    "timestamp": "2025-08-29T20:51:22.266704",
     "response": {
       "communities": [
         {
-          "id": "998b3286-235d-4b3f-b382-08de45217d23",
+          "id": "ec50f759-eb89-43a9-9be4-aa5acca995e7",
           "name": "Berlin Revolutionary Tech",
           "description": "Community for revolutionary technology enthusiasts in Berlin",
           "community_type": "professional",
@@ -1500,13 +1500,13 @@
     "test": "Community Feed",
     "success": false,
     "message": "Invalid response format",
-    "timestamp": "2025-08-29T20:31:51.474836",
+    "timestamp": "2025-08-29T20:51:22.333849",
     "response": {
       "events": [],
       "job_opportunities": [],
       "community_suggestions": [
         {
-          "id": "6ed5f91a-57f3-4c1e-ab19-ce8398130e6b",
+          "id": "daeedcb9-e112-49b2-98ca-015244bbde0a",
           "name": "Berlin Revolutionary Tech",
           "description": "Community for revolutionary technology enthusiasts in Berlin",
           "community_type": "professional",
@@ -1533,127 +1533,7 @@
       ],
       "user_matches": [
         {
-          "id": "b1af6f6f-4eef-4c43-89be-2be71a965509",
-          "user_id": "68b1d3f3cf809034f23fc79e",
-          "display_name": "John Doe",
-          "bio": "Tech enthusiast passionate about digital innovation",
-          "location": "Berlin, Germany",
-          "interests": [
-            "technology",
-            "networking",
-            "ai",
-            "startups"
-          ],
-          "industry": null,
-          "skills": [
-            "Python",
-            "FastAPI",
-            "React",
-            "MongoDB"
-          ],
-          "current_position": null,
-          "current_company": null,
-          "experience_level": null,
-          "looking_for_job": false,
-          "job_preferences": null,
-          "is_recruiter": false,
-          "recruiting_for_companies": [],
-          "preferred_meeting_types": [],
-          "max_distance_km": 50,
-          "public_profile": true,
-          "show_contact_info": false,
-          "discoverable": true,
-          "created_at": "2025-08-29T16:23:16.548000",
-          "last_active": "2025-08-29T16:23:16.630000",
-          "match_score": 0.7000000000000001,
-          "match_reasons": [
-            "Gemeinsame Interessen: ai, startups, technology",
-            "\u00c4hnliche Skills: FastAPI, MongoDB",
-            "Gleiche Stadt: Berlin, Germany"
-          ]
-        },
-        {
-          "id": "c766799a-990f-4094-ba99-2b66941bcc59",
-          "user_id": "68b20735c0efc79794ec5342",
-          "display_name": "John Doe",
-          "bio": "Tech enthusiast passionate about digital innovation",
-          "location": "Berlin, Germany",
-          "interests": [
-            "technology",
-            "networking",
-            "ai",
-            "startups"
-          ],
-          "industry": null,
-          "skills": [
-            "Python",
-            "FastAPI",
-            "React",
-            "MongoDB"
-          ],
-          "current_position": null,
-          "current_company": null,
-          "experience_level": null,
-          "looking_for_job": false,
-          "job_preferences": null,
-          "is_recruiter": false,
-          "recruiting_for_companies": [],
-          "preferred_meeting_types": [],
-          "max_distance_km": 50,
-          "public_profile": true,
-          "show_contact_info": false,
-          "discoverable": true,
-          "created_at": "2025-08-29T20:02:00.015000",
-          "last_active": "2025-08-29T20:02:00.072000",
-          "match_score": 0.7000000000000001,
-          "match_reasons": [
-            "Gemeinsame Interessen: ai, startups, technology",
-            "\u00c4hnliche Skills: FastAPI, MongoDB",
-            "Gleiche Stadt: Berlin, Germany"
-          ]
-        },
-        {
-          "id": "15495a7c-71d7-47a4-aa35-8f8ced2054b1",
-          "user_id": "68b1fa53d1c501dbca3884f2",
-          "display_name": "John Doe",
-          "bio": "Tech enthusiast passionate about digital innovation",
-          "location": "Berlin, Germany",
-          "interests": [
-            "technology",
-            "networking",
-            "ai",
-            "startups"
-          ],
-          "industry": null,
-          "skills": [
-            "Python",
-            "FastAPI",
-            "React",
-            "MongoDB"
-          ],
-          "current_position": null,
-          "current_company": null,
-          "experience_level": null,
-          "looking_for_job": false,
-          "job_preferences": null,
-          "is_recruiter": false,
-          "recruiting_for_companies": [],
-          "preferred_meeting_types": [],
-          "max_distance_km": 50,
-          "public_profile": true,
-          "show_contact_info": false,
-          "discoverable": true,
-          "created_at": "2025-08-29T19:07:01.556000",
-          "last_active": "2025-08-29T19:07:01.614000",
-          "match_score": 0.7000000000000001,
-          "match_reasons": [
-            "Gemeinsame Interessen: ai, startups, technology",
-            "\u00c4hnliche Skills: FastAPI, MongoDB",
-            "Gleiche Stadt: Berlin, Germany"
-          ]
-        },
-        {
-          "id": "8580c50d-68cd-4404-a670-403af12147ce",
+          "id": "9a05c4b6-3637-49a8-80c8-6652506317b3",
           "user_id": "68b2039dd1c501dbca38878f",
           "display_name": "John Doe",
           "bio": "Tech enthusiast passionate about digital innovation",
@@ -1687,13 +1567,13 @@
           "last_active": "2025-08-29T19:46:40.262000",
           "match_score": 0.7000000000000001,
           "match_reasons": [
-            "Gemeinsame Interessen: ai, startups, technology",
-            "\u00c4hnliche Skills: FastAPI, MongoDB",
+            "Gemeinsame Interessen: startups, ai, technology",
+            "\u00c4hnliche Skills: MongoDB, FastAPI",
             "Gleiche Stadt: Berlin, Germany"
           ]
         },
         {
-          "id": "810a4daa-2c58-43b4-824f-c965b368721c",
+          "id": "9cbaa8d7-bfca-43d8-962f-5f4a691cf049",
           "user_id": "68b1c5255c1962a7ef172326",
           "display_name": "John Doe",
           "bio": "Tech enthusiast passionate about digital innovation",
@@ -1727,14 +1607,14 @@
           "last_active": "2025-08-29T15:20:13.879000",
           "match_score": 0.7000000000000001,
           "match_reasons": [
-            "Gemeinsame Interessen: ai, startups, technology",
-            "\u00c4hnliche Skills: FastAPI, MongoDB",
+            "Gemeinsame Interessen: startups, ai, technology",
+            "\u00c4hnliche Skills: MongoDB, FastAPI",
             "Gleiche Stadt: Berlin, Germany"
           ]
         },
         {
-          "id": "ae4d0f05-b7ce-4b4c-ab1f-56e4fa60a6e2",
-          "user_id": "68b1e7314d21bc5a104736a6",
+          "id": "36c1c199-c5de-442a-b6f0-53bc11b45706",
+          "user_id": "68b1d3f3cf809034f23fc79e",
           "display_name": "John Doe",
           "bio": "Tech enthusiast passionate about digital innovation",
           "location": "Berlin, Germany",
@@ -1763,17 +1643,17 @@
           "public_profile": true,
           "show_contact_info": false,
           "discoverable": true,
-          "created_at": "2025-08-29T17:45:22.928000",
-          "last_active": "2025-08-29T17:45:22.989000",
+          "created_at": "2025-08-29T16:23:16.548000",
+          "last_active": "2025-08-29T16:23:16.630000",
           "match_score": 0.7000000000000001,
           "match_reasons": [
-            "Gemeinsame Interessen: ai, startups, technology",
-            "\u00c4hnliche Skills: FastAPI, MongoDB",
+            "Gemeinsame Interessen: startups, ai, technology",
+            "\u00c4hnliche Skills: MongoDB, FastAPI",
             "Gleiche Stadt: Berlin, Germany"
           ]
         },
         {
-          "id": "0f733882-fb71-4854-860c-9039d7c101c1",
+          "id": "3bf43df6-1548-44c7-95a0-bb0641544fd9",
           "user_id": "68b1cf219073449a553f8933",
           "display_name": "John Doe",
           "bio": "Tech enthusiast passionate about digital innovation",
@@ -1807,13 +1687,133 @@
           "last_active": "2025-08-29T16:02:50.073000",
           "match_score": 0.7000000000000001,
           "match_reasons": [
-            "Gemeinsame Interessen: ai, startups, technology",
-            "\u00c4hnliche Skills: FastAPI, MongoDB",
+            "Gemeinsame Interessen: startups, ai, technology",
+            "\u00c4hnliche Skills: MongoDB, FastAPI",
             "Gleiche Stadt: Berlin, Germany"
           ]
         },
         {
-          "id": "98dedd1c-24d2-42de-bee2-daf4946d4dcc",
+          "id": "630eb277-d7da-4be9-bc42-5beecef80815",
+          "user_id": "68b1fa53d1c501dbca3884f2",
+          "display_name": "John Doe",
+          "bio": "Tech enthusiast passionate about digital innovation",
+          "location": "Berlin, Germany",
+          "interests": [
+            "technology",
+            "networking",
+            "ai",
+            "startups"
+          ],
+          "industry": null,
+          "skills": [
+            "Python",
+            "FastAPI",
+            "React",
+            "MongoDB"
+          ],
+          "current_position": null,
+          "current_company": null,
+          "experience_level": null,
+          "looking_for_job": false,
+          "job_preferences": null,
+          "is_recruiter": false,
+          "recruiting_for_companies": [],
+          "preferred_meeting_types": [],
+          "max_distance_km": 50,
+          "public_profile": true,
+          "show_contact_info": false,
+          "discoverable": true,
+          "created_at": "2025-08-29T19:07:01.556000",
+          "last_active": "2025-08-29T19:07:01.614000",
+          "match_score": 0.7000000000000001,
+          "match_reasons": [
+            "Gemeinsame Interessen: startups, ai, technology",
+            "\u00c4hnliche Skills: MongoDB, FastAPI",
+            "Gleiche Stadt: Berlin, Germany"
+          ]
+        },
+        {
+          "id": "44d850df-6583-449f-923e-1924b43196c1",
+          "user_id": "68b20e34c0efc79794ec55f0",
+          "display_name": "John Doe",
+          "bio": "Tech enthusiast passionate about digital innovation",
+          "location": "Berlin, Germany",
+          "interests": [
+            "technology",
+            "networking",
+            "ai",
+            "startups"
+          ],
+          "industry": null,
+          "skills": [
+            "Python",
+            "FastAPI",
+            "React",
+            "MongoDB"
+          ],
+          "current_position": null,
+          "current_company": null,
+          "experience_level": null,
+          "looking_for_job": false,
+          "job_preferences": null,
+          "is_recruiter": false,
+          "recruiting_for_companies": [],
+          "preferred_meeting_types": [],
+          "max_distance_km": 50,
+          "public_profile": true,
+          "show_contact_info": false,
+          "discoverable": true,
+          "created_at": "2025-08-29T20:31:51.295000",
+          "last_active": "2025-08-29T20:31:51.351000",
+          "match_score": 0.7000000000000001,
+          "match_reasons": [
+            "Gemeinsame Interessen: startups, ai, technology",
+            "\u00c4hnliche Skills: MongoDB, FastAPI",
+            "Gleiche Stadt: Berlin, Germany"
+          ]
+        },
+        {
+          "id": "ba594e58-9b35-4f55-8b8e-c9b0ee2b56f7",
+          "user_id": "68b20735c0efc79794ec5342",
+          "display_name": "John Doe",
+          "bio": "Tech enthusiast passionate about digital innovation",
+          "location": "Berlin, Germany",
+          "interests": [
+            "technology",
+            "networking",
+            "ai",
+            "startups"
+          ],
+          "industry": null,
+          "skills": [
+            "Python",
+            "FastAPI",
+            "React",
+            "MongoDB"
+          ],
+          "current_position": null,
+          "current_company": null,
+          "experience_level": null,
+          "looking_for_job": false,
+          "job_preferences": null,
+          "is_recruiter": false,
+          "recruiting_for_companies": [],
+          "preferred_meeting_types": [],
+          "max_distance_km": 50,
+          "public_profile": true,
+          "show_contact_info": false,
+          "discoverable": true,
+          "created_at": "2025-08-29T20:02:00.015000",
+          "last_active": "2025-08-29T20:02:00.072000",
+          "match_score": 0.7000000000000001,
+          "match_reasons": [
+            "Gemeinsame Interessen: startups, ai, technology",
+            "\u00c4hnliche Skills: MongoDB, FastAPI",
+            "Gleiche Stadt: Berlin, Germany"
+          ]
+        },
+        {
+          "id": "af131e9f-6327-4c5c-baf6-0497b1c7f88a",
           "user_id": "68b1d57e1c29e984db567fc9",
           "display_name": "John Doe",
           "bio": "Tech enthusiast passionate about digital innovation",
@@ -1847,13 +1847,53 @@
           "last_active": "2025-08-29T16:29:51.322000",
           "match_score": 0.7000000000000001,
           "match_reasons": [
-            "Gemeinsame Interessen: ai, startups, technology",
-            "\u00c4hnliche Skills: FastAPI, MongoDB",
+            "Gemeinsame Interessen: startups, ai, technology",
+            "\u00c4hnliche Skills: MongoDB, FastAPI",
             "Gleiche Stadt: Berlin, Germany"
           ]
         },
         {
-          "id": "3f4d0d4e-25f4-40f5-bd09-c290acb19591",
+          "id": "f675191d-e5c5-45e6-a749-f919c569e113",
+          "user_id": "68b1e7314d21bc5a104736a6",
+          "display_name": "John Doe",
+          "bio": "Tech enthusiast passionate about digital innovation",
+          "location": "Berlin, Germany",
+          "interests": [
+            "technology",
+            "networking",
+            "ai",
+            "startups"
+          ],
+          "industry": null,
+          "skills": [
+            "Python",
+            "FastAPI",
+            "React",
+            "MongoDB"
+          ],
+          "current_position": null,
+          "current_company": null,
+          "experience_level": null,
+          "looking_for_job": false,
+          "job_preferences": null,
+          "is_recruiter": false,
+          "recruiting_for_companies": [],
+          "preferred_meeting_types": [],
+          "max_distance_km": 50,
+          "public_profile": true,
+          "show_contact_info": false,
+          "discoverable": true,
+          "created_at": "2025-08-29T17:45:22.928000",
+          "last_active": "2025-08-29T17:45:22.989000",
+          "match_score": 0.7000000000000001,
+          "match_reasons": [
+            "Gemeinsame Interessen: startups, ai, technology",
+            "\u00c4hnliche Skills: MongoDB, FastAPI",
+            "Gleiche Stadt: Berlin, Germany"
+          ]
+        },
+        {
+          "id": "4d986b7f-49f1-41eb-beeb-304cbfd65955",
           "user_id": "68b1c5d57db2e9072228c7a8",
           "display_name": "New Features",
           "bio": "Tech innovator passionate about revolutionary digital solutions",
@@ -1888,8 +1928,8 @@
           "last_active": "2025-08-29T15:23:01.503000",
           "match_score": 0.52,
           "match_reasons": [
-            "Gemeinsame Interessen: ai, networking, technology",
-            "\u00c4hnliche Skills: FastAPI, MongoDB",
+            "Gemeinsame Interessen: ai, technology, networking",
+            "\u00c4hnliche Skills: MongoDB, FastAPI",
             "Gleiche Stadt: Berlin, Germany"
           ]
         }
@@ -1900,20 +1940,20 @@
     "test": "Community Create",
     "success": false,
     "message": "HTTP 422",
-    "timestamp": "2025-08-29T20:31:51.524975",
+    "timestamp": "2025-08-29T20:51:22.385076",
     "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"community_type\"],\"msg\":\"Field required\",\"input\":{\"name\":\"Berlin Tech Entrepreneurs\",\"description\":\"Community for tech entrepreneurs in Berlin\",\"category\":\"Technology\",\"location\":\"Berlin, Germany\",\"privacy\":\"public\",\"tags\":[\"startup\",\"tech\",\"networking\",\"berlin\"]},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"},{\"type\":\"missing\",\"loc\":[\"body\",\"primary_interests\"],\"msg\":\"Field required\",\"input\":{\"name\":\"Berlin Tech Entrepreneurs\",\"description\":\"Community for tech entrepreneurs in Berlin\",\"category\":\"Technology\",\"location\":\"Berlin, Germany\",\"privacy\":\"public\",\"tags\":[\"startup\",\"tech\",\"networking\",\"berlin\"]},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"}]}"
   },
   {
     "test": "Community Join",
     "success": false,
     "message": "No access token or community ID available",
-    "timestamp": "2025-08-29T20:31:51.525979"
+    "timestamp": "2025-08-29T20:51:22.386389"
   },
   {
     "test": "My Communities List",
     "success": false,
     "message": "Response is not a list",
-    "timestamp": "2025-08-29T20:31:51.584889",
+    "timestamp": "2025-08-29T20:51:22.439122",
     "response": {
       "communities": [],
       "my_communities": [],
@@ -1925,105 +1965,105 @@
     "test": "Jobs Discover",
     "success": false,
     "message": "Invalid response format",
-    "timestamp": "2025-08-29T20:31:51.637047"
+    "timestamp": "2025-08-29T20:51:22.490030"
   },
   {
     "test": "Jobs Post",
     "success": false,
     "message": "HTTP 422",
-    "timestamp": "2025-08-29T20:31:51.691856",
-    "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"company_name\"],\"msg\":\"Field required\",\"input\":{\"title\":\"Senior Python Developer\",\"company\":\"Tech Solutions Inc\",\"description\":\"Looking for experienced Python developer for exciting projects\",\"location\":\"Berlin, Germany\",\"salary_range\":\"70000-90000\",\"requirements\":[\"Python\",\"FastAPI\",\"MongoDB\",\"5+ years experience\"],\"job_type\":\"full-time\",\"remote_allowed\":true,\"business_card_id\":\"68b20e35c0efc79794ec55f8\"},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"},{\"type\":\"enum\",\"loc\":[\"body\",\"job_type\"],\"msg\":\"Input should be 'full_time', 'part_time', 'freelance', 'contract', 'internship' or 'volunteer'\",\"input\":\"full-time\",\"ctx\":{\"expected\":\"'full_time', 'part_time', 'freelance', 'contract', 'internship' or 'volunteer'\"},\"url\":\"https://errors.pydantic.dev/2.11/v/enum\"},{\"type\":\"missing\",\"loc\":[\"body\",\"experience_level\"],\"msg\":\"Field required\",\"input\":{\"title\":\"Senior Python Developer\",\"company\":\"Tech Solutions Inc\",\"description\":\"Looking for experienced Python developer for exciting projects\",\"location\":\"Berlin, Germany\",\"salary_range\":\"70000-90000\",\"requirements\":[\"Python\",\"FastAPI\",\"MongoDB\",\"5+ years experience\"],\"job_type\":\"full-time\",\"remote_allowed\":true,\"business_card_id\":\"68b20e35c0efc79794ec55f8\"},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"}]}"
+    "timestamp": "2025-08-29T20:51:22.546716",
+    "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"company_name\"],\"msg\":\"Field required\",\"input\":{\"title\":\"Senior Python Developer\",\"company\":\"Tech Solutions Inc\",\"description\":\"Looking for experienced Python developer for exciting projects\",\"location\":\"Berlin, Germany\",\"salary_range\":\"70000-90000\",\"requirements\":[\"Python\",\"FastAPI\",\"MongoDB\",\"5+ years experience\"],\"job_type\":\"full-time\",\"remote_allowed\":true,\"business_card_id\":\"68b212c759338b337ddce3c8\"},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"},{\"type\":\"enum\",\"loc\":[\"body\",\"job_type\"],\"msg\":\"Input should be 'full_time', 'part_time', 'freelance', 'contract', 'internship' or 'volunteer'\",\"input\":\"full-time\",\"ctx\":{\"expected\":\"'full_time', 'part_time', 'freelance', 'contract', 'internship' or 'volunteer'\"},\"url\":\"https://errors.pydantic.dev/2.11/v/enum\"},{\"type\":\"missing\",\"loc\":[\"body\",\"experience_level\"],\"msg\":\"Field required\",\"input\":{\"title\":\"Senior Python Developer\",\"company\":\"Tech Solutions Inc\",\"description\":\"Looking for experienced Python developer for exciting projects\",\"location\":\"Berlin, Germany\",\"salary_range\":\"70000-90000\",\"requirements\":[\"Python\",\"FastAPI\",\"MongoDB\",\"5+ years experience\"],\"job_type\":\"full-time\",\"remote_allowed\":true,\"business_card_id\":\"68b212c759338b337ddce3c8\"},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"}]}"
   },
   {
     "test": "Jobs Apply",
     "success": false,
     "message": "No access token or job ID available",
-    "timestamp": "2025-08-29T20:31:51.692926"
+    "timestamp": "2025-08-29T20:51:22.548129"
   },
   {
     "test": "Get User Cards",
     "success": true,
     "message": "No cards found (empty list)",
-    "timestamp": "2025-08-29T20:31:51.744145"
+    "timestamp": "2025-08-29T20:51:22.597476"
   },
   {
     "test": "Get Specific Card",
     "success": true,
     "message": "Card retrieved: John Doe",
-    "timestamp": "2025-08-29T20:31:51.795681"
+    "timestamp": "2025-08-29T20:51:22.648962"
   },
   {
     "test": "Update Business Card",
     "success": true,
     "message": "Card updated successfully",
-    "timestamp": "2025-08-29T20:31:51.853105"
+    "timestamp": "2025-08-29T20:51:22.704907"
   },
   {
     "test": "Create Card with Custom Code",
     "success": true,
-    "message": "Card created with custom code: TEST549B74",
-    "timestamp": "2025-08-29T20:31:51.912245"
+    "message": "Card created with custom code: TEST59C872",
+    "timestamp": "2025-08-29T20:51:22.788073"
   },
   {
     "test": "Check Code Availability - Available",
     "success": true,
-    "message": "Code AVAIL566C is available",
-    "timestamp": "2025-08-29T20:31:51.960059"
+    "message": "Code AVAILE236 is available",
+    "timestamp": "2025-08-29T20:51:22.839217"
   },
   {
     "test": "Check Code Availability - Taken",
     "success": true,
-    "message": "Code TEST549B74 is correctly marked as taken",
-    "timestamp": "2025-08-29T20:31:52.010435"
+    "message": "Code TEST59C872 is correctly marked as taken",
+    "timestamp": "2025-08-29T20:51:22.890580"
   },
   {
     "test": "Access Card by Code",
     "success": true,
-    "message": "Successfully accessed card using code: TEST549B74",
-    "timestamp": "2025-08-29T20:31:52.069073"
+    "message": "Successfully accessed card using code: TEST59C872",
+    "timestamp": "2025-08-29T20:51:22.941903"
   },
   {
     "test": "Code Uniqueness Validation",
     "success": false,
     "message": "Expected validation error, got HTTP 500",
-    "timestamp": "2025-08-29T20:31:52.125618",
-    "response": "{\"detail\":\"Card creation failed: E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TEST549B74\\\" }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TEST549B74\\\" }', 'keyPattern': {'custom_code': 1}, 'keyValue': {'custom_code': 'TEST549B74'}}\"}"
+    "timestamp": "2025-08-29T20:51:23.005428",
+    "response": "{\"detail\":\"Card creation failed: E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TEST59C872\\\" }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: \\\"TEST59C872\\\" }', 'keyPattern': {'custom_code': 1}, 'keyValue': {'custom_code': 'TEST59C872'}}\"}"
   },
   {
     "test": "Early Adopter User Registration",
     "success": true,
-    "message": "Early Adopter #145 created with unlimited premium features: earlyadopter_fe50ae8c@example.com",
-    "timestamp": "2025-08-29T20:31:52.465200"
+    "message": "Early Adopter #152 created with unlimited premium features: earlyadopter_2bc3725b@example.com",
+    "timestamp": "2025-08-29T20:51:23.345106"
   },
   {
     "test": "Early Adopter Premium Feature Access",
     "success": true,
     "message": "Early Adopter has access to ALL 12 premium features",
-    "timestamp": "2025-08-29T20:31:53.260361"
+    "timestamp": "2025-08-29T20:51:24.057521"
   },
   {
     "test": "Early Adopter vs Regular User Comparison",
     "success": false,
     "message": "No clear difference found between user types",
-    "timestamp": "2025-08-29T20:31:53.819067"
+    "timestamp": "2025-08-29T20:51:24.608468"
   },
   {
     "test": "User Count API Logic",
     "success": true,
-    "message": "Sequential Early Adopter numbering verified: [147, 148, 149]",
-    "timestamp": "2025-08-29T20:31:54.842932"
+    "message": "Sequential Early Adopter numbering verified: [154, 155, 156]",
+    "timestamp": "2025-08-29T20:51:25.642126"
   },
   {
     "test": "Subscription Status Response Format",
     "success": true,
-    "message": "Early Adopter #145 response format correct for frontend parsing",
-    "timestamp": "2025-08-29T20:31:54.901860"
+    "message": "Early Adopter #152 response format correct for frontend parsing",
+    "timestamp": "2025-08-29T20:51:25.700087"
   },
   {
     "test": "Get Subscription Status",
     "success": false,
     "message": "Free plan limits not generous enough for growth-first strategy",
-    "timestamp": "2025-08-29T20:31:54.952382",
+    "timestamp": "2025-08-29T20:51:25.753913",
     "response": {
       "max_business_cards": 999999,
       "max_custom_codes": 999999,
@@ -2058,279 +2098,279 @@
     "test": "Check Feature Access - Free User",
     "success": true,
     "message": "Growth-first validation passed: 9/12 features free (75.0%), 0 premium features properly restricted",
-    "timestamp": "2025-08-29T20:31:55.602820"
+    "timestamp": "2025-08-29T20:51:26.477031"
   },
   {
     "test": "Track Usage System",
     "success": true,
     "message": "Successfully tracked 5 usage events, total usage: 8",
-    "timestamp": "2025-08-29T20:31:55.925816"
+    "timestamp": "2025-08-29T20:51:26.889698"
   },
   {
     "test": "Integration with Existing Features",
     "success": true,
     "message": "Business card creation tracked usage: 4 \u2192 5",
-    "timestamp": "2025-08-29T20:31:57.091522"
+    "timestamp": "2025-08-29T20:51:28.054491"
   },
   {
     "test": "Growth-First Validation",
     "success": false,
     "message": "Not enough premium restrictions: 0",
-    "timestamp": "2025-08-29T20:31:57.149304"
+    "timestamp": "2025-08-29T20:51:28.111112"
   },
   {
     "test": "List Contact Sources - Empty",
     "success": true,
     "message": "Retrieved 0 contact sources (empty list expected)",
-    "timestamp": "2025-08-29T20:31:57.203942"
+    "timestamp": "2025-08-29T20:51:28.166240"
   },
   {
     "test": "Import Contacts - Contact Picker",
     "success": true,
     "message": "Successfully imported 3 contacts from Contact Picker",
-    "timestamp": "2025-08-29T20:31:57.260502"
+    "timestamp": "2025-08-29T20:51:28.225176"
   },
   {
     "test": "Import Contacts - VCF File",
     "success": true,
     "message": "Successfully imported 2 contacts from VCF file",
-    "timestamp": "2025-08-29T20:31:57.316495"
+    "timestamp": "2025-08-29T20:51:28.281197"
   },
   {
     "test": "Import Contacts - Google Placeholder",
     "success": true,
     "message": "Google Contacts placeholder response working correctly",
-    "timestamp": "2025-08-29T20:31:57.365884"
+    "timestamp": "2025-08-29T20:51:28.330424"
   },
   {
     "test": "Import Contacts - Apple Placeholder",
     "success": true,
     "message": "Apple iCloud placeholder response working correctly",
-    "timestamp": "2025-08-29T20:31:57.419775"
+    "timestamp": "2025-08-29T20:51:28.379144"
   },
   {
     "test": "Import Contacts - CSV Unsupported",
     "success": true,
     "message": "CSV import properly rejected as unsupported",
-    "timestamp": "2025-08-29T20:31:57.470914"
+    "timestamp": "2025-08-29T20:51:28.429287"
   },
   {
     "test": "List Contact Sources - With Data",
     "success": true,
     "message": "Retrieved 2 contact sources with correct data",
-    "timestamp": "2025-08-29T20:31:57.521094"
+    "timestamp": "2025-08-29T20:51:28.480057"
   },
   {
     "test": "Unified Contacts List",
     "success": true,
     "message": "Retrieved 5 unified contacts (0 business cards, 5 imported contacts)",
-    "timestamp": "2025-08-29T20:31:57.572675"
+    "timestamp": "2025-08-29T20:51:28.534405"
   },
   {
     "test": "Unified Contacts Search",
     "success": true,
     "message": "Search found 2 contacts matching 'John'",
-    "timestamp": "2025-08-29T20:31:57.624236"
+    "timestamp": "2025-08-29T20:51:28.591883"
   },
   {
     "test": "Imported Contact Messaging Apps",
     "success": true,
     "message": "Imported contact has correct messaging apps: ['whatsapp', 'sms']",
-    "timestamp": "2025-08-29T20:31:57.719402"
+    "timestamp": "2025-08-29T20:51:28.645529"
   },
   {
     "test": "Contact Type Identification",
     "success": true,
     "message": "Contact type identification working correctly (0 business cards, 5 imported contacts)",
-    "timestamp": "2025-08-29T20:31:57.771271"
+    "timestamp": "2025-08-29T20:51:28.700008"
   },
   {
     "test": "Contact Import Invalid Data - Missing Data",
     "success": true,
     "message": "Missing contacts_data properly rejected",
-    "timestamp": "2025-08-29T20:31:57.825259"
+    "timestamp": "2025-08-29T20:51:28.755627"
   },
   {
     "test": "Contact Import Invalid Data - Invalid VCF",
     "success": true,
     "message": "Invalid VCF content properly rejected",
-    "timestamp": "2025-08-29T20:31:57.877639"
+    "timestamp": "2025-08-29T20:51:28.810360"
   },
   {
     "test": "Messaging Apps Default Configuration",
     "success": true,
     "message": "Default messaging apps configured: WhatsApp and SMS both enabled",
-    "timestamp": "2025-08-29T20:31:57.934762"
+    "timestamp": "2025-08-29T20:51:28.870647"
   },
   {
     "test": "Messaging Apps Custom Configuration",
     "success": true,
     "message": "Custom messaging apps configured correctly",
-    "timestamp": "2025-08-29T20:31:58.028530"
+    "timestamp": "2025-08-29T20:51:28.959412"
   },
   {
     "test": "Messaging Apps Update Configuration",
     "success": true,
     "message": "Messaging apps updated successfully: {'whatsapp': True, 'sms': False, 'telegram': True, 'viber': True, 'signal': False}",
-    "timestamp": "2025-08-29T20:31:58.086948"
+    "timestamp": "2025-08-29T20:51:29.019540"
   },
   {
     "test": "Messaging Apps API Response Validation",
     "success": true,
     "message": "All messaging_apps fields properly formatted in API response",
-    "timestamp": "2025-08-29T20:31:58.138329"
+    "timestamp": "2025-08-29T20:51:29.073884"
   },
   {
     "test": "Messaging Apps Persistence",
     "success": true,
     "message": "Messaging apps persist correctly across requests: {'whatsapp': True, 'sms': False, 'telegram': True, 'signal': True, 'viber': False}",
-    "timestamp": "2025-08-29T20:31:58.297585"
+    "timestamp": "2025-08-29T20:51:29.247120"
   },
   {
     "test": "Messaging Apps Multiple Phones Independence",
     "success": true,
     "message": "Independent configs: Work={'whatsapp': True, 'sms': True, 'telegram': False}, Personal={'whatsapp': False, 'sms': True, 'signal': True, 'viber': True}, Emergency={'sms': True}",
-    "timestamp": "2025-08-29T20:31:58.355374"
+    "timestamp": "2025-08-29T20:51:29.308705"
   },
   {
     "test": "Social Media Fix with Custom Code - Missing Field",
     "success": true,
-    "message": "Card created with custom code SOCIAL7388AB, social_media properly initialized",
-    "timestamp": "2025-08-29T20:31:58.409711"
+    "message": "Card created with custom code SOCIAL658154, social_media properly initialized",
+    "timestamp": "2025-08-29T20:51:29.367054"
   },
   {
     "test": "Social Media Fix with Custom Code - Null Field",
     "success": true,
-    "message": "Card created with custom code SOCIAL13E884, null social_media properly handled",
-    "timestamp": "2025-08-29T20:31:58.467049"
+    "message": "Card created with custom code SOCIAL57A061, null social_media properly handled",
+    "timestamp": "2025-08-29T20:51:29.425044"
   },
   {
     "test": "Create Meeting Room",
     "success": true,
-    "message": "Meeting room created with code: 5PMJB",
-    "timestamp": "2025-08-29T20:31:58.525385"
+    "message": "Meeting room created with code: 77WNG",
+    "timestamp": "2025-08-29T20:51:29.487183"
   },
   {
     "test": "Get Meeting Room",
     "success": true,
-    "message": "Meeting room retrieved: 5PMJB",
-    "timestamp": "2025-08-29T20:31:58.576830"
+    "message": "Meeting room retrieved: 77WNG",
+    "timestamp": "2025-08-29T20:51:29.541366"
   },
   {
     "test": "Join Meeting Room",
     "success": true,
-    "message": "Successfully joined meeting room: 5PMJB",
-    "timestamp": "2025-08-29T20:31:58.634836"
+    "message": "Successfully joined meeting room: 77WNG",
+    "timestamp": "2025-08-29T20:51:29.611434"
   },
   {
     "test": "List User Meeting Rooms",
     "success": true,
     "message": "No meeting rooms found (empty list)",
-    "timestamp": "2025-08-29T20:31:58.686693"
+    "timestamp": "2025-08-29T20:51:29.668526"
   },
   {
     "test": "Enhanced Code Access - Meeting Room",
     "success": true,
     "message": "Meeting room code properly rejected by card access endpoint",
-    "timestamp": "2025-08-29T20:31:58.739882"
+    "timestamp": "2025-08-29T20:51:29.717803"
   },
   {
     "test": "Close Meeting Room",
     "success": true,
-    "message": "Meeting room 5PMJB closed successfully",
-    "timestamp": "2025-08-29T20:31:58.793592"
+    "message": "Meeting room 77WNG closed successfully",
+    "timestamp": "2025-08-29T20:51:29.772932"
   },
   {
     "test": "Express Code Collision Prevention - Simultaneous",
     "success": true,
-    "message": "Successfully created 10 unique express codes: ['DQ', '48', '3F', 'KH', 'CY', '6C', 'HD', 'PD', 'EF', 'QN']",
-    "timestamp": "2025-08-29T20:31:59.395843"
+    "message": "Successfully created 10 unique express codes: ['6F', 'UW', 'QM', 'Q7', 'E2', 'KW', 'PA', '6L', '7X', '6Y']",
+    "timestamp": "2025-08-29T20:51:30.406406"
   },
   {
     "test": "Express Cross-Contamination Prevention",
     "success": true,
-    "message": "No cross-contamination detected. Room code: 50, Express codes: ['CK', 'LH', 'EG', 'T5', 'DV']...",
-    "timestamp": "2025-08-29T20:32:00.333724"
+    "message": "No cross-contamination detected. Room code: 60, Express codes: ['WZ', 'DZ', '99', 'C7', 'U4']...",
+    "timestamp": "2025-08-29T20:51:31.408235"
   },
   {
     "test": "User Context Seeding Uniqueness",
     "success": true,
-    "message": "All 10 codes unique across batches. Batch 1: ['QXH', '7T9', '79Z', 'TEG', 'KPU'], Batch 2: ['PYM', 'AYW', 'Y7C', 'SDD', 'ALD']",
-    "timestamp": "2025-08-29T20:32:01.982053"
+    "message": "All 10 codes unique across batches. Batch 1: ['7KY', 'TBP', '73U', 'J5E', 'PLM'], Batch 2: ['RJF', 'P2J', 'Y4C', 'RFM', 'RZZ']",
+    "timestamp": "2025-08-29T20:51:33.042177"
   },
   {
     "test": "Rapid Code Creation Edge Case",
     "success": true,
     "message": "Rapid creation handled well: 20/20 successful, no duplicates",
-    "timestamp": "2025-08-29T20:32:03.184100"
+    "timestamp": "2025-08-29T20:51:34.334869"
   },
   {
     "test": "Many Active Codes Scenario",
     "success": true,
     "message": "Successfully created 30 unique codes without collision",
-    "timestamp": "2025-08-29T20:32:05.009705"
+    "timestamp": "2025-08-29T20:51:36.180960"
   },
   {
     "test": "Global Uniqueness Verification",
     "success": true,
-    "message": "Global uniqueness maintained. Express: ['2S', '6G', '2D', 'VG', '9Q'], Rooms: ['88', '77', '98', '55', '69']",
-    "timestamp": "2025-08-29T20:32:05.594578"
+    "message": "Global uniqueness maintained. Express: ['HR', '2E', 'YS', 'A2', 'VW'], Rooms: ['35', '33', '83', '75', '97']",
+    "timestamp": "2025-08-29T20:51:36.790576"
   },
   {
     "test": "Berlin-Munich User Scenario",
     "success": true,
-    "message": "Scenario successful: Person A code T6, Person B codes ['VT', 'KD', '5Y']..., Person C correctly accessed Person A's card",
-    "timestamp": "2025-08-29T20:32:06.307882"
+    "message": "Scenario successful: Person A code 37, Person B codes ['G3', 'MF', 'UJ']..., Person C correctly accessed Person A's card",
+    "timestamp": "2025-08-29T20:51:37.530134"
   },
   {
     "test": "Code Expiry and Reuse",
     "success": true,
     "message": "Code generation working properly with expiry. Created 15 codes, 15 unique",
-    "timestamp": "2025-08-29T20:32:14.540927"
+    "timestamp": "2025-08-29T20:51:52.864011"
   },
   {
     "test": "Collision Error Handling",
     "success": true,
     "message": "System handled 50 codes without collision or error",
-    "timestamp": "2025-08-29T20:32:17.527770"
+    "timestamp": "2025-08-29T20:51:55.938350"
   },
   {
     "test": "Create Express Code (2-char)",
     "success": true,
-    "message": "Express code created: K7 (expires in 59s)",
-    "timestamp": "2025-08-29T20:32:17.600918"
+    "message": "Express code created: A5 (expires in 59s)",
+    "timestamp": "2025-08-29T20:51:55.998244"
   },
   {
     "test": "Create Express Code (3-char)",
     "success": true,
-    "message": "Express code created: QTQ (expires in 179s)",
-    "timestamp": "2025-08-29T20:32:17.659434"
+    "message": "Express code created: 67M (expires in 179s)",
+    "timestamp": "2025-08-29T20:51:56.056957"
   },
   {
     "test": "Access by Express Code",
     "success": true,
-    "message": "Successfully accessed card using express code: K7",
-    "timestamp": "2025-08-29T20:32:17.714212"
+    "message": "Successfully accessed card using express code: A5",
+    "timestamp": "2025-08-29T20:51:56.109389"
   },
   {
     "test": "Express Code Expiry",
     "success": true,
-    "message": "Express code C5 works immediately after creation and will expire in 30s",
-    "timestamp": "2025-08-29T20:32:17.822067"
+    "message": "Express code KF works immediately after creation and will expire in 30s",
+    "timestamp": "2025-08-29T20:51:56.218094"
   },
   {
     "test": "Create Express Room",
     "success": true,
-    "message": "Express room created with code: 30 (expires in 119s)",
-    "timestamp": "2025-08-29T20:32:17.882000"
+    "message": "Express room created with code: 85 (expires in 119s)",
+    "timestamp": "2025-08-29T20:51:56.275637"
   },
   {
     "test": "Join Express Room",
     "success": false,
     "message": "Missing fields in received card data",
-    "timestamp": "2025-08-29T20:32:17.938017",
+    "timestamp": "2025-08-29T20:51:56.336771",
     "response": {
-      "id": "68b20e35c0efc79794ec55f8",
+      "id": "68b212c759338b337ddce3c8",
       "name": "John Doe",
       "company": "Tech Solutions Inc",
       "position": "Lead Developer",
@@ -2355,230 +2395,234 @@
   {
     "test": "Express Code Uniqueness",
     "success": true,
-    "message": "Generated unique codes: ['97', 'E3', '6Q'] and room codes: ['38', '58']",
-    "timestamp": "2025-08-29T20:32:18.293251"
+    "message": "Generated unique codes: ['X4', 'EA', '2S'] and room codes: ['70', '91']",
+    "timestamp": "2025-08-29T20:51:56.622904"
   },
   {
     "test": "Express Integration",
     "success": false,
     "message": "Express code accessible via regular endpoint: HTTP 400",
-    "timestamp": "2025-08-29T20:32:18.351390"
+    "timestamp": "2025-08-29T20:51:56.676759"
   },
   {
     "test": "Express Room Limits",
     "success": true,
-    "message": "Express room 78 properly handles participant limits",
-    "timestamp": "2025-08-29T20:32:18.461449"
+    "message": "Express room 25 properly handles participant limits",
+    "timestamp": "2025-08-29T20:51:56.795343"
   },
   {
     "test": "Invalid Express Operations - Code",
     "success": true,
     "message": "Non-existent express code properly rejected",
-    "timestamp": "2025-08-29T20:32:18.512630"
+    "timestamp": "2025-08-29T20:51:56.848126"
   },
   {
     "test": "Invalid Express Operations - Room",
     "success": true,
     "message": "Non-existent express room properly rejected",
-    "timestamp": "2025-08-29T20:32:18.564214"
+    "timestamp": "2025-08-29T20:51:56.902215"
   },
   {
     "test": "OCR Scan Business Card",
     "success": true,
-    "message": "Scan initiated successfully: 68b20e52c0efc79794ec5887",
-    "timestamp": "2025-08-29T20:32:18.618305"
+    "message": "Scan initiated successfully: 68b212ec59338b337ddce657",
+    "timestamp": "2025-08-29T20:51:56.957702"
   },
   {
     "test": "Get Scan Results",
     "success": true,
-    "message": "Scan results retrieved for: 68b20e52c0efc79794ec5887",
-    "timestamp": "2025-08-29T20:32:18.670823"
+    "message": "Scan results retrieved for: 68b212ec59338b337ddce657",
+    "timestamp": "2025-08-29T20:51:57.017759"
   },
   {
     "test": "Correct OCR Field",
     "success": false,
     "message": "HTTP 422",
-    "timestamp": "2025-08-29T20:32:18.725745",
+    "timestamp": "2025-08-29T20:51:57.070214",
     "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"scan_id\"],\"msg\":\"Field required\",\"input\":{\"field_type\":\"name\",\"corrected_value\":\"John Doe Corrected\"},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"}]}"
   },
   {
     "test": "Convert Scan to Card",
     "success": false,
     "message": "HTTP 422",
-    "timestamp": "2025-08-29T20:32:18.779470",
+    "timestamp": "2025-08-29T20:51:57.122911",
     "response": "{\"detail\":[{\"type\":\"missing\",\"loc\":[\"body\",\"scan_id\"],\"msg\":\"Field required\",\"input\":{\"card_name\":\"Scanned Business Card\",\"auto_map_fields\":true},\"url\":\"https://errors.pydantic.dev/2.11/v/missing\"}]}"
   },
   {
     "test": "List Scanned Cards",
     "success": true,
     "message": "Retrieved 1 scans, 0 converted",
-    "timestamp": "2025-08-29T20:32:18.829213"
+    "timestamp": "2025-08-29T20:51:57.178842"
   },
   {
     "test": "Scanner Upload Image",
     "success": true,
-    "message": "Image uploaded successfully, scan_id: 68b20e52c0efc79794ec5888",
-    "timestamp": "2025-08-29T20:32:18.921369"
+    "message": "Image uploaded successfully, scan_id: 68b212ed59338b337ddce658",
+    "timestamp": "2025-08-29T20:51:57.246902"
   },
   {
     "test": "Scanner Poll Results",
     "success": true,
     "message": "Scan completed, conversion_ready: False",
-    "timestamp": "2025-08-29T20:32:19.001904"
+    "timestamp": "2025-08-29T20:51:57.326634"
   },
   {
     "test": "Scanner Convert to Card",
-    "success": false,
-    "message": "HTTP 500",
-    "timestamp": "2025-08-29T20:32:19.056349",
-    "response": "{\"detail\":\"Konvertierung fehlgeschlagen: E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: null }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: null }', 'keyPattern': {'custom_code': 1}, 'keyValue': {'custom_code': None}}\"}"
+    "success": true,
+    "message": "Successfully converted scan to business card: 68b212ed59338b337ddce65a",
+    "timestamp": "2025-08-29T20:51:57.380917"
   },
   {
     "test": "Scanner List Scans",
     "success": true,
     "message": "Found 2 scans (test scan may not be included)",
-    "timestamp": "2025-08-29T20:32:19.144043"
+    "timestamp": "2025-08-29T20:51:57.435341"
   },
   {
     "test": "Contact List Integration",
     "success": false,
-    "message": "No converted card ID available",
-    "timestamp": "2025-08-29T20:32:19.145146"
+    "message": "Converted card 68b212ed59338b337ddce65a not found in business card list",
+    "timestamp": "2025-08-29T20:51:57.488365"
   },
   {
     "test": "Scanner Auto-Conversion Logic",
     "success": true,
     "message": "conversion_ready flag correctly set to False",
-    "timestamp": "2025-08-29T20:32:19.214014"
+    "timestamp": "2025-08-29T20:51:57.538982"
   },
   {
     "test": "Scanner Upload Image",
     "success": true,
-    "message": "Image uploaded successfully, scan_id: 68b20e53c0efc79794ec588b",
-    "timestamp": "2025-08-29T20:32:19.281235"
+    "message": "Image uploaded successfully, scan_id: 68b212ed59338b337ddce65b",
+    "timestamp": "2025-08-29T20:51:57.600810"
   },
   {
     "test": "Scanner Poll Results",
     "success": true,
     "message": "Scan completed, conversion_ready: False",
-    "timestamp": "2025-08-29T20:32:19.333900"
+    "timestamp": "2025-08-29T20:51:57.653030"
   },
   {
     "test": "Scanner Convert to Card",
+    "success": true,
+    "message": "Successfully converted scan to business card: 68b212ed59338b337ddce65d",
+    "timestamp": "2025-08-29T20:51:57.710080"
+  },
+  {
+    "test": "Contact List Integration",
     "success": false,
-    "message": "HTTP 500",
-    "timestamp": "2025-08-29T20:32:19.385774",
-    "response": "{\"detail\":\"Konvertierung fehlgeschlagen: E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: null }, full error: {'index': 0, 'code': 11000, 'errmsg': 'E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: null }', 'keyPattern': {'custom_code': 1}, 'keyValue': {'custom_code': None}}\"}"
+    "message": "Converted card 68b212ed59338b337ddce65d not found in business card list",
+    "timestamp": "2025-08-29T20:51:57.763032"
   },
   {
     "test": "Scanner Workflow End-to-End",
-    "success": true,
-    "message": "Workflow partially successful: Upload \u2192 Poll (Convert blocked due to test image)",
-    "timestamp": "2025-08-29T20:32:19.386767"
+    "success": false,
+    "message": "Contact list integration failed",
+    "timestamp": "2025-08-29T20:51:57.763984"
   },
   {
     "test": "Get Print Templates",
     "success": true,
     "message": "Retrieved 3 templates in 3 categories",
-    "timestamp": "2025-08-29T20:32:19.437569"
+    "timestamp": "2025-08-29T20:51:57.817188"
   },
   {
     "test": "Export for Printing",
     "success": false,
     "message": "HTTP 404",
-    "timestamp": "2025-08-29T20:32:19.494041",
+    "timestamp": "2025-08-29T20:51:57.872294",
     "response": "{\"detail\":\"Visitenkarte nicht gefunden\"}"
   },
   {
     "test": "Quick Print Export",
     "success": false,
     "message": "HTTP 404",
-    "timestamp": "2025-08-29T20:32:19.545385",
+    "timestamp": "2025-08-29T20:51:57.925976",
     "response": "{\"detail\":\"Visitenkarte nicht gefunden\"}"
   },
   {
     "test": "Print Preview",
     "success": false,
     "message": "HTTP 404",
-    "timestamp": "2025-08-29T20:32:19.595577",
+    "timestamp": "2025-08-29T20:51:57.981099",
     "response": "{\"detail\":\"Visitenkarte nicht gefunden\"}"
   },
   {
     "test": "Print Job Status",
     "success": false,
     "message": "No print job ID or access token available",
-    "timestamp": "2025-08-29T20:32:19.596585"
+    "timestamp": "2025-08-29T20:51:57.982152"
   },
   {
     "test": "OCR Authentication Required",
     "success": false,
     "message": "Expected 401, got 500",
-    "timestamp": "2025-08-29T20:32:19.647147"
+    "timestamp": "2025-08-29T20:51:58.037937"
   },
   {
     "test": "Print Authentication Required",
     "success": false,
     "message": "Expected 401, got 500",
-    "timestamp": "2025-08-29T20:32:19.701373"
+    "timestamp": "2025-08-29T20:51:58.086205"
   },
   {
     "test": "User Data Isolation - Scans",
     "success": false,
     "message": "Expected 404, got 500",
-    "timestamp": "2025-08-29T20:32:19.752628"
+    "timestamp": "2025-08-29T20:51:58.135150"
   },
   {
     "test": "User Data Isolation - Print Jobs",
     "success": false,
     "message": "Expected 404, got 500",
-    "timestamp": "2025-08-29T20:32:19.809853"
+    "timestamp": "2025-08-29T20:51:58.192716"
   },
   {
     "test": "QR Code Generation",
     "success": true,
-    "message": "QR code generated (size: 695 bytes)",
-    "timestamp": "2025-08-29T20:32:19.872901"
+    "message": "QR code generated (size: 671 bytes)",
+    "timestamp": "2025-08-29T20:51:58.252102"
   },
   {
     "test": "vCard Generation",
     "success": true,
     "message": "vCard generated successfully",
-    "timestamp": "2025-08-29T20:32:19.923513"
+    "timestamp": "2025-08-29T20:51:58.303361"
   },
   {
     "test": "Privacy Report",
     "success": true,
     "message": "Privacy report generated successfully",
-    "timestamp": "2025-08-29T20:32:19.980979"
+    "timestamp": "2025-08-29T20:51:58.354281"
   },
   {
     "test": "Data Export",
     "success": true,
     "message": "GDPR data export completed successfully",
-    "timestamp": "2025-08-29T20:32:20.038687"
+    "timestamp": "2025-08-29T20:51:58.406892"
   },
   {
     "test": "Invalid Authentication",
     "success": true,
     "message": "Properly rejected invalid token",
-    "timestamp": "2025-08-29T20:32:20.086274"
+    "timestamp": "2025-08-29T20:51:58.456530"
   },
   {
     "test": "Non-existent Card",
     "success": true,
     "message": "Properly returned 404 for non-existent card",
-    "timestamp": "2025-08-29T20:32:20.135124"
+    "timestamp": "2025-08-29T20:51:58.504228"
   },
   {
     "test": "Invalid Meeting Room Operations - Non-existent",
     "success": true,
     "message": "Non-existent meeting room properly rejected",
-    "timestamp": "2025-08-29T20:32:20.292548"
+    "timestamp": "2025-08-29T20:51:58.557209"
   },
   {
     "test": "Invalid Meeting Room Operations - Get Non-existent",
     "success": true,
     "message": "Non-existent meeting room get properly rejected",
-    "timestamp": "2025-08-29T20:32:20.341679"
+    "timestamp": "2025-08-29T20:51:58.610818"
   }
 ]
