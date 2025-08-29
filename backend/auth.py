@@ -48,6 +48,10 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     
+    # Check if credentials exist (CRITICAL: Fix for NoneType error)
+    if credentials is None:
+        raise credentials_exception
+    
     try:
         # Extract token from Authorization header
         token = credentials.credentials
