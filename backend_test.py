@@ -1042,6 +1042,201 @@ class BusinessCardAPITester:
         except Exception as e:
             self.log_result("Invalid Meeting Room Operations", False, f"Error: {str(e)}")
             return False
+
+    # ============================================================================
+    # CRITICAL SCANNER API RESPONSE FORMAT TESTING - DEBUG FRONTEND ISSUE
+    # ============================================================================
+    
+    def test_scanner_api_direct_call(self):
+        """Test EXACT scanner API response format that frontend receives"""
+        if not self.access_token:
+            self.log_result("Scanner API Direct Call", False, "No access token available")
+            return False
+            
+        try:
+            import base64
+            from PIL import Image, ImageDraw, ImageFont
+            import io
+            
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create realistic business card image with clear text
+            card_image = Image.new('RGB', (600, 350), color='white')
+            draw = ImageDraw.Draw(card_image)
+            
+            # Try to use a font, fallback to default
+            try:
+                font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 24)
+                font_medium = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 18)
+                font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
+            except:
+                font_large = ImageFont.load_default()
+                font_medium = ImageFont.load_default()
+                font_small = ImageFont.load_default()
+            
+            # Add realistic business card text
+            draw.text((50, 50), "Dr. Sarah Weber", fill='black', font=font_large)
+            draw.text((50, 90), "Chief Technology Officer", fill='black', font=font_medium)
+            draw.text((50, 120), "Digital Innovation GmbH", fill='black', font=font_medium)
+            draw.text((50, 160), "sarah.weber@digitalinnovation.de", fill='black', font=font_small)
+            draw.text((50, 190), "+49-30-555-1234", fill='black', font=font_small)
+            draw.text((50, 220), "www.digitalinnovation.de", fill='black', font=font_small)
+            
+            # Convert to base64
+            buffer = io.BytesIO()
+            card_image.save(buffer, format='PNG')
+            image_data = base64.b64encode(buffer.getvalue()).decode()
+            
+            # 1. Test POST /api/scanner/scan - CAPTURE EXACT RESPONSE
+            scan_request = {
+                "image_data": image_data,
+                "scan_method": "test_upload"
+            }
+            
+            print(f"\n🔍 TESTING POST /api/scanner/scan")
+            response = requests.post(f"{API_BASE}/scanner/scan", json=scan_request, headers=headers)
+            
+            print(f"   Status Code: {response.status_code}")
+            print(f"   Headers: {dict(response.headers)}")
+            
+            if response.status_code == 200:
+                scan_data = response.json()
+                print(f"   EXACT RESPONSE STRUCTURE:")
+                print(f"   {json.dumps(scan_data, indent=2)}")
+                
+                # Check if response has required fields for frontend
+                scan_id = scan_data.get("scan_id")
+                if scan_id:
+                    self.scanner_scan_id = scan_id
+                    self.log_result("Scanner API Direct Call - POST", True, f"Scan initiated with ID: {scan_id}")
+                    
+                    # Wait a moment for processing
+                    import time
+                    time.sleep(3)
+                    
+                    # 2. Test GET /api/scanner/scan/{scan_id} - CAPTURE EXACT RESPONSE
+                    print(f"\n🔍 TESTING GET /api/scanner/scan/{scan_id}")
+                    poll_response = requests.get(f"{API_BASE}/scanner/scan/{scan_id}", headers=headers)
+                    
+                    print(f"   Status Code: {poll_response.status_code}")
+                    print(f"   Headers: {dict(poll_response.headers)}")
+                    
+                    if poll_response.status_code == 200:
+                        poll_data = poll_response.json()
+                        print(f"   EXACT POLLING RESPONSE STRUCTURE:")
+                        print(f"   {json.dumps(poll_data, indent=2)}")
+                        
+                        # 3. CRITICAL: Check if response matches frontend expectations
+                        # Frontend expects: scanResult?.scanned_card?.extracted_fields?.length > 0
+                        
+                        scanned_card = poll_data.get("scanned_card")
+                        if scanned_card:
+                            extracted_fields = scanned_card.get("extracted_fields", [])
+                            print(f"\n🎯 FRONTEND COMPATIBILITY CHECK:")
+                            print(f"   scanned_card exists: {scanned_card is not None}")
+                            print(f"   extracted_fields exists: {'extracted_fields' in scanned_card}")
+                            print(f"   extracted_fields length: {len(extracted_fields)}")
+                            print(f"   extracted_fields content: {extracted_fields}")
+                            
+                            # Check if this matches frontend expectation
+                            frontend_condition = scanned_card and len(extracted_fields) > 0
+                            
+                            if frontend_condition:
+                                self.log_result("Scanner API Response Format", True, 
+                                              f"Response format matches frontend expectations: scanned_card with {len(extracted_fields)} extracted_fields")
+                                return True
+                            else:
+                                self.log_result("Scanner API Response Format", False, 
+                                              f"MISMATCH: Frontend expects scanned_card.extracted_fields.length > 0, got {len(extracted_fields)} fields")
+                                return False
+                        else:
+                            self.log_result("Scanner API Response Format", False, 
+                                          "CRITICAL: No 'scanned_card' field in response - frontend will show 'Keine Informationen erkannt'")
+                            return False
+                    else:
+                        self.log_result("Scanner API Direct Call - GET", False, f"Polling failed: HTTP {poll_response.status_code}", poll_response.text)
+                        return False
+                else:
+                    self.log_result("Scanner API Direct Call - POST", False, "No scan_id in response", scan_data)
+                    return False
+            else:
+                self.log_result("Scanner API Direct Call - POST", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Scanner API Direct Call", False, f"Error: {str(e)}")
+            return False
+    
+    def test_scanner_response_structure_debug(self):
+        """Debug scanner response structure vs frontend expectations"""
+        if not hasattr(self, 'scanner_scan_id') or not self.access_token:
+            self.log_result("Scanner Response Structure Debug", False, "No scan ID or access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Get the scan result again for detailed analysis
+            response = requests.get(f"{API_BASE}/scanner/scan/{self.scanner_scan_id}", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                print(f"\n🔬 DETAILED RESPONSE STRUCTURE ANALYSIS:")
+                print(f"   Response keys: {list(data.keys())}")
+                
+                # Check each level of nesting
+                if "scanned_card" in data:
+                    scanned_card = data["scanned_card"]
+                    print(f"   scanned_card keys: {list(scanned_card.keys()) if scanned_card else 'None'}")
+                    
+                    if scanned_card and "extracted_fields" in scanned_card:
+                        extracted_fields = scanned_card["extracted_fields"]
+                        print(f"   extracted_fields type: {type(extracted_fields)}")
+                        print(f"   extracted_fields length: {len(extracted_fields) if extracted_fields else 0}")
+                        
+                        if extracted_fields:
+                            print(f"   First field structure: {extracted_fields[0] if len(extracted_fields) > 0 else 'None'}")
+                            
+                            # Check field types and values
+                            field_types = [field.get("field_type") for field in extracted_fields if isinstance(field, dict)]
+                            field_values = [field.get("value") for field in extracted_fields if isinstance(field, dict)]
+                            
+                            print(f"   Field types found: {field_types}")
+                            print(f"   Field values found: {field_values}")
+                            
+                            # Check if we have meaningful data
+                            meaningful_fields = [f for f in extracted_fields if isinstance(f, dict) and f.get("value") and len(f.get("value", "").strip()) > 2]
+                            
+                            print(f"   Meaningful fields count: {len(meaningful_fields)}")
+                            
+                            if len(meaningful_fields) > 0:
+                                self.log_result("Scanner Response Structure Debug", True, 
+                                              f"Found {len(meaningful_fields)} meaningful extracted fields")
+                                return True
+                            else:
+                                self.log_result("Scanner Response Structure Debug", False, 
+                                              "No meaningful extracted fields found - OCR may have failed")
+                                return False
+                        else:
+                            self.log_result("Scanner Response Structure Debug", False, 
+                                          "extracted_fields array is empty - this causes 'Keine Informationen erkannt'")
+                            return False
+                    else:
+                        self.log_result("Scanner Response Structure Debug", False, 
+                                      "No extracted_fields in scanned_card - missing key field")
+                        return False
+                else:
+                    self.log_result("Scanner Response Structure Debug", False, 
+                                  "No scanned_card in response - critical structure missing")
+                    return False
+            else:
+                self.log_result("Scanner Response Structure Debug", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Scanner Response Structure Debug", False, f"Error: {str(e)}")
+            return False
     
 
     # ============================================================================
