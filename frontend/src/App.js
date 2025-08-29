@@ -15,6 +15,7 @@ import MeetingRoomViewPage from './pages/MeetingRoomViewPage';
 import VideoMeetingPage from './pages/VideoMeetingPage';
 import ContactImportPage from './pages/ContactImportPage';
 import BusinessCardStudioPage from './pages/BusinessCardStudioPage';
+import ScannerTestPage from './pages/ScannerTestPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import "./App.css";
 
