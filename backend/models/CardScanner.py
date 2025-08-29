@@ -38,7 +38,7 @@ class ScannedField(BaseModel):
             raise ValueError('Confidence must be between 0 and 100')
         return v
     
-    @validator('confidence_level', pre=True, always=True)
+    @validator('confidence_level', always=True)
     def set_confidence_level(cls, v, values):
         if 'confidence' not in values:
             return v
