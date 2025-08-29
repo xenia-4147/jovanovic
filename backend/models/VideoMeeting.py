@@ -74,6 +74,16 @@ class VideoMeetingRoom(BaseModel):
     job_title: Optional[str] = Field(None, description="Job title if recruiting meeting")
     company_name: Optional[str] = Field(None, description="Company name if recruiting")
     
+    # NEW: Meeting Link & Sharing Features
+    share_link: Optional[str] = Field(None, description="Shareable meeting link")
+    qr_code_url: Optional[str] = Field(None, description="QR code URL for easy joining")
+    
+    # NEW: Live Translation Features
+    translation_enabled: bool = Field(default=False, description="Enable live translation")
+    source_language: str = Field(default="auto", description="Auto-detect or specific language")
+    target_languages: List[str] = Field(default_factory=list, description="Languages to translate to")
+    translation_participants: Dict[str, str] = Field(default_factory=dict, description="participant_id -> preferred_language")
+    
     # Meeting status
     status: MeetingStatus = Field(default=MeetingStatus.WAITING)
     started_at: Optional[datetime] = Field(None)
