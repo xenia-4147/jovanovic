@@ -3685,7 +3685,7 @@ async def create_video_meeting(
             participants=[],
             shared_cards=[],
             join_url=join_url,
-            webrtc_config=DEFAULT_ICE_SERVERS
+            webrtc_config=WEBRTC_CONFIG
         )
         
     except Exception as e:
