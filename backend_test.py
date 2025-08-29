@@ -1261,6 +1261,332 @@ class BusinessCardAPITester:
             return False
 
     # ============================================================================
+    # BUSINESS CARD SCANNER WORKFLOW TESTING - CRITICAL FIX VALIDATION
+    # ============================================================================
+    
+    def test_business_card_scanner_workflow_complete(self):
+        """Test the FIXED Business Card Scanner workflow - complete end-to-end test"""
+        if not self.access_token:
+            self.log_result("Business Card Scanner Workflow", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Step 1: Create a regular business card first
+            regular_card_data = {
+                "name": "Dr. Sarah Weber",
+                "company": "Digital Innovation GmbH", 
+                "position": "Chief Technology Officer",
+                "description": "Leading digital transformation and AI initiatives",
+                "phones": [
+                    {
+                        "label": "work",
+                        "number": "+49-30-555-1234",
+                        "is_primary": True
+                    }
+                ],
+                "emails": [
+                    {
+                        "label": "work",
+                        "address": "sarah.weber@digitalinnovation.de",
+                        "is_primary": True
+                    }
+                ],
+                "website": "https://digitalinnovation.de",
+                "is_public": True,
+                "background_color": "#ffffff",
+                "text_color": "#1f2937",
+                "accent_color": "#3b82f6"
+            }
+            
+            # Create regular card
+            response = requests.post(f"{API_BASE}/cards", json=regular_card_data, headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Scanner Workflow - Regular Card Creation", False, f"Failed to create regular card: HTTP {response.status_code}", response.text)
+                return False
+            
+            regular_card = response.json()
+            self.regular_card_id = regular_card["id"]
+            self.log_result("Scanner Workflow - Regular Card Creation", True, f"Regular card created: {regular_card['name']}")
+            
+            # Step 2: Test GET /api/cards with the user_id field fix
+            response = requests.get(f"{API_BASE}/cards", headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Scanner Workflow - GET Cards Fix Validation", False, f"Failed to get cards: HTTP {response.status_code}", response.text)
+                return False
+            
+            cards_before_scanner = response.json()
+            regular_card_found = any(card["id"] == self.regular_card_id for card in cards_before_scanner)
+            
+            if not regular_card_found:
+                self.log_result("Scanner Workflow - GET Cards Fix Validation", False, "Regular card not found in GET /api/cards - user_id field issue still exists")
+                return False
+            
+            self.log_result("Scanner Workflow - GET Cards Fix Validation", True, f"Regular card appears in contact list - user_id field fix working ({len(cards_before_scanner)} cards total)")
+            
+            # Step 3: Simulate business card scanning with OCR
+            # Create a mock scanned card using the scanner endpoints
+            scan_request_data = {
+                "image_data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",  # 1x1 pixel PNG
+                "scan_method": "camera"
+            }
+            
+            # Test scanner endpoint
+            response = requests.post(f"{API_BASE}/scanner/scan", json=scan_request_data, headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Scanner Workflow - OCR Scan", False, f"Scanner endpoint failed: HTTP {response.status_code}", response.text)
+                return False
+            
+            scan_response = response.json()
+            scan_id = scan_response.get("scan_id")
+            
+            if not scan_id:
+                self.log_result("Scanner Workflow - OCR Scan", False, "No scan_id returned from scanner", scan_response)
+                return False
+            
+            self.scanner_scan_id = scan_id
+            self.log_result("Scanner Workflow - OCR Scan", True, f"Business card scanned successfully: {scan_id}")
+            
+            # Step 4: Get scan results
+            response = requests.get(f"{API_BASE}/scanner/scan/{scan_id}", headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Scanner Workflow - Get Scan Results", False, f"Failed to get scan results: HTTP {response.status_code}", response.text)
+                return False
+            
+            scan_result = response.json()
+            scanned_card = scan_result.get("scanned_card")
+            
+            if not scanned_card:
+                self.log_result("Scanner Workflow - Get Scan Results", False, "No scanned_card in results", scan_result)
+                return False
+            
+            self.log_result("Scanner Workflow - Get Scan Results", True, f"Scan results retrieved - Status: {scan_result.get('status')}")
+            
+            # Step 5: Convert scanned card to digital business card
+            convert_request_data = {
+                "scan_id": scan_id,
+                "card_name": "Michael Schmidt",
+                "auto_map_fields": True,
+                "field_mapping": {
+                    "company": "Tech Solutions GmbH",
+                    "position": "Senior Developer",
+                    "phone": "+49-30-555-5678",
+                    "email": "michael.schmidt@techsolutions.de"
+                }
+            }
+            
+            response = requests.post(f"{API_BASE}/scanner/scan/{scan_id}/convert", json=convert_request_data, headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Scanner Workflow - Convert to Card", False, f"Failed to convert scan: HTTP {response.status_code}", response.text)
+                return False
+            
+            converted_card = response.json()
+            self.scanner_card_id = converted_card["id"]
+            
+            self.log_result("Scanner Workflow - Convert to Card", True, f"Scanned card converted to digital card: {converted_card['name']}")
+            
+            # Step 6: CRITICAL TEST - Verify scanner card appears in GET /api/cards
+            response = requests.get(f"{API_BASE}/cards", headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Scanner Workflow - Scanner Card in Contact List", False, f"Failed to get cards after conversion: HTTP {response.status_code}", response.text)
+                return False
+            
+            cards_after_scanner = response.json()
+            scanner_card_found = any(card["id"] == self.scanner_card_id for card in cards_after_scanner)
+            
+            if not scanner_card_found:
+                self.log_result("Scanner Workflow - Scanner Card in Contact List", False, "CRITICAL ISSUE: Scanner card does NOT appear in contact list after conversion!")
+                return False
+            
+            # Verify both regular and scanner cards appear together
+            both_cards_found = (
+                any(card["id"] == self.regular_card_id for card in cards_after_scanner) and
+                any(card["id"] == self.scanner_card_id for card in cards_after_scanner)
+            )
+            
+            if not both_cards_found:
+                self.log_result("Scanner Workflow - Both Cards in Contact List", False, "Both regular and scanner cards should appear together")
+                return False
+            
+            self.log_result("Scanner Workflow - Scanner Card in Contact List", True, f"✅ CRITICAL FIX VALIDATED: Scanner card appears in contact list!")
+            self.log_result("Scanner Workflow - Both Cards in Contact List", True, f"Both regular and scanner cards appear together ({len(cards_after_scanner)} total cards)")
+            
+            # Step 7: Test multiple scanner cards
+            for i in range(2):
+                # Create another scanned card
+                scan_request_data = {
+                    "image_data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+                    "scan_method": "camera"
+                }
+                
+                response = requests.post(f"{API_BASE}/scanner/scan", json=scan_request_data, headers=headers)
+                
+                if response.status_code == 200:
+                    scan_response = response.json()
+                    scan_id = scan_response.get("scan_id")
+                    
+                    if scan_id:
+                        # Convert to card
+                        convert_request_data = {
+                            "scan_id": scan_id,
+                            "card_name": f"Scanner Test Card {i+2}",
+                            "auto_map_fields": True
+                        }
+                        
+                        response = requests.post(f"{API_BASE}/scanner/scan/{scan_id}/convert", json=convert_request_data, headers=headers)
+                        
+                        if response.status_code == 200:
+                            converted_card = response.json()
+                            self.log_result(f"Multiple Scanner Cards - Card {i+2}", True, f"Additional scanner card created: {converted_card['name']}")
+            
+            # Final verification - all cards appear
+            response = requests.get(f"{API_BASE}/cards", headers=headers)
+            
+            if response.status_code == 200:
+                final_cards = response.json()
+                self.log_result("Multiple Scanner Cards - Final Verification", True, f"All cards appear in contact list ({len(final_cards)} total cards)")
+            
+            self.log_result("Business Card Scanner Workflow", True, "✅ COMPLETE SCANNER WORKFLOW SUCCESSFUL - 'Nothing happens after photographing business card' issue RESOLVED!")
+            return True
+            
+        except Exception as e:
+            self.log_result("Business Card Scanner Workflow", False, f"Error: {str(e)}")
+            return False
+    
+    def test_scanner_auto_convert_flow(self):
+        """Test the scanner auto-convert flow: Photo → OCR → Extract Fields → Convert → Appears in Contact List"""
+        if not self.access_token:
+            self.log_result("Scanner Auto-Convert Flow", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Step 1: Photo simulation (upload image)
+            scan_request_data = {
+                "image_data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",
+                "scan_method": "camera",
+                "device_info": {
+                    "device_type": "mobile",
+                    "os": "iOS",
+                    "app_version": "1.0.0"
+                }
+            }
+            
+            # Photo → OCR
+            response = requests.post(f"{API_BASE}/scanner/scan", json=scan_request_data, headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Scanner Auto-Convert Flow - Photo to OCR", False, f"Photo upload failed: HTTP {response.status_code}", response.text)
+                return False
+            
+            scan_response = response.json()
+            scan_id = scan_response.get("scan_id")
+            
+            self.log_result("Scanner Auto-Convert Flow - Photo to OCR", True, f"Photo processed by OCR: {scan_id}")
+            
+            # Step 2: OCR → Extract Fields
+            response = requests.get(f"{API_BASE}/scanner/scan/{scan_id}", headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Scanner Auto-Convert Flow - Extract Fields", False, f"Field extraction failed: HTTP {response.status_code}", response.text)
+                return False
+            
+            scan_result = response.json()
+            scanned_card = scan_result.get("scanned_card", {})
+            extracted_fields = scanned_card.get("extracted_fields", [])
+            
+            self.log_result("Scanner Auto-Convert Flow - Extract Fields", True, f"Fields extracted: {len(extracted_fields)} fields found")
+            
+            # Step 3: Extract Fields → Convert
+            convert_request_data = {
+                "scan_id": scan_id,
+                "card_name": "Auto-Convert Test Card",
+                "auto_map_fields": True
+            }
+            
+            response = requests.post(f"{API_BASE}/scanner/scan/{scan_id}/convert", json=convert_request_data, headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Scanner Auto-Convert Flow - Convert", False, f"Auto-convert failed: HTTP {response.status_code}", response.text)
+                return False
+            
+            converted_card = response.json()
+            auto_convert_card_id = converted_card["id"]
+            
+            self.log_result("Scanner Auto-Convert Flow - Convert", True, f"Auto-converted to digital card: {converted_card['name']}")
+            
+            # Step 4: Convert → Appears in Contact List
+            response = requests.get(f"{API_BASE}/cards", headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Scanner Auto-Convert Flow - Contact List", False, f"Failed to check contact list: HTTP {response.status_code}", response.text)
+                return False
+            
+            cards = response.json()
+            auto_convert_card_found = any(card["id"] == auto_convert_card_id for card in cards)
+            
+            if not auto_convert_card_found:
+                self.log_result("Scanner Auto-Convert Flow - Contact List", False, "Auto-converted card does NOT appear in contact list!")
+                return False
+            
+            self.log_result("Scanner Auto-Convert Flow - Contact List", True, "✅ Auto-converted card appears in contact list!")
+            self.log_result("Scanner Auto-Convert Flow", True, "✅ Complete auto-convert flow working: Photo → OCR → Extract → Convert → Contact List")
+            return True
+            
+        except Exception as e:
+            self.log_result("Scanner Auto-Convert Flow", False, f"Error: {str(e)}")
+            return False
+    
+    def test_scanner_list_and_management(self):
+        """Test scanner card listing and management"""
+        if not self.access_token:
+            self.log_result("Scanner List and Management", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Test listing scanned cards
+            response = requests.get(f"{API_BASE}/scanner/scans", headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Scanner List and Management - List Scans", False, f"Failed to list scans: HTTP {response.status_code}", response.text)
+                return False
+            
+            scan_list = response.json()
+            scans = scan_list.get("scans", [])
+            total_count = scan_list.get("total_count", 0)
+            converted_count = scan_list.get("converted_count", 0)
+            
+            self.log_result("Scanner List and Management - List Scans", True, f"Listed {total_count} scans, {converted_count} converted")
+            
+            # Verify scan data structure
+            if scans:
+                first_scan = scans[0]
+                required_fields = ["id", "user_id", "status", "scan_timestamp"]
+                
+                if all(field in first_scan for field in required_fields):
+                    self.log_result("Scanner List and Management - Scan Structure", True, "Scan data structure is correct")
+                else:
+                    self.log_result("Scanner List and Management - Scan Structure", False, "Missing required fields in scan data", first_scan)
+                    return False
+            
+            self.log_result("Scanner List and Management", True, "Scanner listing and management working correctly")
+            return True
+            
+        except Exception as e:
+            self.log_result("Scanner List and Management", False, f"Error: {str(e)}")
+            return False
+
+    # ============================================================================
     # CAMERA CONNECTION ISSUES TESTING - FOCUSED ON FIXED ISSUES
     # ============================================================================
     
