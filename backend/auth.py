@@ -38,7 +38,7 @@ def create_refresh_token(user_id: str) -> str:
     return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security),
     db = Depends(lambda: None)  # Will be replaced with actual DB dependency
 ) -> User:
     """Get current authenticated user from JWT token"""
