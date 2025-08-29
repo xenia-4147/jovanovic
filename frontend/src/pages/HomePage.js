@@ -112,6 +112,62 @@ const HomePage = () => {
     });
   };
 
+  // Video Meeting Functions
+  const createInstantMeeting = async () => {
+    try {
+      setIsCreatingMeeting(true);
+      
+      const meetingData = {
+        title: `Sofort-Meeting von ${user?.full_name || user?.email}`,
+        description: "Automatisch generiertes Meeting",
+        meeting_type: "group",
+        max_participants: 10,
+        duration_minutes: 45,
+        allow_card_sharing: true,
+        share_host_card: true,
+        is_public: false,
+        translation_enabled: true,
+        source_language: "de",
+        target_languages: ["en", "fr", "es"]
+      };
+
+      const response = await api.post('/video/meeting/create', meetingData);
+      const meeting = response.data;
+      
+      toast({
+        title: "Meeting erstellt! 🎉",
+        description: `Meeting-Code: ${meeting.meeting?.meeting_code}`,
+      });
+
+      // Redirect to meeting room
+      window.open(`/meeting/${meeting.meeting?.meeting_code}`, '_blank');
+      
+    } catch (error) {
+      console.error('Failed to create meeting:', error);
+      toast({
+        title: "Fehler",
+        description: "Meeting konnte nicht erstellt werden.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingMeeting(false);
+    }
+  };
+
+  const joinMeeting = () => {
+    if (!meetingCode.trim()) {
+      toast({
+        title: "Meeting-Code erforderlich",
+        description: "Bitte geben Sie einen Meeting-Code ein.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Redirect to meeting room
+    window.open(`/meeting/${meetingCode.trim().toUpperCase()}`, '_blank');
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
