@@ -284,6 +284,11 @@ class MeetingResponse(BaseModel):
     # Join info
     join_url: Optional[str] = Field(None, description="Meeting join URL")
     webrtc_config: Optional[Dict[str, Any]] = Field(None, description="WebRTC configuration")
+    
+    # NEW: Enhanced Meeting Link Features
+    share_link: Optional[str] = None
+    qr_code_url: Optional[str] = None
+    meeting_link_card: Optional[Dict[str, Any]] = None
 
 
 class MeetingListResponse(BaseModel):
