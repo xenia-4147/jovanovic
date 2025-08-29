@@ -1044,6 +1044,253 @@ class BusinessCardAPITester:
             return False
     
 
+    # ============================================================================
+    # OCR FUNCTIONALITY TESTS - CRITICAL TESSERACT VERIFICATION
+    # ============================================================================
+    
+    def test_ocr_service_initialization(self):
+        """Test OCR Service Initialization - Verify Tesseract is available"""
+        try:
+            # Test direct import of OCR service
+            import sys
+            sys.path.append('/app/backend')
+            
+            from services.OCRService import ocr_service, TESSERACT_AVAILABLE
+            
+            if TESSERACT_AVAILABLE:
+                self.log_result("OCR Service Initialization", True, "Tesseract is available and OCR service initialized")
+                return True
+            else:
+                self.log_result("OCR Service Initialization", False, "Tesseract is not available")
+                return False
+                
+        except Exception as e:
+            self.log_result("OCR Service Initialization", False, f"Error importing OCR service: {str(e)}")
+            return False
+    
+    def test_tesseract_availability(self):
+        """Test Tesseract OCR Engine Availability"""
+        try:
+            import subprocess
+            
+            # Test tesseract command
+            result = subprocess.run(['tesseract', '--version'], 
+                                  capture_output=True, text=True, timeout=10)
+            
+            if result.returncode == 0 and 'tesseract' in result.stdout.lower():
+                version_info = result.stdout.split('\n')[0]
+                self.log_result("Tesseract Availability", True, f"Tesseract installed: {version_info}")
+                return True
+            else:
+                self.log_result("Tesseract Availability", False, f"Tesseract command failed: {result.stderr}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Tesseract Availability", False, f"Error checking Tesseract: {str(e)}")
+            return False
+    
+    def test_ocr_preprocessing(self):
+        """Test OCR Image Preprocessing Functions"""
+        try:
+            import sys
+            sys.path.append('/app/backend')
+            import base64
+            from PIL import Image
+            import io
+            
+            from services.OCRService import ocr_service
+            
+            # Create a simple test image (business card-like)
+            test_image = Image.new('RGB', (400, 250), color='white')
+            
+            # Convert to base64
+            buffer = io.BytesIO()
+            test_image.save(buffer, format='PNG')
+            image_data = base64.b64encode(buffer.getvalue()).decode()
+            
+            # Test preprocessing
+            import asyncio
+            processed_image = asyncio.run(ocr_service._preprocess_image(image_data))
+            
+            if processed_image is not None and hasattr(processed_image, 'shape'):
+                self.log_result("OCR Preprocessing", True, f"Image preprocessing successful, shape: {processed_image.shape}")
+                return True
+            else:
+                self.log_result("OCR Preprocessing", False, "Image preprocessing failed")
+                return False
+                
+        except Exception as e:
+            self.log_result("OCR Preprocessing", False, f"Error in preprocessing: {str(e)}")
+            return False
+    
+    def test_business_card_ocr_extraction(self):
+        """Test Business Card OCR Text Extraction with Real Business Card Data"""
+        try:
+            import sys
+            sys.path.append('/app/backend')
+            import base64
+            from PIL import Image, ImageDraw, ImageFont
+            import io
+            
+            from services.OCRService import ocr_service
+            
+            # Create a realistic business card image with text
+            card_image = Image.new('RGB', (600, 350), color='white')
+            draw = ImageDraw.Draw(card_image)
+            
+            # Try to use a default font, fallback to basic if not available
+            try:
+                font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 24)
+                font_medium = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 18)
+                font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
+            except:
+                font_large = ImageFont.load_default()
+                font_medium = ImageFont.load_default()
+                font_small = ImageFont.load_default()
+            
+            # Add realistic business card text
+            draw.text((50, 50), "Dr. Sarah Weber", fill='black', font=font_large)
+            draw.text((50, 90), "Chief Technology Officer", fill='black', font=font_medium)
+            draw.text((50, 120), "Digital Innovation GmbH", fill='black', font=font_medium)
+            draw.text((50, 160), "sarah.weber@digitalinnovation.de", fill='black', font=font_small)
+            draw.text((50, 190), "+49-30-555-1234", fill='black', font=font_small)
+            draw.text((50, 220), "www.digitalinnovation.de", fill='black', font=font_small)
+            
+            # Convert to base64
+            buffer = io.BytesIO()
+            card_image.save(buffer, format='PNG')
+            image_data = base64.b64encode(buffer.getvalue()).decode()
+            
+            # Test OCR extraction
+            import asyncio
+            scan_result = asyncio.run(ocr_service.scan_business_card(
+                image_data=image_data,
+                user_id="test_user_ocr",
+                scan_method="test"
+            ))
+            
+            if scan_result and scan_result.status == "completed":
+                extracted_text = scan_result.raw_ocr_data.get("combined_text", "") if scan_result.raw_ocr_data else ""
+                field_count = len(scan_result.extracted_fields)
+                confidence = scan_result.overall_confidence
+                
+                # Check if we extracted meaningful text
+                has_name = any("sarah" in field.value.lower() or "weber" in field.value.lower() 
+                             for field in scan_result.extracted_fields)
+                has_email = any("@" in field.value for field in scan_result.extracted_fields)
+                has_phone = any(field.field_type == "phone" for field in scan_result.extracted_fields)
+                
+                success_indicators = sum([has_name, has_email, has_phone])
+                
+                if success_indicators >= 2:  # At least 2 key fields detected
+                    self.log_result("Business Card OCR Extraction", True, 
+                                  f"OCR successful: {field_count} fields, {confidence:.1f}% confidence, key fields detected")
+                    return True
+                else:
+                    self.log_result("Business Card OCR Extraction", False, 
+                                  f"OCR completed but key fields missing: {field_count} fields, {confidence:.1f}% confidence")
+                    return False
+            else:
+                status = scan_result.status if scan_result else "unknown"
+                error = scan_result.error_message if scan_result and scan_result.error_message else "No error message"
+                self.log_result("Business Card OCR Extraction", False, f"OCR failed with status: {status}, error: {error}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Business Card OCR Extraction", False, f"Error in OCR extraction: {str(e)}")
+            return False
+    
+    def test_ocr_field_detection(self):
+        """Test OCR Field Type Detection and Classification"""
+        try:
+            import sys
+            sys.path.append('/app/backend')
+            
+            from services.OCRService import ocr_service
+            
+            # Test field type detection with various text samples
+            test_cases = [
+                ("sarah.weber@digitalinnovation.de", "email"),
+                ("+49-30-555-1234", "phone"),
+                ("www.digitalinnovation.de", "website"),
+                ("Digital Innovation GmbH", "company"),
+                ("Chief Technology Officer", "position"),
+                ("Dr. Sarah Weber", "name")
+            ]
+            
+            correct_detections = 0
+            total_tests = len(test_cases)
+            
+            for text, expected_type in test_cases:
+                detected_type = ocr_service._determine_field_type(text)
+                if detected_type == expected_type:
+                    correct_detections += 1
+                    print(f"   ✅ '{text}' correctly detected as '{detected_type}'")
+                else:
+                    print(f"   ❌ '{text}' detected as '{detected_type}', expected '{expected_type}'")
+            
+            accuracy = (correct_detections / total_tests) * 100
+            
+            if accuracy >= 80:  # 80% accuracy threshold
+                self.log_result("OCR Field Detection", True, 
+                              f"Field detection accuracy: {accuracy:.1f}% ({correct_detections}/{total_tests})")
+                return True
+            else:
+                self.log_result("OCR Field Detection", False, 
+                              f"Field detection accuracy too low: {accuracy:.1f}% ({correct_detections}/{total_tests})")
+                return False
+                
+        except Exception as e:
+            self.log_result("OCR Field Detection", False, f"Error in field detection test: {str(e)}")
+            return False
+    
+    def test_ocr_confidence_scoring(self):
+        """Test OCR Confidence Scoring System"""
+        try:
+            import sys
+            sys.path.append('/app/backend')
+            
+            from services.OCRService import ocr_service
+            
+            # Test confidence calculation for different field types
+            test_cases = [
+                ("perfect.email@domain.com", "email", 90),  # Should be high confidence
+                ("+49-30-123-4567", "phone", 80),           # Should be good confidence  
+                ("www.example.com", "website", 85),         # Should be high confidence
+                ("ab", "name", 60),                         # Should be low (too short)
+                ("verylongcompanynamethatgoesonfar", "company", 70)  # Should be medium (too long)
+            ]
+            
+            confidence_tests_passed = 0
+            total_confidence_tests = len(test_cases)
+            
+            for text, field_type, expected_min_confidence in test_cases:
+                calculated_confidence = ocr_service._calculate_pattern_confidence(text, field_type)
+                
+                if calculated_confidence >= expected_min_confidence:
+                    confidence_tests_passed += 1
+                    print(f"   ✅ '{text}' ({field_type}): {calculated_confidence:.1f}% >= {expected_min_confidence}%")
+                else:
+                    print(f"   ❌ '{text}' ({field_type}): {calculated_confidence:.1f}% < {expected_min_confidence}%")
+            
+            success_rate = (confidence_tests_passed / total_confidence_tests) * 100
+            
+            if success_rate >= 80:
+                self.log_result("OCR Confidence Scoring", True, 
+                              f"Confidence scoring working: {success_rate:.1f}% tests passed")
+                return True
+            else:
+                self.log_result("OCR Confidence Scoring", False, 
+                              f"Confidence scoring issues: {success_rate:.1f}% tests passed")
+                return False
+                
+        except Exception as e:
+            self.log_result("OCR Confidence Scoring", False, f"Error in confidence scoring test: {str(e)}")
+            return False
+    
+    # ============================================================================
+    # ENHANCED 9-CHARACTER VIDEO MEETING CODE GENERATION TESTING
+    # ============================================================================
     
     def test_9_character_meeting_code_generation(self):
         """Test enhanced 9-character meeting code generation with collision resistance"""
