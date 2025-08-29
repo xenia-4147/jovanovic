@@ -6052,6 +6052,15 @@ END:VCARD"""
             self.test_convert_scan_to_card,
             self.test_list_scanned_cards,
             
+            # 🎯 BUSINESS CARD SCANNER WORKFLOW TESTS (REVIEW REQUEST FOCUS)
+            self.test_scanner_upload_image,
+            self.test_scanner_poll_results,
+            self.test_scanner_convert_to_card,
+            self.test_scanner_list_scans,
+            self.test_contact_list_integration,
+            self.test_scanner_auto_conversion_logic,
+            self.test_scanner_workflow_end_to_end,
+            
             # Print Export Tests - Game Changing Feature  
             self.test_get_print_templates,
             self.test_export_for_printing,
