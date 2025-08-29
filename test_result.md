@@ -396,7 +396,12 @@ test_plan:
     - "Job Board API Endpoints"
     - "VideoSocketService Implementation"
     - "CommunityMatchingService Implementation"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Video Meeting API Endpoints"
+    - "Community Networking API Endpoints"
+    - "Job Board API Endpoints"
+    - "VideoSocketService Implementation"
+    - "CommunityMatchingService Implementation"
   test_all: false
   test_priority: "high_first"
 
