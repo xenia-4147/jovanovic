@@ -1044,6 +1044,522 @@ class BusinessCardAPITester:
             return False
     
     # ============================================================================
+    # VIDEO MEETING SYSTEM TESTS - NEW CLAIMED ENDPOINTS
+    # ============================================================================
+    
+    def test_video_meeting_create(self):
+        """Test POST /api/video/meeting/create - Create video meetings"""
+        if not self.access_token or not self.card_id:
+            self.log_result("Video Meeting Create", False, "No access token or card ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            meeting_data = {
+                "title": "Tech Networking Session",
+                "description": "Video meeting for business card sharing",
+                "duration_minutes": 60,
+                "max_participants": 10,
+                "password": "meeting123",
+                "business_card_id": self.card_id
+            }
+            
+            response = requests.post(f"{API_BASE}/video/meeting/create", json=meeting_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["meeting_id", "webrtc_config", "ice_servers", "meeting_url"]
+                
+                if all(field in data for field in required_fields):
+                    self.video_meeting_id = data["meeting_id"]
+                    self.log_result("Video Meeting Create", True, f"Video meeting created: {data['meeting_id']}")
+                    return True
+                else:
+                    self.log_result("Video Meeting Create", False, "Missing required fields in response", data)
+                    return False
+            elif response.status_code == 404:
+                self.log_result("Video Meeting Create", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Video Meeting Create", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Video Meeting Create", False, f"Error: {str(e)}")
+            return False
+    
+    def test_video_meeting_join(self):
+        """Test POST /api/video/meeting/join - Join video meetings"""
+        if not self.access_token or not hasattr(self, 'video_meeting_id'):
+            self.log_result("Video Meeting Join", False, "No access token or video meeting ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            join_data = {
+                "meeting_id": self.video_meeting_id,
+                "business_card_id": self.card_id,
+                "password": "meeting123"
+            }
+            
+            response = requests.post(f"{API_BASE}/video/meeting/join", json=join_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["success", "participant_id", "webrtc_config", "shared_cards"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_result("Video Meeting Join", True, f"Successfully joined video meeting")
+                    return True
+                else:
+                    self.log_result("Video Meeting Join", False, "Missing required fields in response", data)
+                    return False
+            elif response.status_code == 404:
+                self.log_result("Video Meeting Join", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Video Meeting Join", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Video Meeting Join", False, f"Error: {str(e)}")
+            return False
+    
+    def test_video_meetings_list(self):
+        """Test GET /api/video/meetings - List user's video meetings"""
+        if not self.access_token:
+            self.log_result("Video Meetings List", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/video/meetings", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if isinstance(data, list):
+                    self.log_result("Video Meetings List", True, f"Retrieved {len(data)} video meetings")
+                    return True
+                else:
+                    self.log_result("Video Meetings List", False, "Response is not a list", data)
+                    return False
+            elif response.status_code == 404:
+                self.log_result("Video Meetings List", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Video Meetings List", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Video Meetings List", False, f"Error: {str(e)}")
+            return False
+    
+    def test_video_meeting_share_card(self):
+        """Test POST /api/video/meeting/{meeting_id}/share-card - Share business cards during meetings"""
+        if not self.access_token or not hasattr(self, 'video_meeting_id'):
+            self.log_result("Video Meeting Share Card", False, "No access token or video meeting ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            share_data = {
+                "business_card_id": self.card_id,
+                "recipient_participant_id": "participant_123"
+            }
+            
+            response = requests.post(f"{API_BASE}/video/meeting/{self.video_meeting_id}/share-card", 
+                                   json=share_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if data.get("success") == True:
+                    self.log_result("Video Meeting Share Card", True, "Business card shared successfully in video meeting")
+                    return True
+                else:
+                    self.log_result("Video Meeting Share Card", False, "Card sharing failed", data)
+                    return False
+            elif response.status_code == 404:
+                self.log_result("Video Meeting Share Card", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Video Meeting Share Card", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Video Meeting Share Card", False, f"Error: {str(e)}")
+            return False
+    
+    # ============================================================================
+    # COMMUNITY NETWORKING TESTS - NEW CLAIMED ENDPOINTS
+    # ============================================================================
+    
+    def test_community_profile_get(self):
+        """Test GET /api/community/profile - Get/create user community profile"""
+        if not self.access_token:
+            self.log_result("Community Profile Get", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/community/profile", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["user_id", "interests", "skills", "location", "bio"]
+                
+                if all(field in data for field in required_fields):
+                    self.log_result("Community Profile Get", True, "Community profile retrieved successfully")
+                    return True
+                else:
+                    self.log_result("Community Profile Get", False, "Missing required fields in response", data)
+                    return False
+            elif response.status_code == 404:
+                self.log_result("Community Profile Get", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Community Profile Get", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Community Profile Get", False, f"Error: {str(e)}")
+            return False
+    
+    def test_community_profile_update(self):
+        """Test PUT /api/community/profile - Update profile with interests/skills"""
+        if not self.access_token:
+            self.log_result("Community Profile Update", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            profile_data = {
+                "interests": ["Technology", "Networking", "AI", "Startups"],
+                "skills": ["Python", "FastAPI", "React", "MongoDB"],
+                "location": "Berlin, Germany",
+                "bio": "Tech enthusiast passionate about digital innovation",
+                "availability": "weekends",
+                "networking_goals": ["Find co-founder", "Learn new technologies"]
+            }
+            
+            response = requests.put(f"{API_BASE}/community/profile", json=profile_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if data.get("interests") == profile_data["interests"]:
+                    self.log_result("Community Profile Update", True, "Community profile updated successfully")
+                    return True
+                else:
+                    self.log_result("Community Profile Update", False, "Profile update not reflected", data)
+                    return False
+            elif response.status_code == 404:
+                self.log_result("Community Profile Update", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Community Profile Update", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Community Profile Update", False, f"Error: {str(e)}")
+            return False
+    
+    def test_community_discover(self):
+        """Test GET /api/community/discover - AI-powered community matching"""
+        if not self.access_token:
+            self.log_result("Community Discover", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/community/discover", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["matches", "algorithm_version", "match_score"]
+                
+                if "matches" in data and isinstance(data["matches"], list):
+                    self.log_result("Community Discover", True, f"AI matching returned {len(data['matches'])} matches")
+                    return True
+                else:
+                    self.log_result("Community Discover", False, "Invalid response format", data)
+                    return False
+            elif response.status_code == 404:
+                self.log_result("Community Discover", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Community Discover", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Community Discover", False, f"Error: {str(e)}")
+            return False
+    
+    def test_community_feed(self):
+        """Test GET /api/community/feed - Personalized networking feed"""
+        if not self.access_token:
+            self.log_result("Community Feed", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/community/feed", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["feed_items", "personalization_score", "last_updated"]
+                
+                if "feed_items" in data and isinstance(data["feed_items"], list):
+                    self.log_result("Community Feed", True, f"Personalized feed returned {len(data['feed_items'])} items")
+                    return True
+                else:
+                    self.log_result("Community Feed", False, "Invalid response format", data)
+                    return False
+            elif response.status_code == 404:
+                self.log_result("Community Feed", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Community Feed", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Community Feed", False, f"Error: {str(e)}")
+            return False
+    
+    def test_community_create(self):
+        """Test POST /api/community/create - Create new communities"""
+        if not self.access_token:
+            self.log_result("Community Create", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            community_data = {
+                "name": "Berlin Tech Entrepreneurs",
+                "description": "Community for tech entrepreneurs in Berlin",
+                "category": "Technology",
+                "location": "Berlin, Germany",
+                "privacy": "public",
+                "tags": ["startup", "tech", "networking", "berlin"]
+            }
+            
+            response = requests.post(f"{API_BASE}/community/create", json=community_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["community_id", "name", "member_count", "join_url"]
+                
+                if all(field in data for field in required_fields):
+                    self.community_id = data["community_id"]
+                    self.log_result("Community Create", True, f"Community created: {data['community_id']}")
+                    return True
+                else:
+                    self.log_result("Community Create", False, "Missing required fields in response", data)
+                    return False
+            elif response.status_code == 404:
+                self.log_result("Community Create", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Community Create", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Community Create", False, f"Error: {str(e)}")
+            return False
+    
+    def test_community_join(self):
+        """Test POST /api/community/{community_id}/join - Join communities"""
+        if not self.access_token or not hasattr(self, 'community_id'):
+            self.log_result("Community Join", False, "No access token or community ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            join_data = {
+                "business_card_id": self.card_id,
+                "introduction": "Excited to join this tech community!"
+            }
+            
+            response = requests.post(f"{API_BASE}/community/{self.community_id}/join", 
+                                   json=join_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if data.get("success") == True:
+                    self.log_result("Community Join", True, "Successfully joined community")
+                    return True
+                else:
+                    self.log_result("Community Join", False, "Community join failed", data)
+                    return False
+            elif response.status_code == 404:
+                self.log_result("Community Join", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Community Join", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Community Join", False, f"Error: {str(e)}")
+            return False
+    
+    def test_community_my_communities(self):
+        """Test GET /api/community/my-communities - List user's communities"""
+        if not self.access_token:
+            self.log_result("My Communities List", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/community/my-communities", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if isinstance(data, list):
+                    self.log_result("My Communities List", True, f"Retrieved {len(data)} user communities")
+                    return True
+                else:
+                    self.log_result("My Communities List", False, "Response is not a list", data)
+                    return False
+            elif response.status_code == 404:
+                self.log_result("My Communities List", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("My Communities List", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("My Communities List", False, f"Error: {str(e)}")
+            return False
+    
+    # ============================================================================
+    # JOB BOARD TESTS - NEW CLAIMED ENDPOINTS
+    # ============================================================================
+    
+    def test_jobs_discover(self):
+        """Test GET /api/jobs/discover - AI-matched job opportunities"""
+        if not self.access_token:
+            self.log_result("Jobs Discover", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            response = requests.get(f"{API_BASE}/jobs/discover", headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["jobs", "match_algorithm", "personalization_score"]
+                
+                if "jobs" in data and isinstance(data["jobs"], list):
+                    self.log_result("Jobs Discover", True, f"AI job matching returned {len(data['jobs'])} opportunities")
+                    return True
+                else:
+                    self.log_result("Jobs Discover", False, "Invalid response format", data)
+                    return False
+            elif response.status_code == 404:
+                self.log_result("Jobs Discover", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Jobs Discover", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Jobs Discover", False, f"Error: {str(e)}")
+            return False
+    
+    def test_jobs_post(self):
+        """Test POST /api/jobs/post - Post job opportunities"""
+        if not self.access_token:
+            self.log_result("Jobs Post", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            job_data = {
+                "title": "Senior Python Developer",
+                "company": "Tech Solutions Inc",
+                "description": "Looking for experienced Python developer for exciting projects",
+                "location": "Berlin, Germany",
+                "salary_range": "70000-90000",
+                "requirements": ["Python", "FastAPI", "MongoDB", "5+ years experience"],
+                "job_type": "full-time",
+                "remote_allowed": True,
+                "business_card_id": self.card_id
+            }
+            
+            response = requests.post(f"{API_BASE}/jobs/post", json=job_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                required_fields = ["job_id", "title", "company", "posted_at", "application_url"]
+                
+                if all(field in data for field in required_fields):
+                    self.job_id = data["job_id"]
+                    self.log_result("Jobs Post", True, f"Job posted successfully: {data['job_id']}")
+                    return True
+                else:
+                    self.log_result("Jobs Post", False, "Missing required fields in response", data)
+                    return False
+            elif response.status_code == 404:
+                self.log_result("Jobs Post", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Jobs Post", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Jobs Post", False, f"Error: {str(e)}")
+            return False
+    
+    def test_jobs_apply(self):
+        """Test POST /api/jobs/{job_id}/apply - Apply for jobs"""
+        if not self.access_token or not hasattr(self, 'job_id'):
+            self.log_result("Jobs Apply", False, "No access token or job ID available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            application_data = {
+                "business_card_id": self.card_id,
+                "cover_letter": "I am very interested in this position and believe my skills align perfectly with your requirements.",
+                "resume_url": "https://example.com/resume.pdf",
+                "portfolio_url": "https://github.com/johndoe"
+            }
+            
+            response = requests.post(f"{API_BASE}/jobs/{self.job_id}/apply", 
+                                   json=application_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                
+                if data.get("success") == True:
+                    self.log_result("Jobs Apply", True, "Job application submitted successfully")
+                    return True
+                else:
+                    self.log_result("Jobs Apply", False, "Job application failed", data)
+                    return False
+            elif response.status_code == 404:
+                self.log_result("Jobs Apply", False, "Endpoint not implemented - returns 404")
+                return False
+            else:
+                self.log_result("Jobs Apply", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Jobs Apply", False, f"Error: {str(e)}")
+            return False
+    
+    # ============================================================================
     # OCR BUSINESS CARD SCANNER TESTS - GAME CHANGING FEATURE
     # ============================================================================
     
