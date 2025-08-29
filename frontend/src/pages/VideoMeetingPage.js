@@ -108,26 +108,52 @@ const VideoMeetingPage = () => {
     try {
       setIsJoining(true);
       
-      // Initialize camera first
+      // Initialize camera first for immediate connection
       await initializeCamera();
       
-      // Join meeting via API (if implemented)
+      // Join meeting via API with proper participant tracking
       try {
-        await api.post(`/video/meeting/join`, {
+        const joinResponse = await api.post(`/video/meeting/join`, {
           meeting_code: meetingCode,
-          user_id: user.id
+          display_name: user?.full_name || user?.email || "Meeting Participant"
         });
+        
+        const joinResult = joinResponse.data;
+        
+        if (joinResult.success) {
+          // Extract participant information for camera setup
+          const participant = joinResult.participant;
+          const participantId = participant?.id || joinResult.participant_id;
+          
+          if (participantId) {
+            // Store participant ID for WebRTC peer connections
+            localStorage.setItem(`meeting_${meetingCode}_participant_id`, participantId);
+            
+            toast({
+              title: "Meeting beigetreten! 🎉",
+              description: `Sie sind Meeting ${meetingCode} beigetreten. Kamera ist verbunden.`,
+            });
+          } else {
+            toast({
+              title: "Meeting beigetreten! 🎉",
+              description: `Sie sind Meeting ${meetingCode} beigetreten.`,
+            });
+          }
+        } else {
+          throw new Error(joinResult.message || "Join failed");
+        }
+        
       } catch (apiError) {
-        // Continue without API - local demo mode
-        console.log('API join failed, continuing in demo mode');
+        // Continue in demo mode if API fails
+        console.log('API join failed, continuing in demo mode:', apiError);
+        
+        toast({
+          title: "Meeting beigetreten! 🎉",
+          description: `Sie sind Meeting ${meetingCode} beigetreten (Demo-Modus).`,
+        });
       }
       
       setMeetingJoined(true);
-      
-      toast({
-        title: "Meeting beigetreten! 🎉",
-        description: `Sie sind Meeting ${meetingCode} beigetreten.`,
-      });
       
     } catch (error) {
       console.error('Failed to join meeting:', error);
