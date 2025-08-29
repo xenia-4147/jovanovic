@@ -31,6 +31,13 @@ const CodeAccessPage = () => {
     try {
       const cleanCode = code.trim().toUpperCase();
       
+      // Check if it's a video meeting code (6 characters, alphanumeric)
+      if (/^[A-Z0-9]{6}$/.test(cleanCode)) {
+        // Redirect directly to video meeting
+        navigate(`/meeting/${cleanCode}`);
+        return;
+      }
+      
       // First try as express code
       try {
         const response = await api.post('/express/access', { code: cleanCode });
