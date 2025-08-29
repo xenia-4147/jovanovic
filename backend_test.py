@@ -1344,15 +1344,29 @@ class BusinessCardAPITester:
             response = requests.get(f"{API_BASE}/qr/meeting/{self.test_meeting_code}")
             
             if response.status_code == 200:
-                # Check if response is PNG image
-                content_type = response.headers.get('content-type', '')
-                
-                if 'image/png' in content_type:
-                    self.log_result("QR Code Endpoint for Meetings", True, f"QR code generated for meeting {self.test_meeting_code} (size: {len(response.content)} bytes)")
-                    return True
-                else:
-                    self.log_result("QR Code Endpoint for Meetings", False, f"Unexpected content type: {content_type}")
-                    return False
+                # Check if response contains QR code data (JSON format with base64 image)
+                try:
+                    data = response.json()
+                    if data.get("success") and "qr_code_base64" in data:
+                        qr_data = data["qr_code_base64"]
+                        if qr_data and qr_data.startswith("data:image/png;base64,"):
+                            self.log_result("QR Code Endpoint for Meetings", True, f"QR code generated for meeting {self.test_meeting_code} (base64 format)")
+                            return True
+                        else:
+                            self.log_result("QR Code Endpoint for Meetings", False, f"Invalid QR code format: {qr_data[:50]}...")
+                            return False
+                    else:
+                        self.log_result("QR Code Endpoint for Meetings", False, "Missing QR code data in response", data)
+                        return False
+                except:
+                    # Fallback: check if it's a direct PNG image
+                    content_type = response.headers.get('content-type', '')
+                    if 'image/png' in content_type:
+                        self.log_result("QR Code Endpoint for Meetings", True, f"QR code generated for meeting {self.test_meeting_code} (PNG format, size: {len(response.content)} bytes)")
+                        return True
+                    else:
+                        self.log_result("QR Code Endpoint for Meetings", False, f"Unexpected content type: {content_type}")
+                        return False
             elif response.status_code == 404:
                 self.log_result("QR Code Endpoint for Meetings", False, f"QR code endpoint not found - mobile camera access broken")
                 return False
