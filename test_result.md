@@ -490,8 +490,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Community Networking API Endpoints"
-    - "Job Board API Endpoints"
+    - "STUN/TURN Server Integration & WebRTC Enhancement"
+    - "Meeting Response Format Enhancement" 
+    - "Video Meeting API Endpoints"
+    - "NEW Revolutionary Meeting Link Generation & Live Translation APIs"
   stuck_tasks: 
     - "Community Networking API Endpoints"
     - "Job Board API Endpoints"
