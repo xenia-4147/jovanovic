@@ -113,7 +113,7 @@ const CardScanner = ({ onCardCreated }) => {
     }
   };
   
-  // Poll scan results
+  // Poll scan results and optionally auto-convert
   const pollScanResults = async (scanId, maxAttempts = 10) => {
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       try {
@@ -125,8 +125,24 @@ const CardScanner = ({ onCardCreated }) => {
           
           toast({
             title: "Scan abgeschlossen! ✨",
-            description: `${result.scanned_card.extracted_fields.length} Felder erkannt`,
+            description: `${result.scanned_card.extracted_fields.length} Felder erkannt - klicken Sie "Automatisch zur Kontaktliste" für sofortige Übertragung`,
           });
+          
+          // Check if we should auto-convert (high confidence results)
+          const hasHighConfidenceFields = result.scanned_card.extracted_fields.some(
+            field => field.confidence_level === 'high'
+          );
+          
+          if (hasHighConfidenceFields && result.scanned_card.extracted_fields.length >= 3) {
+            // Show option for immediate auto-convert
+            setTimeout(() => {
+              toast({
+                title: "🚀 Automatische Übertragung verfügbar!",
+                description: "Diese Visitenkarte kann sofort zur Kontaktliste hinzugefügt werden.",
+              });
+            }, 2000);
+          }
+          
           break;
         } else if (result.status === 'failed') {
           throw new Error('Scan fehlgeschlagen');
@@ -141,6 +157,53 @@ const CardScanner = ({ onCardCreated }) => {
         console.error('Polling error:', error);
         break;
       }
+    }
+  };
+
+  // Auto-convert to contact (quick action)
+  const autoConvertToContact = async () => {
+    if (!scanResult?.conversion_ready) return;
+    
+    setConverting(true);
+    
+    try {
+      // Get name field for card name
+      const nameField = scanResult.scanned_card.extracted_fields.find(
+        field => field.field_type === 'name' || field.field_type === 'full_name'
+      );
+      
+      const cardName = nameField?.value || 'Gescannte Visitenkarte';
+      
+      const response = await api.post(`/scanner/scan/${scanResult.scan_id}/convert`, {
+        scan_id: scanResult.scan_id,
+        card_name: cardName,
+        auto_map_fields: true
+      });
+      
+      if (response.data) {
+        toast({
+          title: "Automatisch zur Kontaktliste hinzugefügt! 🎉📇",
+          description: `"${cardName}" wurde erfolgreich zu Ihren Kontakten hinzugefügt.`,
+        });
+        
+        // Call parent callback
+        if (onCardCreated) {
+          onCardCreated(response.data);
+        }
+        
+        // Reset scanner
+        setScanResult(null);
+      }
+      
+    } catch (error) {
+      console.error('Auto-conversion failed:', error);
+      toast({
+        title: "Automatische Übertragung fehlgeschlagen",
+        description: "Bitte verwenden Sie die manuelle Konvertierung.",
+        variant: "destructive"
+      });
+    } finally {
+      setConverting(false);
     }
   };
   
