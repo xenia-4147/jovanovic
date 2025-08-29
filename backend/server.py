@@ -4289,9 +4289,12 @@ async def apply_for_job(
         logger.error(f"Job application failed: {str(e)}")
         raise HTTPException(status_code=500, detail="Bewerbung fehlgeschlagen")
 
+# Include the API router
+app.include_router(api_router)
+
 # Get services
 privacy_service = PrivacyService(db)
-auth_service = AuthService()
+auth_service = AuthService(db)
 
 if __name__ == "__main__":
     import uvicorn
