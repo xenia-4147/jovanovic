@@ -96,9 +96,9 @@ class CardScanRequest(BaseModel):
     scan_method: str = Field(default="camera", description="Scanning method")
     device_info: Optional[Dict[str, str]] = Field(None)
     
-    @validator('image_data', 'image_url')
-    def at_least_one_image_source(cls, v, values, field):
-        if field.name == 'image_url' and not v and not values.get('image_data'):
+    @validator('image_url')
+    def at_least_one_image_source(cls, v, values):
+        if not v and not values.get('image_data'):
             raise ValueError('Either image_data or image_url must be provided')
         return v
 
