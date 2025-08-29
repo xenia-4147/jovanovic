@@ -125,15 +125,16 @@ const CardScanner = ({ onCardCreated }) => {
           
           toast({
             title: "Scan abgeschlossen! ✨",
-            description: `${result.scanned_card.extracted_fields.length} Felder erkannt - klicken Sie "Automatisch zur Kontaktliste" für sofortige Übertragung`,
+            description: `${result?.scanned_card?.extracted_fields?.length || 0} Felder erkannt - klicken Sie "Automatisch zur Kontaktliste" für sofortige Übertragung`,
           });
           
-          // Check if we should auto-convert (high confidence results)
-          const hasHighConfidenceFields = result.scanned_card.extracted_fields.some(
+          // Check if we should auto-convert (high confidence results)  
+          const extractedFields = result?.scanned_card?.extracted_fields || [];
+          const hasHighConfidenceFields = extractedFields.some(
             field => field.confidence_level === 'high'
           );
           
-          if (hasHighConfidenceFields && result.scanned_card.extracted_fields.length >= 3) {
+          if (hasHighConfidenceFields && extractedFields.length >= 2) { // Lowered threshold to 2
             // Show option for immediate auto-convert
             setTimeout(() => {
               toast({
