@@ -4170,6 +4170,20 @@ async def startup_event():
         await db.upgradeprompts.create_index("user_id")
         await db.upgradeprompts.create_index([("user_id", 1), ("shown_at", -1)])
         
+        # OCR Scanner indexes
+        await db.scannedcards.create_index("user_id")
+        await db.scannedcards.create_index([("user_id", 1), ("scan_timestamp", -1)])
+        await db.scannedcards.create_index("status")
+        await db.scannedcards.create_index("is_converted")
+        await db.scannedcards.create_index("converted_to_card_id", sparse=True)
+        
+        # Print jobs indexes
+        await db.printjobs.create_index("user_id")
+        await db.printjobs.create_index([("user_id", 1), ("created_at", -1)])
+        await db.printjobs.create_index("business_card_id")
+        await db.printjobs.create_index("status")
+        await db.printjobs.create_index("template_id")
+        
         logger.info("Database indexes created successfully")
         
     except Exception as e:
