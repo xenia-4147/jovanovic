@@ -283,7 +283,7 @@ const CameraScanner = ({ onCardScanned, onClose }) => {
           onCardScanned(convertResponse.data);
         }
         
-        // Stop camera and close scanner
+        // Stop camera and close scanner (ALWAYS)
         stopCamera();
         if (onClose) {
           onClose();
@@ -299,6 +299,12 @@ const CameraScanner = ({ onCardScanned, onClose }) => {
           title: "Scan erfolgreich - Manuelle Überprüfung erforderlich",
           description: "Bitte überprüfen Sie die erkannten Felder und bestätigen Sie die Erstellung.",
         });
+        
+        // Still stop camera even on fallback
+        stopCamera();
+        if (onClose) {
+          onClose();
+        }
       }
       
     } catch (error) {
@@ -314,6 +320,12 @@ const CameraScanner = ({ onCardScanned, onClose }) => {
         description: "Scan erfolgreich - bitte prüfen Sie die Felder manuell.",
         variant: "destructive"
       });
+      
+      // CRITICAL: Always stop camera even on error
+      stopCamera();
+      if (onClose) {
+        onClose();
+      }
     }
   };
 
