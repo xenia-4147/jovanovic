@@ -1043,9 +1043,7 @@ class BusinessCardAPITester:
             self.log_result("Invalid Meeting Room Operations", False, f"Error: {str(e)}")
             return False
     
-    # ============================================================================
-    # ENHANCED 9-CHARACTER VIDEO MEETING CODE GENERATION TESTING
-    # ============================================================================
+
     
     def test_9_character_meeting_code_generation(self):
         """Test enhanced 9-character meeting code generation with collision resistance"""
