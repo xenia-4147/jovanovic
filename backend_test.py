@@ -1260,11 +1260,7 @@ class BusinessCardAPITester:
             self.log_result("Enhanced Features with 9-Char Codes", False, f"Error: {str(e)}")
             return False
 
-    # ============================================================================
-    # BUSINESS CARD SCANNER WORKFLOW TESTING - CRITICAL FIX VALIDATION
-    # ============================================================================
-    
-    def test_business_card_scanner_workflow_complete(self):
+
         """Test the FIXED Business Card Scanner workflow - complete end-to-end test"""
         if not self.access_token:
             self.log_result("Business Card Scanner Workflow", False, "No access token available")
