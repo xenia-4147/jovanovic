@@ -2791,6 +2791,9 @@ async def convert_scan_to_card(
         
         # Insert into database
         card_dict = card.dict(by_alias=True, exclude={"id"})
+        # Remove custom_code if it's None to avoid database index conflicts
+        if card_dict.get('custom_code') is None:
+            card_dict.pop('custom_code', None)
         result = await db.businesscards.insert_one(card_dict)
         card.id = str(result.inserted_id)
         
