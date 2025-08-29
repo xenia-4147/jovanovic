@@ -3609,6 +3609,695 @@ async def get_print_job_status(
 
 # Include the router in the main app
 app.include_router(api_router)
+# ============================================================================
+# VIDEO MEETING & COMMUNITY NETWORKING ENDPOINTS
+# Revolutionary Features: Video Meetings + Community Matching + Job Board
+# ============================================================================
+
+# Import Video Meeting and Community models
+from models.VideoMeeting import (
+    VideoMeetingRoom, CreateMeetingRequest, JoinMeetingRequest, ShareBusinessCardRequest,
+    MeetingResponse, MeetingListResponse, MeetingJoinResponse, DEFAULT_ICE_SERVERS
+)
+from models.Community import (
+    Community, UserProfile, CommunityMembership, NetworkingEvent, JobOpportunity, JobApplication,
+    CreateCommunityRequest, JoinCommunityRequest, CreateEventRequest, PostJobRequest, UpdateProfileRequest,
+    CommunityMatchResponse, UserMatchResponse, NetworkingFeedResponse, CommunityListResponse,
+    CommunityType, EventType, JobType, ExperienceLevel
+)
+
+# Import services
+from services.VideoSocketService import get_video_socket_service
+from services.CommunityMatchingService import get_community_matching_service
+
+# Initialize services
+video_socket_service = get_video_socket_service(db)
+community_matching_service = get_community_matching_service(db)
+
+# Video Meeting Endpoints
+
+@api_router.post("/video/meeting/create", response_model=MeetingResponse)
+async def create_video_meeting(
+    meeting_request: CreateMeetingRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new video meeting room with business card integration"""
+    try:
+        # Create meeting room
+        meeting = VideoMeetingRoom(
+            title=meeting_request.title,
+            description=meeting_request.description,
+            meeting_type=meeting_request.meeting_type,
+            host_id=str(current_user.id),
+            max_participants=meeting_request.max_participants,
+            duration_minutes=meeting_request.duration_minutes,
+            password=meeting_request.password,
+            is_public=meeting_request.is_public,
+            allow_card_sharing=meeting_request.allow_card_sharing,
+            community_tags=meeting_request.community_tags,
+            is_job_related=meeting_request.is_job_related,
+            job_title=meeting_request.job_title,
+            company_name=meeting_request.company_name,
+            scheduled_for=meeting_request.scheduled_for
+        )
+        
+        # Generate meeting code if not provided
+        if not meeting.meeting_code:
+            meeting.meeting_code = f"{uuid.uuid4().hex[:6].upper()}"
+        
+        # Set host business card if requested
+        if meeting_request.share_host_card:
+            # Get user's primary business card
+            host_card = await db.businesscards.find_one({"userId": str(current_user.id)})
+            if host_card:
+                meeting.host_business_card_id = str(host_card["_id"])
+        
+        # Save meeting to database
+        meeting_dict = meeting.dict(by_alias=True, exclude={"id"})
+        result = await db.videomeetings.insert_one(meeting_dict)
+        meeting.id = str(result.inserted_id)
+        
+        # Create join URL
+        join_url = f"/meeting/join/{meeting.meeting_code}"
+        
+        logger.info(f"Video meeting created: {meeting.title} by {current_user.email}")
+        
+        return MeetingResponse(
+            meeting=meeting,
+            participants=[],
+            shared_cards=[],
+            join_url=join_url,
+            webrtc_config=DEFAULT_ICE_SERVERS
+        )
+        
+    except Exception as e:
+        logger.error(f"Video meeting creation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Video Meeting konnte nicht erstellt werden: {str(e)}")
+
+@api_router.post("/video/meeting/join", response_model=MeetingJoinResponse)
+async def join_video_meeting(
+    join_request: JoinMeetingRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Join a video meeting room"""
+    try:
+        # Find meeting by code
+        meeting_data = await db.videomeetings.find_one({
+            "meeting_code": join_request.meeting_code.upper()
+        })
+        
+        if not meeting_data:
+            return MeetingJoinResponse(
+                success=False,
+                webrtc_config={},
+                ice_servers=[],
+                message="Meeting nicht gefunden"
+            )
+        
+        # Convert ObjectId to string
+        if "_id" in meeting_data:
+            meeting_data["_id"] = str(meeting_data["_id"])
+        
+        meeting = VideoMeetingRoom(**meeting_data)
+        
+        # Check password if required
+        if meeting.password and meeting.password != join_request.password:
+            return MeetingJoinResponse(
+                success=False,
+                webrtc_config={},
+                ice_servers=[],
+                message="Falsches Passwort"
+            )
+        
+        # Check meeting capacity
+        current_participants = await db.meetingparticipants.count_documents({
+            "meeting_id": str(meeting.id),
+            "left_at": {"$exists": False}
+        })
+        
+        if current_participants >= meeting.max_participants:
+            return MeetingJoinResponse(
+                success=False,
+                webrtc_config={},
+                ice_servers=[],
+                message="Meeting ist voll"
+            )
+        
+        # Get user's business card for sharing if requested
+        participant_card = None
+        if join_request.share_business_card:
+            card_data = await db.businesscards.find_one({"userId": str(current_user.id)})
+            if card_data:
+                participant_card = str(card_data["_id"])
+        
+        return MeetingJoinResponse(
+            success=True,
+            meeting=meeting,
+            webrtc_config=DEFAULT_ICE_SERVERS,
+            ice_servers=DEFAULT_ICE_SERVERS["iceServers"],
+            message=f"Erfolgreich dem Meeting '{meeting.title}' beigetreten"
+        )
+        
+    except Exception as e:
+        logger.error(f"Video meeting join failed: {str(e)}")
+        return MeetingJoinResponse(
+            success=False,
+            webrtc_config={},
+            ice_servers=[],
+            message=f"Meeting-Beitritt fehlgeschlagen: {str(e)}"
+        )
+
+@api_router.get("/video/meetings", response_model=MeetingListResponse)
+async def list_user_video_meetings(
+    current_user: User = Depends(get_current_user)
+):
+    """List user's video meetings"""
+    try:
+        # Get user's hosted meetings
+        hosted_meetings = []
+        cursor = db.videomeetings.find({"host_id": str(current_user.id)})
+        
+        async for meeting_data in cursor:
+            if "_id" in meeting_data:
+                meeting_data["_id"] = str(meeting_data["_id"])
+            meeting = VideoMeetingRoom(**meeting_data)
+            hosted_meetings.append(meeting)
+        
+        # Get meetings where user is a participant
+        participated_meetings = []
+        participant_cursor = db.meetingparticipants.find({
+            "user_id": str(current_user.id),
+            "left_at": {"$exists": False}
+        })
+        
+        async for participant_data in participant_cursor:
+            meeting_data = await db.videomeetings.find_one({
+                "_id": participant_data["meeting_id"]
+            })
+            if meeting_data:
+                if "_id" in meeting_data:
+                    meeting_data["_id"] = str(meeting_data["_id"])
+                meeting = VideoMeetingRoom(**meeting_data)
+                if meeting not in hosted_meetings:  # Avoid duplicates
+                    participated_meetings.append(meeting)
+        
+        all_meetings = hosted_meetings + participated_meetings
+        
+        return MeetingListResponse(
+            meetings=all_meetings,
+            community_meetings=[],  # Will be populated later
+            job_meetings=[],        # Will be populated later
+            total_count=len(all_meetings)
+        )
+        
+    except Exception as e:
+        logger.error(f"Failed to list video meetings: {str(e)}")
+        raise HTTPException(status_code=500, detail="Video Meetings konnten nicht geladen werden")
+
+@api_router.post("/video/meeting/{meeting_id}/share-card")
+async def share_business_card_in_meeting(
+    meeting_id: str,
+    share_request: ShareBusinessCardRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Share business card in video meeting"""
+    try:
+        # Validate meeting exists and user is participant
+        from bson import ObjectId
+        meeting_data = await db.videomeetings.find_one({"_id": ObjectId(meeting_id)})
+        
+        if not meeting_data:
+            raise HTTPException(status_code=404, detail="Meeting nicht gefunden")
+        
+        # Check if user is participant
+        participant = await db.meetingparticipants.find_one({
+            "meeting_id": meeting_id,
+            "user_id": str(current_user.id),
+            "left_at": {"$exists": False}
+        })
+        
+        if not participant:
+            raise HTTPException(status_code=403, detail="Nicht am Meeting teilgenommen")
+        
+        # Validate business card belongs to user
+        card_data = await db.businesscards.find_one({
+            "_id": ObjectId(share_request.business_card_id),
+            "userId": str(current_user.id)
+        })
+        
+        if not card_data:
+            raise HTTPException(status_code=404, detail="Visitenkarte nicht gefunden")
+        
+        # Use video socket service to share card
+        await video_socket_service.send_business_card_share(
+            meeting_id=meeting_id,
+            sender_id=str(current_user.id),
+            business_card_id=share_request.business_card_id,
+            message=share_request.message or "",
+            recipient_ids=share_request.recipient_ids or []
+        )
+        
+        return {"success": True, "message": "Visitenkarte geteilt"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Business card sharing failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Visitenkarten-Freigabe fehlgeschlagen")
+
+# Community Networking Endpoints
+
+@api_router.get("/community/profile", response_model=UserProfile)
+async def get_user_community_profile(
+    current_user: User = Depends(get_current_user)
+):
+    """Get user's community profile"""
+    try:
+        profile_data = await db.userprofiles.find_one({"user_id": str(current_user.id)})
+        
+        if not profile_data:
+            # Create default profile
+            profile = UserProfile(
+                user_id=str(current_user.id),
+                display_name=current_user.full_name or current_user.email.split('@')[0],
+                interests=[],
+                skills=[]
+            )
+            
+            profile_dict = profile.dict(by_alias=True, exclude={"id"})
+            result = await db.userprofiles.insert_one(profile_dict)
+            profile.id = str(result.inserted_id)
+            
+            return profile
+        
+        if "_id" in profile_data:
+            profile_data["_id"] = str(profile_data["_id"])
+        
+        return UserProfile(**profile_data)
+        
+    except Exception as e:
+        logger.error(f"Failed to get community profile: {str(e)}")
+        raise HTTPException(status_code=500, detail="Community-Profil konnte nicht geladen werden")
+
+@api_router.put("/community/profile", response_model=UserProfile)
+async def update_community_profile(
+    profile_update: UpdateProfileRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Update user's community profile"""
+    try:
+        # Get existing profile
+        profile_data = await db.userprofiles.find_one({"user_id": str(current_user.id)})
+        
+        if profile_data:
+            # Update existing profile
+            update_data = {k: v for k, v in profile_update.dict().items() if v is not None}
+            update_data["last_active"] = datetime.utcnow()
+            
+            await db.userprofiles.update_one(
+                {"user_id": str(current_user.id)},
+                {"$set": update_data}
+            )
+            
+            # Get updated profile
+            updated_profile_data = await db.userprofiles.find_one({"user_id": str(current_user.id)})
+            if "_id" in updated_profile_data:
+                updated_profile_data["_id"] = str(updated_profile_data["_id"])
+            
+            profile = UserProfile(**updated_profile_data)
+        else:
+            # Create new profile
+            profile_data = profile_update.dict()
+            profile_data["user_id"] = str(current_user.id)
+            profile_data["display_name"] = profile_data.get("display_name") or current_user.full_name or current_user.email.split('@')[0]
+            
+            # Remove None values
+            profile_data = {k: v for k, v in profile_data.items() if v is not None}
+            
+            profile = UserProfile(**profile_data)
+            profile_dict = profile.dict(by_alias=True, exclude={"id"})
+            result = await db.userprofiles.insert_one(profile_dict)
+            profile.id = str(result.inserted_id)
+        
+        # Update matching indices
+        await community_matching_service.update_user_indices(str(current_user.id))
+        
+        logger.info(f"Community profile updated for user {current_user.email}")
+        
+        return profile
+        
+    except Exception as e:
+        logger.error(f"Profile update failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Profil-Update fehlgeschlagen")
+
+@api_router.get("/community/discover", response_model=CommunityMatchResponse)
+async def discover_communities(
+    limit: int = 10,
+    current_user: User = Depends(get_current_user)
+):
+    """Discover matching communities based on user interests"""
+    try:
+        matching_communities = await community_matching_service.find_matching_communities(
+            user_id=str(current_user.id),
+            limit=limit
+        )
+        
+        # Extract community objects from matches
+        communities = []
+        for match in matching_communities:
+            community_data = match.copy()
+            # Remove match-specific fields for Community model
+            community_data.pop('match_score', None)
+            community_data.pop('match_reasons', None)
+            communities.append(Community(**community_data))
+        
+        # Get recommended interests from user profile
+        profile_data = await db.userprofiles.find_one({"user_id": str(current_user.id)})
+        recommended_interests = []
+        if profile_data:
+            recommended_interests = profile_data.get("interests", [])
+        
+        return CommunityMatchResponse(
+            communities=communities,
+            recommended_interests=recommended_interests,
+            total_matches=len(matching_communities)
+        )
+        
+    except Exception as e:
+        logger.error(f"Community discovery failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Community-Entdeckung fehlgeschlagen")
+
+@api_router.get("/community/feed", response_model=NetworkingFeedResponse)
+async def get_networking_feed(
+    current_user: User = Depends(get_current_user)
+):
+    """Get personalized networking feed with events, jobs, and matches"""
+    try:
+        # Initialize community matching service if needed
+        await community_matching_service.initialize()
+        
+        feed = await community_matching_service.get_community_recommendations_feed(
+            user_id=str(current_user.id)
+        )
+        
+        # Convert dict results to proper objects
+        events = []
+        for event_data in feed.get('upcoming_events', []):
+            if isinstance(event_data, dict):
+                event_data.pop('match_score', None)
+                event_data.pop('match_reasons', None)
+                events.append(NetworkingEvent(**event_data))
+        
+        job_opportunities = []
+        for job_data in feed.get('job_matches', []):
+            if isinstance(job_data, dict):
+                job_data.pop('match_score', None) 
+                job_data.pop('match_reasons', None)
+                job_opportunities.append(JobOpportunity(**job_data))
+        
+        communities = []
+        for community_data in feed.get('recommended_communities', []):
+            if isinstance(community_data, dict):
+                community_data.pop('match_score', None)
+                community_data.pop('match_reasons', None)
+                communities.append(Community(**community_data))
+        
+        return NetworkingFeedResponse(
+            events=events,
+            job_opportunities=job_opportunities,
+            community_suggestions=communities,
+            user_matches=feed.get('suggested_connections', [])
+        )
+        
+    except Exception as e:
+        logger.error(f"Networking feed failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Networking-Feed konnte nicht geladen werden")
+
+@api_router.post("/community/create", response_model=Community)
+async def create_community(
+    community_request: CreateCommunityRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new community"""
+    try:
+        community = Community(
+            name=community_request.name,
+            description=community_request.description,
+            community_type=community_request.community_type,
+            primary_interests=community_request.primary_interests,
+            location=community_request.location,
+            industry_focus=community_request.industry_focus,
+            is_public=community_request.is_public,
+            max_members=community_request.max_members,
+            creator_id=str(current_user.id)
+        )
+        
+        # Save community
+        community_dict = community.dict(by_alias=True, exclude={"id"})
+        result = await db.communities.insert_one(community_dict)
+        community.id = str(result.inserted_id)
+        
+        # Create membership for creator
+        membership = CommunityMembership(
+            community_id=str(community.id),
+            user_id=str(current_user.id),
+            role="admin"
+        )
+        
+        membership_dict = membership.dict(by_alias=True, exclude={"id"})
+        await db.communitymemberships.insert_one(membership_dict)
+        
+        logger.info(f"Community created: {community.name} by {current_user.email}")
+        
+        return community
+        
+    except Exception as e:
+        logger.error(f"Community creation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Community konnte nicht erstellt werden")
+
+@api_router.post("/community/{community_id}/join")
+async def join_community(
+    community_id: str,
+    join_request: JoinCommunityRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Join a community"""
+    try:
+        from bson import ObjectId
+        
+        # Check if community exists
+        community_data = await db.communities.find_one({"_id": ObjectId(community_id)})
+        if not community_data:
+            raise HTTPException(status_code=404, detail="Community nicht gefunden")
+        
+        # Check if already a member
+        existing_membership = await db.communitymemberships.find_one({
+            "community_id": community_id,
+            "user_id": str(current_user.id)
+        })
+        
+        if existing_membership:
+            return {"message": "Bereits Mitglied dieser Community"}
+        
+        # Create membership
+        membership = CommunityMembership(
+            community_id=community_id,
+            user_id=str(current_user.id),
+            role="member"
+        )
+        
+        membership_dict = membership.dict(by_alias=True, exclude={"id"})
+        await db.communitymemberships.insert_one(membership_dict)
+        
+        # Update community member count
+        await db.communities.update_one(
+            {"_id": ObjectId(community_id)},
+            {"$inc": {"member_count": 1}}
+        )
+        
+        logger.info(f"User {current_user.email} joined community {community_id}")
+        
+        return {"message": "Erfolgreich der Community beigetreten"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Community join failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Community-Beitritt fehlgeschlagen")
+
+@api_router.get("/community/my-communities", response_model=CommunityListResponse)
+async def get_my_communities(
+    current_user: User = Depends(get_current_user)
+):
+    """Get user's communities"""
+    try:
+        # Get user's memberships
+        memberships = []
+        membership_cursor = db.communitymemberships.find({"user_id": str(current_user.id)})
+        
+        my_communities = []
+        async for membership_data in membership_cursor:
+            community_data = await db.communities.find_one({
+                "_id": membership_data["community_id"]
+            })
+            
+            if community_data:
+                if "_id" in community_data:
+                    community_data["_id"] = str(community_data["_id"])
+                community = Community(**community_data)
+                my_communities.append(community)
+        
+        return CommunityListResponse(
+            communities=[],
+            my_communities=my_communities,
+            suggested_communities=[],
+            total_count=len(my_communities)
+        )
+        
+    except Exception as e:
+        logger.error(f"Failed to get my communities: {str(e)}")
+        raise HTTPException(status_code=500, detail="Meine Communities konnten nicht geladen werden")
+
+# Job Board Endpoints
+
+@api_router.get("/jobs/discover", response_model=List[JobOpportunity])
+async def discover_jobs(
+    limit: int = 10,
+    job_type: Optional[JobType] = None,
+    remote_only: bool = False,
+    current_user: User = Depends(get_current_user)
+):
+    """Discover matching job opportunities"""
+    try:
+        job_matches = await community_matching_service.find_job_matches(
+            user_id=str(current_user.id),
+            limit=limit
+        )
+        
+        jobs = []
+        for match in job_matches:
+            job_data = match.copy()
+            # Remove match-specific fields
+            job_data.pop('match_score', None)
+            job_data.pop('match_reasons', None)
+            
+            job = JobOpportunity(**job_data)
+            
+            # Apply filters
+            if job_type and job.job_type != job_type:
+                continue
+            if remote_only and not job.remote_allowed:
+                continue
+                
+            jobs.append(job)
+        
+        return jobs[:limit]
+        
+    except Exception as e:
+        logger.error(f"Job discovery failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Job-Suche fehlgeschlagen")
+
+@api_router.post("/jobs/post", response_model=JobOpportunity)
+async def post_job_opportunity(
+    job_request: PostJobRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Post a new job opportunity"""
+    try:
+        # Get user's business card for company representation
+        company_card = await db.businesscards.find_one({"userId": str(current_user.id)})
+        company_card_id = str(company_card["_id"]) if company_card else None
+        
+        job = JobOpportunity(
+            title=job_request.title,
+            company_name=job_request.company_name,
+            description=job_request.description,
+            job_type=job_request.job_type,
+            experience_level=job_request.experience_level,
+            location=job_request.location,
+            remote_allowed=job_request.remote_allowed,
+            required_skills=job_request.required_skills,
+            salary_min=job_request.salary_min,
+            salary_max=job_request.salary_max,
+            posted_by=str(current_user.id),
+            company_business_card_id=company_card_id
+        )
+        
+        # Save job
+        job_dict = job.dict(by_alias=True, exclude={"id"})
+        result = await db.jobopportunities.insert_one(job_dict)
+        job.id = str(result.inserted_id)
+        
+        logger.info(f"Job posted: {job.title} by {current_user.email}")
+        
+        return job
+        
+    except Exception as e:
+        logger.error(f"Job posting failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Job konnte nicht gepostet werden")
+
+@api_router.post("/jobs/{job_id}/apply")
+async def apply_for_job(
+    job_id: str,
+    cover_message: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Apply for a job opportunity"""
+    try:
+        from bson import ObjectId
+        
+        # Check if job exists
+        job_data = await db.jobopportunities.find_one({"_id": ObjectId(job_id)})
+        if not job_data:
+            raise HTTPException(status_code=404, detail="Job nicht gefunden")
+        
+        # Check if already applied
+        existing_application = await db.jobapplications.find_one({
+            "job_id": job_id,
+            "applicant_id": str(current_user.id)
+        })
+        
+        if existing_application:
+            raise HTTPException(status_code=400, detail="Bereits für diesen Job beworben")
+        
+        # Get applicant's business card
+        applicant_card = await db.businesscards.find_one({"userId": str(current_user.id)})
+        applicant_card_id = str(applicant_card["_id"]) if applicant_card else None
+        
+        # Create application
+        application = JobApplication(
+            job_id=job_id,
+            applicant_id=str(current_user.id),
+            cover_message=cover_message,
+            applicant_business_card_id=applicant_card_id
+        )
+        
+        application_dict = application.dict(by_alias=True, exclude={"id"})
+        await db.jobapplications.insert_one(application_dict)
+        
+        # Update job applications count
+        await db.jobopportunities.update_one(
+            {"_id": ObjectId(job_id)},
+            {"$inc": {"applications_count": 1}}
+        )
+        
+        logger.info(f"Job application submitted: {job_id} by {current_user.email}")
+        
+        return {"message": "Bewerbung erfolgreich eingereicht"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Job application failed: {str(e)}")
+        raise HTTPException(status_code=500, detail="Bewerbung fehlgeschlagen")
+
+# Get services
+privacy_service = PrivacyService(db)
+auth_service = AuthService(db)
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8001)
 
 @app.on_event("startup")
 async def startup_event():
