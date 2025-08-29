@@ -4389,6 +4389,26 @@ END:VCARD"""
             self.test_express_room_participant_limits,
             self.test_invalid_express_operations,
             
+            # OCR Business Card Scanner Tests - Game Changing Feature
+            self.test_ocr_scan_business_card,
+            self.test_get_scan_results,
+            self.test_correct_ocr_field,
+            self.test_convert_scan_to_card,
+            self.test_list_scanned_cards,
+            
+            # Print Export Tests - Game Changing Feature  
+            self.test_get_print_templates,
+            self.test_export_for_printing,
+            self.test_quick_print_export,
+            self.test_print_preview,
+            self.test_print_job_status,
+            
+            # Authentication & Authorization Tests for New Features
+            self.test_ocr_authentication_required,
+            self.test_print_authentication_required,
+            self.test_user_data_isolation_scans,
+            self.test_user_data_isolation_print_jobs,
+            
             # Utility tests
             self.test_qr_code_generation,
             self.test_vcard_generation,
