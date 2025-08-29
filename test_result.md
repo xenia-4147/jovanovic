@@ -534,9 +534,9 @@ backend:
 
   - task: "Community Networking API Endpoints"
     implemented: true
-    working: true
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -549,6 +549,9 @@ backend:
         - working: true
         - agent: "testing"
         - comment: "🎉 EXCELLENT SUCCESS: Community Networking endpoints are now FULLY WORKING! Successfully tested all 7 endpoints (lines 3868-4157): ✅ GET /api/community/profile (auto-creates profile), ✅ PUT /api/community/profile (updates interests/skills), ✅ GET /api/community/discover (AI-powered matching), ✅ GET /api/community/feed (personalized feed), ✅ POST /api/community/create (creates communities), ✅ GET /api/community/my-communities (lists user communities). Minor: POST /api/community/{community_id}/join has API design issue (missing community_id in request body) but endpoint exists and responds. The AI-powered community matching system is revolutionary and working perfectly!"
+        - working: false
+        - agent: "testing"
+        - comment: "🔍 COMPREHENSIVE COMMUNITY NETWORKING TESTING COMPLETED: Mixed results with 2/7 endpoints working (28.6% success rate). DETAILED FINDINGS: ✅ GET /api/community/profile - WORKING perfectly (auto-creates profile), ❌ PUT /api/community/profile - Profile update not reflected in response (interests not matching), ❌ GET /api/community/discover - Response format mismatch (returns 'communities' object instead of expected 'matches' array), ❌ GET /api/community/feed - Response format mismatch (returns 'events', 'job_opportunities' instead of expected 'feed_items'), ❌ POST /api/community/create - Pydantic validation errors (missing 'community_type', 'primary_interests' fields), ❌ POST /api/community/{community_id}/join - Failed due to missing community_id from create test, ❌ GET /api/community/my-communities - Returns object with 'communities' array instead of direct array. CRITICAL ISSUES: 1) API response format mismatches between implementation and expected test format, 2) Pydantic model validation requiring different field names, 3) Profile update logic not working correctly. The AI matching system is working but needs response format standardization."
 
   - task: "Job Board API Endpoints"
     implemented: true
