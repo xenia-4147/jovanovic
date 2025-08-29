@@ -114,11 +114,13 @@ const CardScanner = ({ onCardCreated }) => {
   };
   
   // Poll scan results and optionally auto-convert
-  const pollScanResults = async (scanId, maxAttempts = 10) => {
+  const pollScanResults = async (scanId, maxAttempts = 15) => { // Increased from 10 to 15
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       try {
         const response = await api.get(`/scanner/scan/${scanId}`);
         const result = response.data;
+        
+        console.log(`Poll attempt ${attempt + 1}: Status = ${result?.status}, Fields = ${result?.scanned_card?.extracted_fields?.length || 0}`);
         
         if (result.status === 'completed') {
           setScanResult(result);
