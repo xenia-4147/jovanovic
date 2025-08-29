@@ -3607,8 +3607,6 @@ async def get_print_job_status(
         logger.error(f"Failed to get print job status: {str(e)}")
         raise HTTPException(status_code=500, detail="Druckauftrags-Status konnte nicht geladen werden")
 
-# Include the router in the main app
-app.include_router(api_router)
 # ============================================================================
 # VIDEO MEETING & COMMUNITY NETWORKING ENDPOINTS
 # Revolutionary Features: Video Meetings + Community Matching + Job Board
