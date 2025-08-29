@@ -134,13 +134,24 @@ const HomePage = () => {
       const response = await api.post('/video/meeting/create', meetingData);
       const meeting = response.data;
       
-      toast({
-        title: "Meeting erstellt! 🎉",
-        description: `Meeting-Code: ${meeting.meeting?.meeting_code}`,
-      });
+      // Copy meeting link to clipboard (like Zoom)
+      const meetingLink = `${window.location.origin}/meeting/${meeting.meeting?.meeting_code}`;
+      
+      try {
+        await navigator.clipboard.writeText(meetingLink);
+        toast({
+          title: "Meeting erstellt & Link kopiert! 🎉📋",
+          description: `Meeting-Code: ${meeting.meeting?.meeting_code} | Link wurde in Zwischenablage kopiert`,
+        });
+      } catch (clipboardError) {
+        toast({
+          title: "Meeting erstellt! 🎉",
+          description: `Meeting-Code: ${meeting.meeting?.meeting_code} | Link: ${meetingLink}`,
+        });
+      }
 
       // Redirect to meeting room
-      window.open(`/meeting/${meeting.meeting?.meeting_code}`, '_blank');
+      window.open(meetingLink, '_blank');
       
     } catch (error) {
       console.error('Failed to create meeting:', error);
