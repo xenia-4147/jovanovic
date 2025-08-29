@@ -3794,9 +3794,19 @@ async def join_video_meeting(
             if card_data:
                 participant_card = str(card_data["_id"])
         
+        # Create participant object for camera connection
+        participant = MeetingParticipant(
+            meeting_id=str(meeting.id),
+            user_id=str(current_user.id),
+            display_name=current_user.full_name or current_user.email,
+            business_card_id=participant_card,
+            role=ParticipantRole.PARTICIPANT
+        )
+        
         return MeetingJoinResponse(
             success=True,
             meeting=meeting,
+            participant=participant,  # Critical for camera connection!
             webrtc_config=WEBRTC_CONFIG,
             ice_servers=WEBRTC_CONFIG["iceServers"],
             message=f"Erfolgreich dem Meeting '{meeting.title}' beigetreten"
