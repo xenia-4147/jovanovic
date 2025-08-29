@@ -495,7 +495,7 @@ test_plan:
     - "Video Meeting API Endpoints"
     - "NEW Revolutionary Meeting Link Generation & Live Translation APIs"
   stuck_tasks: 
-    - "Community Networking API Endpoints"
+    - "Community Networking API Endpoints" 
     - "Job Board API Endpoints"
   test_all: false
   test_priority: "critical_first"
