@@ -191,8 +191,20 @@ const CardScanner = ({ onCardCreated }) => {
           onCardCreated(response.data);
         }
         
-        // Reset scanner
+        // Reset scanner completely - return to main view
         setScanResult(null);
+        setScanning(false);
+        setConverting(false);
+        
+        // Optional: Close scanner after successful conversion
+        setTimeout(() => {
+          if (window.confirm("Visitenkarte erfolgreich hinzugefügt! Möchten Sie zur Kontaktliste wechseln?")) {
+            // Close scanner and let parent handle navigation
+            if (onCardCreated) {
+              onCardCreated({ ...response.data, navigateToList: true });
+            }
+          }
+        }, 1000);
       }
       
     } catch (error) {
