@@ -343,7 +343,9 @@ WEBRTC_CONFIG = {
     "iceServers": DEFAULT_ICE_SERVERS,
     "iceCandidatePoolSize": 10,
     "bundlePolicy": "balanced",
-    "rtcpMuxPolicy": "require"
+    "rtcpMuxPolicy": "require",
+    "iceTransportPolicy": "all",
+    "sdpSemantics": "unified-plan"
 }
 
 # Meeting Limits Based on User Tier
