@@ -490,6 +490,8 @@ metadata:
 
 test_plan:
   current_focus:
+    - "OCR Service Tesseract Integration - CRITICAL VERIFICATION"
+    - "Business Card Scanner Workflow - CRITICAL FIX VALIDATION"
     - "Enhanced 9-Character Video Meeting Code Generation"
     - "STUN/TURN Server Integration & WebRTC Enhancement"
     - "Meeting Response Format Enhancement" 
