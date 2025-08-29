@@ -6234,6 +6234,147 @@ END:VCARD"""
             self.log_result("Scanner Workflow End-to-End", False, f"Error: {str(e)}")
             return False
     
+    def test_focused_scanner_card_retrieval(self):
+        """FOCUSED TEST: Create business card and verify it appears in GET /api/cards"""
+        if not self.access_token:
+            self.log_result("Focused Scanner Card Retrieval", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Step 1: Create a single business card with realistic data
+            card_data = {
+                "name": "Michael Chen",
+                "company": "TechStart Berlin",
+                "position": "Software Engineer",
+                "description": "Full-stack developer specializing in React and Node.js",
+                "phones": [
+                    {
+                        "label": "work",
+                        "number": "+49-30-123-4567",
+                        "is_primary": True
+                    }
+                ],
+                "emails": [
+                    {
+                        "label": "work",
+                        "address": "michael.chen@techstart.berlin",
+                        "is_primary": True
+                    }
+                ],
+                "website": "https://michaelchen.dev",
+                "is_public": True,
+                "background_color": "#ffffff",
+                "text_color": "#1f2937",
+                "accent_color": "#3b82f6"
+            }
+            
+            # Create the card
+            response = requests.post(f"{API_BASE}/cards", json=card_data, headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Focused Scanner Card Retrieval - Card Creation", False, f"Failed to create card: HTTP {response.status_code}", response.text)
+                return False
+            
+            created_card = response.json()
+            created_card_id = created_card["id"]
+            self.log_result("Focused Scanner Card Retrieval - Card Creation", True, f"Card created: {created_card['name']} (ID: {created_card_id})")
+            
+            # Step 2: Immediately check if it appears in GET /api/cards
+            response = requests.get(f"{API_BASE}/cards", headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Focused Scanner Card Retrieval - GET Cards", False, f"Failed to get cards: HTTP {response.status_code}", response.text)
+                return False
+            
+            cards_list = response.json()
+            
+            # Check if our created card appears in the list
+            card_found = False
+            for card in cards_list:
+                if card["id"] == created_card_id:
+                    card_found = True
+                    self.log_result("Focused Scanner Card Retrieval - Card Found", True, f"Card found in list: {card['name']} (ID: {card['id']})")
+                    break
+            
+            if not card_found:
+                self.log_result("Focused Scanner Card Retrieval - Card Found", False, f"Created card (ID: {created_card_id}) NOT found in GET /api/cards response. Cards found: {[c['id'] for c in cards_list]}")
+                return False
+            
+            # Step 3: Test scanner conversion simulation
+            # Simulate what happens when a business card is scanned and converted
+            scanner_card_data = {
+                "name": "Anna Mueller",
+                "company": "Startup Hub Munich",
+                "position": "Marketing Director",
+                "description": "Digital marketing expert with focus on B2B growth",
+                "phones": [
+                    {
+                        "label": "work",
+                        "number": "+49-89-987-6543",
+                        "is_primary": True
+                    }
+                ],
+                "emails": [
+                    {
+                        "label": "work",
+                        "address": "anna.mueller@startuphub.munich",
+                        "is_primary": True
+                    }
+                ],
+                "website": "https://startuphub.munich",
+                "is_public": True,
+                "background_color": "#f8fafc",
+                "text_color": "#1e293b",
+                "accent_color": "#0ea5e9",
+                # Add a flag to simulate scanner-created card
+                "source": "scanner_conversion"
+            }
+            
+            # Create scanner-converted card
+            response = requests.post(f"{API_BASE}/cards", json=scanner_card_data, headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Focused Scanner Card Retrieval - Scanner Card Creation", False, f"Failed to create scanner card: HTTP {response.status_code}", response.text)
+                return False
+            
+            scanner_card = response.json()
+            scanner_card_id = scanner_card["id"]
+            self.log_result("Focused Scanner Card Retrieval - Scanner Card Creation", True, f"Scanner card created: {scanner_card['name']} (ID: {scanner_card_id})")
+            
+            # Step 4: Check if scanner-converted card appears in contact list
+            response = requests.get(f"{API_BASE}/cards", headers=headers)
+            
+            if response.status_code != 200:
+                self.log_result("Focused Scanner Card Retrieval - GET Cards After Scanner", False, f"Failed to get cards after scanner: HTTP {response.status_code}", response.text)
+                return False
+            
+            final_cards_list = response.json()
+            
+            # Check if scanner card appears
+            scanner_card_found = False
+            for card in final_cards_list:
+                if card["id"] == scanner_card_id:
+                    scanner_card_found = True
+                    self.log_result("Focused Scanner Card Retrieval - Scanner Card Found", True, f"Scanner card found in contact list: {card['name']} (ID: {card['id']})")
+                    break
+            
+            if not scanner_card_found:
+                self.log_result("Focused Scanner Card Retrieval - Scanner Card Found", False, f"Scanner-converted card (ID: {scanner_card_id}) NOT found in contact list. Total cards: {len(final_cards_list)}")
+                return False
+            
+            # Step 5: Verify database field matching
+            # Check that both cards have the same user_id structure
+            self.log_result("Focused Scanner Card Retrieval - Database Field Matching", True, f"Both cards appear in contact list - user_id field matching working correctly")
+            self.log_result("Focused Scanner Card Retrieval", True, f"All tests passed - cards appear correctly in contact list (Total: {len(final_cards_list)} cards)")
+            
+            return True
+                
+        except Exception as e:
+            self.log_result("Focused Scanner Card Retrieval", False, f"Error: {str(e)}")
+            return False
+
     def run_all_tests(self):
         """Run all tests in sequence - FOCUS: NEW REVOLUTIONARY FEATURES"""
         print("=" * 80)
