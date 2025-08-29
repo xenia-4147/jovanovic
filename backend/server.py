@@ -3663,6 +3663,12 @@ async def create_video_meeting(
         if not meeting.meeting_code:
             meeting.meeting_code = f"{uuid.uuid4().hex[:6].upper()}"
         
+        # Generate shareable meeting link (like Zoom)
+        base_url = "https://cardnet-pro.preview.emergentagent.com"
+        join_url = f"{base_url}/meeting/{meeting.meeting_code}"
+        share_link = f"{base_url}/join?code={meeting.meeting_code}"
+        qr_code_url = f"{base_url}/api/qr/meeting/{meeting.meeting_code}"
+        
         # Set host business card if requested
         if meeting_request.share_host_card:
             # Get user's primary business card
@@ -3670,23 +3676,42 @@ async def create_video_meeting(
             if host_card:
                 meeting.host_business_card_id = str(host_card["_id"])
         
+        # Apply translation settings from request
+        if hasattr(meeting_request, 'translation_enabled') and meeting_request.translation_enabled:
+            meeting.translation_enabled = meeting_request.translation_enabled
+            meeting.source_language = getattr(meeting_request, 'source_language', 'auto')
+            meeting.target_languages = getattr(meeting_request, 'target_languages', [])
+        
+        # Set share link and QR code on meeting object
+        meeting.share_link = share_link
+        meeting.qr_code_url = qr_code_url
+        
         # Save meeting to database
         meeting_dict = meeting.dict(by_alias=True, exclude={"id"})
         result = await db.videomeetings.insert_one(meeting_dict)
         meeting.id = str(result.inserted_id)
         
-        # Generate shareable meeting link (like Zoom)
-        base_url = "https://cardnet-pro.preview.emergentagent.com"
-        join_url = f"{base_url}/meeting/{meeting.meeting_code}"
-        share_link = f"{base_url}/join?code={meeting.meeting_code}"
-        
-        # Add meeting link to business card sharing
+        # Create meeting link card data for business card integration
         meeting_link_card = {
+            "type": "video_meeting",
             "meeting_title": meeting.title,
             "meeting_code": meeting.meeting_code,
-            "join_link": share_link,
-            "qr_code_url": f"{base_url}/api/qr/meeting/{meeting.meeting_code}",
-            "scheduled_for": meeting.scheduled_for.isoformat() if meeting.scheduled_for else None
+            "host_name": current_user.full_name or current_user.email,
+            "company_name": meeting.company_name or "Business Card Studio",
+            "share_link": share_link,
+            "qr_code_url": qr_code_url,
+            "scheduled_for": meeting.scheduled_for.isoformat() if meeting.scheduled_for else None,
+            "duration_minutes": meeting.duration_minutes,
+            "meeting_info": {
+                "title": meeting.title,
+                "host_name": current_user.full_name or current_user.email,
+                "meeting_time": meeting.scheduled_for.isoformat() if meeting.scheduled_for else "Sofort verfügbar",
+                "features": {
+                    "business_cards": meeting.allow_card_sharing,
+                    "translation": meeting.translation_enabled,
+                    "languages": meeting.target_languages if meeting.translation_enabled else []
+                }
+            }
         }
         
         logger.info(f"Video meeting created: {meeting.title} by {current_user.email}")
@@ -3697,6 +3722,7 @@ async def create_video_meeting(
             shared_cards=[],
             join_url=join_url,
             share_link=share_link,  # NEW: Shareable link like Zoom
+            qr_code_url=qr_code_url,  # NEW: QR code URL
             meeting_link_card=meeting_link_card,  # NEW: For business card integration
             webrtc_config=WEBRTC_CONFIG
         )
