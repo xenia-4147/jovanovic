@@ -490,17 +490,14 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Video Meeting Screen Implementation"
-    - "Active Meeting Screen Implementation"
-    - "Community Profile Screen Implementation"
-    - "Community Discover Screen Implementation"
-    - "Networking Feed Screen Implementation"
-    - "Job Discover Screen Implementation"
-    - "React Native Navigation Integration"
-    - "React Native API Services Integration"
-  stuck_tasks: []
+    - "NEW Revolutionary Meeting Link Generation & Live Translation APIs"
+    - "Video Meeting API Endpoints"
+    - "Community Networking API Endpoints"
+    - "Job Board API Endpoints"
+  stuck_tasks: 
+    - "NEW Revolutionary Meeting Link Generation & Live Translation APIs"
   test_all: false
-  test_priority: "high_first"
+  test_priority: "critical_first"
 
 agent_communication:
     - agent: "main"
