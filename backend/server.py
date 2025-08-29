@@ -1887,6 +1887,93 @@ async def import_from_vcf_file(request: ContactImportRequest, user: User) -> Con
         logger.error(f"VCF import failed: {str(e)}")
         raise HTTPException(status_code=400, detail=f"VCF-Import fehlgeschlagen: {str(e)}")
 
+async def import_from_csv_file(request: ContactImportRequest, user: User) -> ContactImportResponse:
+    """Import contacts from CSV file"""
+    from bson import ObjectId
+    
+    if not request.file_content:
+        raise HTTPException(status_code=400, detail="Keine Datei bereitgestellt")
+    
+    try:
+        import base64
+        import io
+        import csv
+        
+        # Decode base64 file content
+        file_data = base64.b64decode(request.file_content).decode('utf-8')
+        
+        # Parse CSV content
+        contacts = []
+        csv_reader = csv.DictReader(io.StringIO(file_data))
+        
+        for row in csv_reader:
+            # Map common CSV headers to contact fields
+            contact_data = {}
+            
+            # Try different common header variations
+            for key, value in row.items():
+                key_lower = key.lower().strip()
+                if key_lower in ['name', 'full name', 'display name', 'contact name']:
+                    contact_data['name'] = value
+                elif key_lower in ['email', 'email address', 'e-mail']:
+                    contact_data['email'] = [value] if value else []
+                elif key_lower in ['phone', 'phone number', 'mobile', 'tel']:
+                    contact_data['tel'] = [value] if value else []
+                elif key_lower in ['company', 'organization', 'org']:
+                    contact_data['org'] = value
+                elif key_lower in ['title', 'job title', 'position']:
+                    contact_data['title'] = value
+            
+            if contact_data.get('name'):
+                contacts.append(contact_data)
+        
+        # Create contact source
+        source = ContactSource(
+            user_id=str(user.id),
+            source_type=ContactSourceType.CSV_FILE,
+            name=f"CSV Import {datetime.utcnow().strftime('%Y-%m-%d %H:%M')}",
+            total_contacts=len(contacts),
+            imported_contacts=0,
+            status=SyncStatus.PENDING
+        )
+        
+        # Save source to database
+        source_dict = source.dict(by_alias=True, exclude={"id"})
+        result = await db.contactsources.insert_one(source_dict)
+        source.id = str(result.inserted_id)
+        
+        # Import contacts
+        contacts_imported = 0
+        for contact_data in contacts:
+            imported_contact = await create_imported_contact_from_data(
+                contact_data, str(user.id), str(source.id)
+            )
+            if imported_contact:
+                contacts_imported += 1
+        
+        # Update source with final count
+        await db.contactsources.update_one(
+            {"_id": ObjectId(str(source.id))},
+            {"$set": {
+                "imported_contacts": contacts_imported,
+                "status": SyncStatus.COMPLETED.value,
+                "last_sync": datetime.utcnow()
+            }}
+        )
+        
+        logger.info(f"CSV import completed: {contacts_imported} contacts imported for user {user.email}")
+        
+        return ContactImportResponse(
+            success=True,
+            message=f"Erfolgreich {contacts_imported} Kontakte aus CSV-Datei importiert",
+            source_id=str(source.id),
+            contacts_imported=contacts_imported
+        )
+        
+    except Exception as e:
+        logger.error(f"CSV import failed: {str(e)}")
+        raise HTTPException(status_code=400, detail=f"CSV-Import fehlgeschlagen: {str(e)}")
+
 async def import_from_google_contacts(request: ContactImportRequest, user: User) -> ContactImportResponse:
     """Import contacts from Google Contacts API"""
     # This will require OAuth implementation
