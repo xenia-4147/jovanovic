@@ -3718,6 +3718,8 @@ async def create_video_meeting(
         
         return MeetingResponse(
             meeting=meeting,
+            meeting_id=meeting.id,
+            ice_servers=WEBRTC_CONFIG["iceServers"],
             participants=[],
             shared_cards=[],
             join_url=join_url,
