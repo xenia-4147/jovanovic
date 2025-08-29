@@ -220,7 +220,7 @@ const CameraScanner = ({ onCardScanned, onClose }) => {
     }
   };
 
-  // Poll scan results
+  // Poll scan results and auto-convert to contact
   const pollScanResults = async (scanId, maxAttempts = 10) => {
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       try {
@@ -230,19 +230,11 @@ const CameraScanner = ({ onCardScanned, onClose }) => {
         if (result.status === 'completed') {
           toast({
             title: "Scan abgeschlossen! ✨",
-            description: `${result.scanned_card.extracted_fields.length} Felder erkannt`,
+            description: `${result.scanned_card.extracted_fields.length} Felder erkannt - wird automatisch zur Kontaktliste hinzugefügt...`,
           });
           
-          // Call parent callback with results
-          if (onCardScanned) {
-            onCardScanned(result);
-          }
-          
-          // Stop camera and close
-          stopCamera();
-          if (onClose) {
-            onClose();
-          }
+          // Automatically convert to contact/business card
+          await autoConvertToContact(result);
           
           break;
         } else if (result.status === 'failed') {
@@ -261,6 +253,68 @@ const CameraScanner = ({ onCardScanned, onClose }) => {
     }
     
     setScanning(false);
+  };
+
+  // Auto-convert scan result to contact/business card
+  const autoConvertToContact = async (scanResult) => {
+    try {
+      // Get name field for card name
+      const nameField = scanResult.scanned_card.extracted_fields.find(
+        field => field.field_type === 'name' || field.field_type === 'full_name'
+      );
+      
+      const cardName = nameField?.value || 'Gescannte Visitenkarte';
+      
+      // Convert to business card automatically
+      const convertResponse = await api.post(`/scanner/scan/${scanResult.scan_id}/convert`, {
+        scan_id: scanResult.scan_id,
+        card_name: cardName,
+        auto_map_fields: true
+      });
+      
+      if (convertResponse.data) {
+        toast({
+          title: "Automatisch zur Kontaktliste hinzugefügt! 🎉📇",
+          description: `"${cardName}" wurde automatisch zu Ihren Kontakten hinzugefügt.`,
+        });
+        
+        // Call parent callback with the created card
+        if (onCardScanned) {
+          onCardScanned(convertResponse.data);
+        }
+        
+        // Stop camera and close scanner
+        stopCamera();
+        if (onClose) {
+          onClose();
+        }
+        
+      } else {
+        // Fallback: show scan results for manual conversion
+        if (onCardScanned) {
+          onCardScanned(scanResult);
+        }
+        
+        toast({
+          title: "Scan erfolgreich - Manuelle Überprüfung erforderlich",
+          description: "Bitte überprüfen Sie die erkannten Felder und bestätigen Sie die Erstellung.",
+        });
+      }
+      
+    } catch (error) {
+      console.error('Auto-convert failed:', error);
+      
+      // Fallback: show scan results for manual conversion
+      if (onCardScanned) {
+        onCardScanned(scanResult);
+      }
+      
+      toast({
+        title: "Automatische Konvertierung fehlgeschlagen",
+        description: "Scan erfolgreich - bitte prüfen Sie die Felder manuell.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
