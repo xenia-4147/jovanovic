@@ -555,9 +555,9 @@ backend:
 
   - task: "Job Board API Endpoints"
     implemented: true
-    working: true
+    working: false
     file: "/app/backend/server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -570,6 +570,9 @@ backend:
         - working: true
         - agent: "testing"
         - comment: "🚀 OUTSTANDING SUCCESS: Job Board endpoints are now FULLY FUNCTIONAL! Successfully tested all 3 endpoints (lines 4161-4290): ✅ GET /api/jobs/discover (AI-powered job matching with user skills), ✅ POST /api/jobs/post (creates job opportunities with business card integration), ✅ POST /api/jobs/{job_id}/apply (submits applications with cover messages). All endpoints include proper German localization, business card integration, and AI-powered matching algorithms. The job board system is revolutionary and production-ready!"
+        - working: false
+        - agent: "testing"
+        - comment: "🔍 COMPREHENSIVE JOB BOARD TESTING COMPLETED: All 3/3 endpoints failing (0% success rate). DETAILED FINDINGS: ❌ GET /api/jobs/discover - Response format mismatch (missing expected 'jobs', 'algorithm_version', 'match_score' fields), ❌ POST /api/jobs/post - Pydantic validation errors (missing 'company_name', 'experience_level' fields, invalid 'job_type' enum value 'full-time' should be 'full_time'), ❌ POST /api/jobs/{job_id}/apply - Failed due to missing job_id from post test. CRITICAL ISSUES: 1) API response format mismatches between implementation and expected test format, 2) Pydantic model validation requiring different field names and enum values, 3) Field naming inconsistencies (company vs company_name, full-time vs full_time). The AI job matching system exists but needs response format and validation standardization."
 
   - task: "VideoSocketService Implementation"
     implemented: true
