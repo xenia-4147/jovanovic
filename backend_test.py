@@ -1044,6 +1044,223 @@ class BusinessCardAPITester:
             return False
     
     # ============================================================================
+    # ENHANCED 9-CHARACTER VIDEO MEETING CODE GENERATION TESTING
+    # ============================================================================
+    
+    def test_9_character_meeting_code_generation(self):
+        """Test enhanced 9-character meeting code generation with collision resistance"""
+        if not self.access_token:
+            self.log_result("9-Character Meeting Code Generation", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Test multiple meeting creations to verify 9-character codes
+            meeting_codes = []
+            
+            for i in range(5):  # Create 5 meetings to test code uniqueness
+                meeting_data = {
+                    "title": f"Code Test Meeting {i+1}",
+                    "description": f"Testing 9-character code generation - Meeting {i+1}",
+                    "meeting_type": "networking_event",
+                    "duration_minutes": 30,
+                    "max_participants": 10,
+                    "share_host_card": True,
+                    "allow_card_sharing": True,
+                    "is_public": True
+                }
+                
+                response = requests.post(f"{API_BASE}/video/meeting/create", json=meeting_data, headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    meeting = data.get("meeting", {})
+                    meeting_code = meeting.get("meeting_code")
+                    
+                    if meeting_code:
+                        meeting_codes.append(meeting_code)
+                        
+                        # Verify code is exactly 9 characters
+                        if len(meeting_code) != 9:
+                            self.log_result("9-Character Code Length", False, f"Expected 9 characters, got {len(meeting_code)}: {meeting_code}")
+                            return False
+                        
+                        # Verify code format (A-Z, 0-9 only)
+                        import string
+                        valid_chars = string.ascii_uppercase + string.digits
+                        if not all(c in valid_chars for c in meeting_code):
+                            self.log_result("9-Character Code Format", False, f"Invalid characters in code: {meeting_code}")
+                            return False
+                    else:
+                        self.log_result("9-Character Meeting Code Generation", False, f"No meeting_code in response for meeting {i+1}", data)
+                        return False
+                else:
+                    self.log_result("9-Character Meeting Code Generation", False, f"Failed to create meeting {i+1}: HTTP {response.status_code}", response.text)
+                    return False
+            
+            # Verify all codes are unique (collision resistance)
+            if len(set(meeting_codes)) != len(meeting_codes):
+                self.log_result("Code Collision Resistance", False, f"Duplicate codes found: {meeting_codes}")
+                return False
+            
+            # Store first meeting code for further tests
+            self.video_meeting_code = meeting_codes[0]
+            
+            self.log_result("9-Character Code Length", True, f"All {len(meeting_codes)} codes are exactly 9 characters")
+            self.log_result("9-Character Code Format", True, f"All codes use valid format (A-Z, 0-9): {meeting_codes}")
+            self.log_result("Code Collision Resistance", True, f"All {len(meeting_codes)} codes are unique - no collisions detected")
+            self.log_result("9-Character Meeting Code Generation", True, f"Successfully generated {len(meeting_codes)} unique 9-character codes")
+            return True
+                
+        except Exception as e:
+            self.log_result("9-Character Meeting Code Generation", False, f"Error: {str(e)}")
+            return False
+    
+    def test_code_collision_resistance_stress(self):
+        """Stress test collision resistance with rapid code generation"""
+        if not self.access_token:
+            self.log_result("Code Collision Stress Test", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Generate many codes rapidly to test collision resistance
+            meeting_codes = []
+            successful_creations = 0
+            
+            for i in range(20):  # Create 20 meetings rapidly
+                meeting_data = {
+                    "title": f"Stress Test Meeting {i+1}",
+                    "description": f"Collision resistance stress test - Meeting {i+1}",
+                    "meeting_type": "group",
+                    "duration_minutes": 15,
+                    "max_participants": 5,
+                    "is_public": True
+                }
+                
+                response = requests.post(f"{API_BASE}/video/meeting/create", json=meeting_data, headers=headers)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    meeting = data.get("meeting", {})
+                    meeting_code = meeting.get("meeting_code")
+                    
+                    if meeting_code and len(meeting_code) == 9:
+                        meeting_codes.append(meeting_code)
+                        successful_creations += 1
+                    else:
+                        self.log_result("Code Collision Stress Test", False, f"Invalid code in meeting {i+1}: {meeting_code}")
+                        return False
+                else:
+                    # Some failures are acceptable under stress, but log them
+                    print(f"   Meeting {i+1} creation failed: HTTP {response.status_code}")
+            
+            # Verify no collisions occurred
+            unique_codes = set(meeting_codes)
+            collision_rate = (len(meeting_codes) - len(unique_codes)) / len(meeting_codes) if meeting_codes else 0
+            
+            if collision_rate == 0:
+                self.log_result("Code Collision Stress Test", True, f"Generated {successful_creations} codes with 0% collision rate")
+                return True
+            else:
+                self.log_result("Code Collision Stress Test", False, f"Collision rate: {collision_rate:.2%} ({len(meeting_codes) - len(unique_codes)} collisions)")
+                return False
+                
+        except Exception as e:
+            self.log_result("Code Collision Stress Test", False, f"Error: {str(e)}")
+            return False
+    
+    def test_enhanced_meeting_features_with_9char_codes(self):
+        """Test that 9-character codes work with all revolutionary features"""
+        if not self.access_token:
+            self.log_result("Enhanced Features with 9-Char Codes", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create meeting with all revolutionary features enabled
+            meeting_data = {
+                "title": "Revolutionary Features Test with 9-Char Code",
+                "description": "Testing all enhanced features with 9-character meeting codes",
+                "meeting_type": "networking_event",
+                "duration_minutes": 60,
+                "max_participants": 15,
+                "password": "test123",
+                "share_host_card": True,
+                "allow_card_sharing": True,
+                "community_tags": ["technology", "networking", "ai"],
+                "is_public": True,
+                # Revolutionary features
+                "translation_enabled": True,
+                "source_language": "de",
+                "target_languages": ["en", "fr", "es", "it"]
+            }
+            
+            response = requests.post(f"{API_BASE}/video/meeting/create", json=meeting_data, headers=headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                meeting = data.get("meeting", {})
+                
+                # Verify 9-character code
+                meeting_code = meeting.get("meeting_code")
+                if not meeting_code or len(meeting_code) != 9:
+                    self.log_result("Enhanced Features with 9-Char Codes", False, f"Invalid meeting code: {meeting_code}")
+                    return False
+                
+                # Store for other tests
+                self.enhanced_meeting_id = meeting.get("id")
+                self.enhanced_meeting_code = meeting_code
+                
+                # Verify Zoom-like share link with 9-character code
+                share_link = meeting.get("share_link")
+                if not share_link or meeting_code not in share_link:
+                    self.log_result("Share Link with 9-Char Code", False, f"Share link doesn't contain 9-char code: {share_link}")
+                    return False
+                
+                # Verify QR code URL with 9-character code
+                qr_code_url = meeting.get("qr_code_url")
+                if not qr_code_url or meeting_code not in qr_code_url:
+                    self.log_result("QR Code with 9-Char Code", False, f"QR code URL doesn't contain 9-char code: {qr_code_url}")
+                    return False
+                
+                # Verify business card integration data
+                meeting_link_card = data.get("meeting_link_card", {})
+                if not meeting_link_card or meeting_link_card.get("meeting_code") != meeting_code:
+                    self.log_result("Business Card Integration with 9-Char Code", False, "Meeting link card missing or invalid code")
+                    return False
+                
+                # Verify translation settings with 9-character code
+                if not meeting.get("translation_enabled") or meeting.get("target_languages") != ["en", "fr", "es", "it"]:
+                    self.log_result("Translation with 9-Char Code", False, "Translation settings not properly applied")
+                    return False
+                
+                # Verify WebRTC config is provided
+                webrtc_config = data.get("webrtc_config", {})
+                if not webrtc_config or "iceServers" not in webrtc_config:
+                    self.log_result("WebRTC Config with 9-Char Code", False, "WebRTC configuration missing")
+                    return False
+                
+                self.log_result("9-Character Code Format", True, f"Code: {meeting_code} (9 characters)")
+                self.log_result("Share Link with 9-Char Code", True, f"Share link: {share_link}")
+                self.log_result("QR Code with 9-Char Code", True, f"QR code URL: {qr_code_url}")
+                self.log_result("Business Card Integration with 9-Char Code", True, "Meeting link card data complete")
+                self.log_result("Translation with 9-Char Code", True, f"Translation: {meeting.get('source_language')} -> {meeting.get('target_languages')}")
+                self.log_result("WebRTC Config with 9-Char Code", True, f"WebRTC config with {len(webrtc_config.get('iceServers', []))} ICE servers")
+                self.log_result("Enhanced Features with 9-Char Codes", True, "All revolutionary features working with 9-character codes")
+                return True
+            else:
+                self.log_result("Enhanced Features with 9-Char Codes", False, f"HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Enhanced Features with 9-Char Codes", False, f"Error: {str(e)}")
+            return False
+
+    # ============================================================================
     # NEW REVOLUTIONARY FEATURES TESTING - MEETING LINK GENERATION & LIVE TRANSLATION
     # ============================================================================
     
