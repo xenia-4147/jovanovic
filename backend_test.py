@@ -5056,22 +5056,51 @@ END:VCARD"""
             return False
     
     def run_all_tests(self):
-        """Run all tests in sequence"""
+        """Run all tests in sequence - FOCUS: NEW REVOLUTIONARY FEATURES"""
         print("=" * 80)
-        print("DIGITAL BUSINESS CARDS API TEST SUITE - MONETIZATION INFRASTRUCTURE TESTING")
+        print("🚀 REVOLUTIONARY FEATURES TESTING - MEETING LINK GENERATION & LIVE TRANSLATION")
         print("=" * 80)
         print(f"Testing API at: {API_BASE}")
+        print("🎯 PRIORITY: Testing NEW game-changing video meeting and translation features")
         print()
         
         tests = [
-            # Core API tests
+            # Core API tests (required for authentication)
             self.test_health_check,
             self.test_user_registration,
             self.test_user_login,
             self.test_protected_endpoint,
             
-            # Business card tests
+            # Business card tests (required for meeting integration)
             self.test_create_business_card,
+            
+            # 🔥 NEW REVOLUTIONARY FEATURES TESTING (PRIORITY: CRITICAL)
+            self.test_enhanced_video_meeting_create,
+            self.test_meeting_share_link_generation,
+            self.test_live_translation_enable,
+            self.test_participant_translation_preference,
+            
+            # Legacy Video Meeting System Tests (for comparison)
+            self.test_video_meeting_create,
+            self.test_video_meeting_join,
+            self.test_video_meetings_list,
+            self.test_video_meeting_share_card,
+            
+            # Community Networking Tests
+            self.test_community_profile_get,
+            self.test_community_profile_update,
+            self.test_community_discover,
+            self.test_community_feed,
+            self.test_community_create,
+            self.test_community_join,
+            self.test_community_my_communities,
+            
+            # Job Board Tests
+            self.test_jobs_discover,
+            self.test_jobs_post,
+            self.test_jobs_apply,
+            
+            # Additional business card tests
             self.test_get_user_cards,
             self.test_get_specific_card,
             self.test_update_business_card,
@@ -5128,26 +5157,6 @@ END:VCARD"""
             self.test_list_user_meeting_rooms,
             self.test_enhanced_code_access_meeting_room,
             self.test_close_meeting_room,
-            
-            # Video Meeting System Tests - NEW CLAIMED ENDPOINTS
-            self.test_video_meeting_create,
-            self.test_video_meeting_join,
-            self.test_video_meetings_list,
-            self.test_video_meeting_share_card,
-            
-            # Community Networking Tests - NEW CLAIMED ENDPOINTS
-            self.test_community_profile_get,
-            self.test_community_profile_update,
-            self.test_community_discover,
-            self.test_community_feed,
-            self.test_community_create,
-            self.test_community_join,
-            self.test_community_my_communities,
-            
-            # Job Board Tests - NEW CLAIMED ENDPOINTS
-            self.test_jobs_discover,
-            self.test_jobs_post,
-            self.test_jobs_apply,
             
             # Express Share Collision Prevention Tests (CRITICAL)
             self.test_express_code_collision_prevention_simultaneous,
