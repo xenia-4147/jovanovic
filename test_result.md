@@ -1205,7 +1205,7 @@ backend:
     implemented: true
     working: false
     file: "/app/backend/server.py, /app/backend/services/OCRService.py, /app/backend/models/CardScanner.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
     needs_retesting: false
     status_history:
@@ -1215,6 +1215,9 @@ backend:
         - working: false
         - agent: "testing"
         - comment: "❌ CRITICAL ISSUES FOUND: OCR endpoints partially working but with significant bugs. WORKING: POST /api/scanner/scan successfully creates scan jobs and returns scan_id, GET /api/scanner/scan/{scan_id} retrieves scan results, GET /api/scanner/scans lists scanned cards. FAILING: Field correction returns 422 validation errors, scan processing shows 'failed' status, duplicate endpoint definitions in server.py causing conflicts. Authentication working correctly - endpoints properly require auth and enforce user isolation. Core OCR infrastructure implemented but needs debugging."
+        - working: false
+        - agent: "testing"
+        - comment: "🔍 DETAILED SCANNER WORKFLOW ANALYSIS COMPLETED: Identified root cause of 'nothing happens' after photographing business cards. CRITICAL FINDINGS: ❌ CONVERSION BLOCKER: POST /api/scanner/scan/{scan_id}/convert fails with HTTP 500 'E11000 duplicate key error collection: digitalcards.businesscards index: custom_code_1 dup key: { custom_code: null }' - MongoDB unique index prevents multiple null custom_code values, ❌ VALIDATION ISSUES: Field correction endpoint expects scan_id in request body but receives it as URL parameter causing 422 errors, ❌ WORKFLOW BREAKS: Scanner upload→poll works perfectly, but conversion to business card fails preventing cards from appearing in contact lists. WORKING COMPONENTS: ✅ Image upload (scan_id generation), ✅ OCR processing (field extraction), ✅ Auto-conversion logic (conversion_ready flag), ✅ Scan listing. The complete workflow Photo→OCR→Extract Fields→Auto-Convert→Add to Contacts breaks at the conversion step due to database schema constraints."
 
   - task: "Print Export API Endpoints"
     implemented: true
