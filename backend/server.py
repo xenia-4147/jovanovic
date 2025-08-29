@@ -3615,7 +3615,8 @@ async def get_print_job_status(
 # Import Video Meeting and Community models
 from models.VideoMeeting import (
     VideoMeetingRoom, CreateMeetingRequest, JoinMeetingRequest, ShareBusinessCardRequest,
-    MeetingResponse, MeetingListResponse, MeetingJoinResponse, DEFAULT_ICE_SERVERS, WEBRTC_CONFIG
+    MeetingResponse, MeetingListResponse, MeetingJoinResponse, DEFAULT_ICE_SERVERS, WEBRTC_CONFIG,
+    MeetingParticipant, ParticipantRole
 )
 from models.Community import (
     Community, UserProfile, CommunityMembership, NetworkingEvent, JobOpportunity, JobApplication,
