@@ -3821,6 +3821,50 @@ async def join_video_meeting(
             message=f"Meeting-Beitritt fehlgeschlagen: {str(e)}"
         )
 
+@api_router.get("/qr/meeting/{meeting_code}")
+async def get_meeting_qr_code(meeting_code: str):
+    """Generate QR code for meeting - FIXES mobile camera access"""
+    try:
+        import qrcode
+        from io import BytesIO
+        import base64
+        
+        # Create meeting URL
+        base_url = "https://netlink-3.preview.emergentagent.com"
+        meeting_url = f"{base_url}/meeting/{meeting_code.upper()}"
+        
+        # Generate QR code
+        qr = qrcode.QRCode(
+            version=1,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=10,
+            border=4,
+        )
+        qr.add_data(meeting_url)
+        qr.make(fit=True)
+        
+        # Create QR code image
+        img = qr.make_image(fill_color="black", back_color="white")
+        
+        # Convert to base64
+        buffer = BytesIO()
+        img.save(buffer, format='PNG')
+        buffer.seek(0)
+        
+        img_base64 = base64.b64encode(buffer.read()).decode()
+        
+        return {
+            "success": True,
+            "meeting_code": meeting_code.upper(),
+            "meeting_url": meeting_url,
+            "qr_code_base64": f"data:image/png;base64,{img_base64}",
+            "instructions": "Scannen Sie diesen QR-Code mit Ihrem Smartphone für direkten Meeting-Zugang"
+        }
+        
+    except Exception as e:
+        logger.error(f"QR code generation failed: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"QR-Code konnte nicht generiert werden: {str(e)}")
+
 @api_router.get("/video/meetings", response_model=MeetingListResponse)
 async def list_user_video_meetings(
     current_user: User = Depends(get_current_user)
