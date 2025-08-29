@@ -5292,6 +5292,12 @@ END:VCARD"""
             self.test_create_business_card,
             
             # 🔥 NEW REVOLUTIONARY FEATURES TESTING (PRIORITY: CRITICAL)
+            # 9-Character Code Generation Tests (FOCUS OF THIS REVIEW)
+            self.test_9_character_meeting_code_generation,
+            self.test_code_collision_resistance_stress,
+            self.test_enhanced_meeting_features_with_9char_codes,
+            
+            # Enhanced Video Meeting Features
             self.test_enhanced_video_meeting_create,
             self.test_meeting_share_link_generation,
             self.test_live_translation_enable,
