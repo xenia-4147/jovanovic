@@ -391,17 +391,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Video Meeting API Endpoints"
-    - "Community Networking API Endpoints"
-    - "Job Board API Endpoints"
-    - "VideoSocketService Implementation"
-    - "CommunityMatchingService Implementation"
-  stuck_tasks:
-    - "Video Meeting API Endpoints"
-    - "Community Networking API Endpoints"
-    - "Job Board API Endpoints"
-    - "VideoSocketService Implementation"
-    - "CommunityMatchingService Implementation"
+    - "Video Meeting WebRTC Config Fix"
+    - "Community Join API Design Fix"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
