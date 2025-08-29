@@ -275,9 +275,9 @@ async def create_business_card(
 async def get_user_cards(current_user: User = Depends(get_current_user)):
     """Get user's business cards"""
     try:
-        # Use string user ID for query (FIXED: use correct field name)
+        # Use string user ID for query (FIXED: use userId field name to match database)
         user_id_str = str(current_user.id)
-        cards_cursor = db.businesscards.find({"user_id": user_id_str})  # FIXED: user_id not userId
+        cards_cursor = db.businesscards.find({"userId": user_id_str})  # CORRECT: userId matches database
         cards = []
         
         async for card_data in cards_cursor:
