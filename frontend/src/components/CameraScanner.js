@@ -124,14 +124,54 @@ const CameraScanner = ({ onCardScanned, onClose }) => {
     }
   };
 
-  // Stop camera
+  // Stop camera and cleanup (CRITICAL: Enhanced cleanup)
   const stopCamera = useCallback(() => {
     if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current.getTracks().forEach(track => {
+        track.stop();
+        console.log('Camera track stopped:', track.kind);
+      });
       streamRef.current = null;
     }
+    
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+    
     setCameraActive(false);
+    console.log('Camera fully stopped and cleaned up');
   }, []);
+
+  // Enhanced cleanup on component unmount and page unload
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      console.log('Page unloading - stopping camera');
+      stopCamera();
+    };
+    
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        console.log('Page hidden - stopping camera');
+        stopCamera();
+      }
+    };
+    
+    // Add event listeners for page unload
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    window.addEventListener('pagehide', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      // Cleanup on unmount
+      console.log('Component unmounting - stopping camera');
+      stopCamera();
+      
+      // Remove event listeners
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('pagehide', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [stopCamera]);
 
   // Switch camera
   const switchCamera = async (deviceId) => {
