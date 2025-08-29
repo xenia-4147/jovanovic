@@ -7399,12 +7399,13 @@ END:VCARD"""
             return False
 
     def run_all_tests(self):
-        """Run all tests in sequence - FOCUS: NEW REVOLUTIONARY FEATURES"""
+        """Run all tests in sequence - FOCUS: BUSINESS CARD SCANNER AUTHENTICATION FIX"""
         print("=" * 80)
-        print("🚀 REVOLUTIONARY FEATURES TESTING - MEETING LINK GENERATION & LIVE TRANSLATION")
+        print("🚀 BUSINESS CARD SCANNER AUTHENTICATION FIX VERIFICATION")
         print("=" * 80)
         print(f"Testing API at: {API_BASE}")
-        print("🎯 PRIORITY: Testing NEW game-changing video meeting and translation features")
+        print("🎯 PRIORITY: Verify scanner endpoints no longer return 500 errors due to NoneType credential issues")
+        print("🎯 FOCUS: Complete scanner workflow after authentication fix")
         print()
         
         tests = [
@@ -7414,11 +7415,13 @@ END:VCARD"""
             self.test_user_login,
             self.test_protected_endpoint,
             
-            # Business card tests (required for meeting integration)
+            # Business card tests (required for scanner integration)
             self.test_create_business_card,
             
-            # 🔥 CRITICAL BUSINESS CARD SCANNER DEBUG (PRIORITY: CRITICAL)
-            self.test_scanned_business_card_debug,
+            # 🔥 CRITICAL: BUSINESS CARD SCANNER AUTHENTICATION FIX VERIFICATION
+            self.test_scanner_authentication_fix,
+            self.test_complete_scanner_workflow,
+            self.test_ocr_functionality_validation,
             
             # 🎯 SCANNER API RESPONSE FORMAT TESTING (CRITICAL DEBUG)
             self.test_scanner_api_direct_call,
