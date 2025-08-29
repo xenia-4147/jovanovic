@@ -1046,6 +1046,364 @@ class BusinessCardAPITester:
             return False
 
     # ============================================================================
+    # BUSINESS CARD SCANNER WORKFLOW TESTING - AUTHENTICATION FIX VERIFICATION
+    # ============================================================================
+    
+    def test_scanner_authentication_fix(self):
+        """Test that scanner endpoints no longer return 500 errors due to NoneType credential issues"""
+        if not self.access_token:
+            self.log_result("Scanner Authentication Fix", False, "No access token available")
+            return False
+            
+        try:
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Test scanner endpoint with minimal request to check authentication
+            test_request = {
+                "image_data": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==",  # 1x1 pixel PNG
+                "scan_method": "test_auth"
+            }
+            
+            response = requests.post(f"{API_BASE}/scanner/scan", json=test_request, headers=headers)
+            
+            # Should NOT return 500 Internal Server Error due to authentication issues
+            if response.status_code == 500:
+                response_text = response.text
+                if "NoneType" in response_text or "credentials" in response_text.lower():
+                    self.log_result("Scanner Authentication Fix", False, 
+                                  "Still getting NoneType credential errors", response_text)
+                    return False
+                else:
+                    # 500 for other reasons is acceptable (OCR processing issues, etc.)
+                    self.log_result("Scanner Authentication Fix", True, 
+                                  "No authentication NoneType errors (500 for other reasons)")
+                    return True
+            elif response.status_code in [200, 400, 422]:
+                # These are acceptable responses - authentication is working
+                self.log_result("Scanner Authentication Fix", True, 
+                              f"Authentication working properly (HTTP {response.status_code})")
+                return True
+            else:
+                self.log_result("Scanner Authentication Fix", False, 
+                              f"Unexpected response: HTTP {response.status_code}", response.text)
+                return False
+                
+        except Exception as e:
+            self.log_result("Scanner Authentication Fix", False, f"Error: {str(e)}")
+            return False
+    
+    def test_complete_scanner_workflow(self):
+        """Test end-to-end scanner functionality: scan → poll → convert"""
+        if not self.access_token:
+            self.log_result("Complete Scanner Workflow", False, "No access token available")
+            return False
+            
+        try:
+            import base64
+            from PIL import Image, ImageDraw, ImageFont
+            import io
+            import time
+            
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create realistic business card image with clear text
+            card_image = Image.new('RGB', (600, 350), color='white')
+            draw = ImageDraw.Draw(card_image)
+            
+            # Try to use a font, fallback to default
+            try:
+                font_large = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 24)
+                font_medium = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 18)
+                font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 14)
+            except:
+                font_large = ImageFont.load_default()
+                font_medium = ImageFont.load_default()
+                font_small = ImageFont.load_default()
+            
+            # Add realistic business card text
+            draw.text((50, 50), "Dr. Sarah Weber", fill='black', font=font_large)
+            draw.text((50, 90), "Chief Technology Officer", fill='black', font=font_medium)
+            draw.text((50, 120), "Digital Innovation GmbH", fill='black', font=font_medium)
+            draw.text((50, 160), "sarah.weber@digitalinnovation.de", fill='black', font=font_small)
+            draw.text((50, 190), "+49-30-555-1234", fill='black', font=font_small)
+            draw.text((50, 220), "www.digitalinnovation.de", fill='black', font=font_small)
+            
+            # Convert to base64
+            buffer = io.BytesIO()
+            card_image.save(buffer, format='PNG')
+            image_data = base64.b64encode(buffer.getvalue()).decode()
+            
+            # Step 1: POST /api/scanner/scan
+            scan_request = {
+                "image_data": image_data,
+                "scan_method": "test_workflow"
+            }
+            
+            scan_response = requests.post(f"{API_BASE}/scanner/scan", json=scan_request, headers=headers)
+            
+            if scan_response.status_code != 200:
+                self.log_result("Complete Scanner Workflow - Scan", False, 
+                              f"Scan failed: HTTP {scan_response.status_code}", scan_response.text)
+                return False
+            
+            scan_data = scan_response.json()
+            scan_id = scan_data.get("scan_id")
+            
+            if not scan_id:
+                self.log_result("Complete Scanner Workflow - Scan", False, 
+                              "No scan_id in response", scan_data)
+                return False
+            
+            self.log_result("Complete Scanner Workflow - Scan", True, 
+                          f"Scan initiated successfully with ID: {scan_id}")
+            
+            # Step 2: GET /api/scanner/scan/{scan_id} - Poll until completion
+            max_polls = 10
+            poll_count = 0
+            scan_completed = False
+            final_scan_result = None
+            
+            while poll_count < max_polls and not scan_completed:
+                time.sleep(2)  # Wait 2 seconds between polls
+                poll_count += 1
+                
+                poll_response = requests.get(f"{API_BASE}/scanner/scan/{scan_id}", headers=headers)
+                
+                if poll_response.status_code != 200:
+                    self.log_result("Complete Scanner Workflow - Poll", False, 
+                                  f"Poll failed: HTTP {poll_response.status_code}", poll_response.text)
+                    return False
+                
+                poll_data = poll_response.json()
+                status = poll_data.get("status")
+                
+                if status == "completed":
+                    scan_completed = True
+                    final_scan_result = poll_data
+                    break
+                elif status == "failed":
+                    self.log_result("Complete Scanner Workflow - Poll", False, 
+                                  "Scan processing failed", poll_data)
+                    return False
+                elif status in ["pending", "processing"]:
+                    continue  # Keep polling
+                else:
+                    self.log_result("Complete Scanner Workflow - Poll", False, 
+                                  f"Unknown status: {status}", poll_data)
+                    return False
+            
+            if not scan_completed:
+                self.log_result("Complete Scanner Workflow - Poll", False, 
+                              f"Scan did not complete after {max_polls} polls")
+                return False
+            
+            # Step 3: Verify extracted_fields contain meaningful data
+            scanned_card = final_scan_result.get("scanned_card")
+            if not scanned_card:
+                self.log_result("Complete Scanner Workflow - Fields", False, 
+                              "No scanned_card in response", final_scan_result)
+                return False
+            
+            extracted_fields = scanned_card.get("extracted_fields", [])
+            if len(extracted_fields) == 0:
+                self.log_result("Complete Scanner Workflow - Fields", False, 
+                              "No extracted_fields found - OCR failed")
+                return False
+            
+            # Check for meaningful data
+            meaningful_fields = []
+            for field in extracted_fields:
+                if isinstance(field, dict) and field.get("value") and len(field.get("value", "").strip()) > 2:
+                    meaningful_fields.append(field)
+            
+            if len(meaningful_fields) == 0:
+                self.log_result("Complete Scanner Workflow - Fields", False, 
+                              "No meaningful extracted fields found")
+                return False
+            
+            self.log_result("Complete Scanner Workflow - Fields", True, 
+                          f"Found {len(meaningful_fields)} meaningful extracted fields")
+            
+            # Step 4: POST /api/scanner/scan/{scan_id}/convert to business card
+            convert_request = {
+                "scan_id": scan_id,
+                "card_name": "Dr. Sarah Weber",
+                "auto_map_fields": True
+            }
+            
+            convert_response = requests.post(f"{API_BASE}/scanner/scan/{scan_id}/convert", 
+                                           json=convert_request, headers=headers)
+            
+            if convert_response.status_code != 200:
+                self.log_result("Complete Scanner Workflow - Convert", False, 
+                              f"Convert failed: HTTP {convert_response.status_code}", convert_response.text)
+                return False
+            
+            convert_data = convert_response.json()
+            converted_card_id = convert_data.get("id")
+            
+            if not converted_card_id:
+                self.log_result("Complete Scanner Workflow - Convert", False, 
+                              "No card ID in convert response", convert_data)
+                return False
+            
+            self.log_result("Complete Scanner Workflow - Convert", True, 
+                          f"Successfully converted scan to business card: {converted_card_id}")
+            
+            # Store for cleanup or further testing
+            self.scanner_converted_card_id = converted_card_id
+            
+            return True
+            
+        except Exception as e:
+            self.log_result("Complete Scanner Workflow", False, f"Error: {str(e)}")
+            return False
+    
+    def test_ocr_functionality_validation(self):
+        """Test OCR functionality: text extraction, field detection, confidence scoring"""
+        if not self.access_token:
+            self.log_result("OCR Functionality Validation", False, "No access token available")
+            return False
+            
+        try:
+            import base64
+            from PIL import Image, ImageDraw, ImageFont
+            import io
+            import time
+            
+            headers = {"Authorization": f"Bearer {self.access_token}"}
+            
+            # Create business card with specific text for OCR validation
+            card_image = Image.new('RGB', (600, 350), color='white')
+            draw = ImageDraw.Draw(card_image)
+            
+            # Use clear, readable font
+            try:
+                font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 20)
+            except:
+                font = ImageFont.load_default()
+            
+            # Add specific text for validation
+            test_texts = [
+                "Max Mustermann",
+                "max.mustermann@example.com", 
+                "+49-30-123-4567",
+                "Example Company GmbH"
+            ]
+            
+            y_pos = 50
+            for text in test_texts:
+                draw.text((50, y_pos), text, fill='black', font=font)
+                y_pos += 40
+            
+            # Convert to base64
+            buffer = io.BytesIO()
+            card_image.save(buffer, format='PNG')
+            image_data = base64.b64encode(buffer.getvalue()).decode()
+            
+            # Scan the card
+            scan_request = {
+                "image_data": image_data,
+                "scan_method": "ocr_validation"
+            }
+            
+            scan_response = requests.post(f"{API_BASE}/scanner/scan", json=scan_request, headers=headers)
+            
+            if scan_response.status_code != 200:
+                self.log_result("OCR Functionality Validation", False, 
+                              f"Scan failed: HTTP {scan_response.status_code}", scan_response.text)
+                return False
+            
+            scan_data = scan_response.json()
+            scan_id = scan_data.get("scan_id")
+            
+            # Wait for processing
+            time.sleep(3)
+            
+            # Get results
+            poll_response = requests.get(f"{API_BASE}/scanner/scan/{scan_id}", headers=headers)
+            
+            if poll_response.status_code != 200:
+                self.log_result("OCR Functionality Validation", False, 
+                              f"Poll failed: HTTP {poll_response.status_code}", poll_response.text)
+                return False
+            
+            poll_data = poll_response.json()
+            scanned_card = poll_data.get("scanned_card")
+            
+            if not scanned_card:
+                self.log_result("OCR Functionality Validation", False, 
+                              "No scanned_card in response")
+                return False
+            
+            extracted_fields = scanned_card.get("extracted_fields", [])
+            overall_confidence = scanned_card.get("overall_confidence", 0)
+            
+            # Validate OCR results
+            validations = []
+            
+            # 1. Text extraction - should find some of our test texts
+            extracted_values = [field.get("value", "") for field in extracted_fields if isinstance(field, dict)]
+            text_found = any(any(test_text.lower() in value.lower() for value in extracted_values) 
+                           for test_text in ["mustermann", "example.com", "123-4567", "example"])
+            
+            validations.append(("Text Extraction", text_found, 
+                              f"Found recognizable text in {len(extracted_values)} extracted values"))
+            
+            # 2. Field detection and classification
+            field_types = [field.get("field_type") for field in extracted_fields if isinstance(field, dict)]
+            has_field_classification = len(set(field_types)) > 1  # Multiple different field types
+            
+            validations.append(("Field Classification", has_field_classification, 
+                              f"Detected field types: {set(field_types)}"))
+            
+            # 3. Confidence scoring
+            confidences = [field.get("confidence", 0) for field in extracted_fields if isinstance(field, dict)]
+            has_confidence_scores = len(confidences) > 0 and all(0 <= c <= 100 for c in confidences)
+            
+            validations.append(("Confidence Scoring", has_confidence_scores, 
+                              f"Confidence scores: {confidences}"))
+            
+            # 4. Structured data output
+            has_structured_output = (
+                len(extracted_fields) > 0 and
+                all(isinstance(field, dict) and "field_type" in field and "value" in field 
+                    for field in extracted_fields)
+            )
+            
+            validations.append(("Structured Output", has_structured_output, 
+                              f"Structured fields: {len(extracted_fields)}"))
+            
+            # Check overall results
+            passed_validations = sum(1 for _, passed, _ in validations if passed)
+            total_validations = len(validations)
+            
+            if passed_validations >= 3:  # At least 3 out of 4 validations should pass
+                self.log_result("OCR Functionality Validation", True, 
+                              f"OCR working correctly: {passed_validations}/{total_validations} validations passed")
+                
+                # Log individual validation results
+                for name, passed, message in validations:
+                    status = "✅" if passed else "❌"
+                    print(f"   {status} {name}: {message}")
+                
+                return True
+            else:
+                self.log_result("OCR Functionality Validation", False, 
+                              f"OCR issues detected: only {passed_validations}/{total_validations} validations passed")
+                
+                # Log individual validation results
+                for name, passed, message in validations:
+                    status = "✅" if passed else "❌"
+                    print(f"   {status} {name}: {message}")
+                
+                return False
+            
+        except Exception as e:
+            self.log_result("OCR Functionality Validation", False, f"Error: {str(e)}")
+            return False
+
+    # ============================================================================
     # CRITICAL SCANNER API RESPONSE FORMAT TESTING - DEBUG FRONTEND ISSUE
     # ============================================================================
     
