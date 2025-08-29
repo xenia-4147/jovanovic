@@ -12,7 +12,7 @@ import io
 import base64
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Dict
 import uuid
 
 # Import our models and services
