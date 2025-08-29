@@ -397,9 +397,9 @@ const CodeAccessPage = () => {
                     Video Meeting Codes 🎥
                   </h4>
                   <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• 6-stellige Codes für Videokonferenzen</li>
-                    <li>• Direkter Kamera-Zugriff & Live-Video</li>
-                    <li>• Zoom-ähnliche Meeting-Räume</li>
+                    <li>• 9-stellige Codes für Videokonferenzen</li>
+                    <li>• Sicher gegen Kollisionen bei tausenden Meetings</li>
+                    <li>• Zoom-ähnliche Meeting-Räume mit Kamera</li>
                   </ul>
                 </div>
               </div>
