@@ -3659,9 +3659,13 @@ async def create_video_meeting(
             scheduled_for=meeting_request.scheduled_for
         )
         
-        # Generate meeting code if not provided
+        # Generate secure meeting code (9 characters for collision avoidance)
         if not meeting.meeting_code:
-            meeting.meeting_code = f"{uuid.uuid4().hex[:6].upper()}"
+            import secrets
+            import string
+            # Generate 9-character alphanumeric code (36^9 = 101 trillion combinations)
+            alphabet = string.ascii_uppercase + string.digits
+            meeting.meeting_code = ''.join(secrets.choice(alphabet) for _ in range(9))
         
         # Generate shareable meeting link (like Zoom)
         base_url = "https://netlink-3.preview.emergentagent.com"
