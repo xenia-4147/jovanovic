@@ -34,13 +34,13 @@ const CONFIDENCE_LEVELS = {
 const CardScanner = ({ onCardCreated }) => {
   const { toast } = useToast();
   const fileInputRef = useRef(null);
-  const cameraInputRef = useRef(null);
   
   // States
   const [scanning, setScanning] = useState(false);
   const [scanResult, setScanResult] = useState(null);
   const [converting, setConverting] = useState(false);
   const [editingField, setEditingField] = useState(null);
+  const [showCameraScanner, setShowCameraScanner] = useState(false);
   
   // Camera capture
   const handleCameraCapture = useCallback(async (event) => {
