@@ -167,8 +167,8 @@ const CardScanner = ({ onCardCreated }) => {
     setConverting(true);
     
     try {
-      // Get name field for card name
-      const nameField = scanResult.scanned_card.extracted_fields.find(
+      // Get name field for card name (safe access)
+      const nameField = scanResult?.scanned_card?.extracted_fields?.find(
         field => field.field_type === 'name' || field.field_type === 'full_name'
       );
       
