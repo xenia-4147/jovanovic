@@ -2682,8 +2682,10 @@ async def get_scan_result(
             scan_id=scan.id,
             status=scan.status,
             scanned_card={
+                "user_id": str(current_user.id),  # Required field
+                "original_image_url": getattr(scan, 'original_image_url', ''),  # Required field  
                 "overall_confidence": getattr(scan, 'overall_confidence', 0),
-                "extraction_method": getattr(scan, 'extraction_method', 'tesseract'),  # Safe fallback
+                "extraction_method": getattr(scan, 'extraction_method', 'tesseract'),
                 "extracted_fields": [
                     {
                         "field_type": field.field_type,
