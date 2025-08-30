@@ -3183,10 +3183,9 @@ async def get_scan_result(
 ):
     """Get OCR scan results"""
     try:
-        # Find scan
-        from bson import ObjectId
+        # Find scan by UUID (not ObjectId)
         scan_data = await db.scannedcards.find_one({
-            "_id": ObjectId(scan_id),
+            "id": scan_id,  # Use UUID field
             "user_id": str(current_user.id)
         })
         
