@@ -3274,34 +3274,6 @@ async def correct_scan_field(
         logger.error(f"Field correction failed: {str(e)}")
         raise HTTPException(status_code=500, detail="Korrektur fehlgeschlagen")
 
-        scans = []
-        pending_count = 0
-        converted_count = 0
-        
-        from models.CardScanner import ScannedBusinessCard
-        async for scan_data in scans_cursor:
-            if "_id" in scan_data:
-                scan_data["_id"] = str(scan_data["_id"])
-            
-            scan = ScannedBusinessCard(**scan_data)
-            scans.append(scan)
-            
-            if scan.status == "pending":
-                pending_count += 1
-            if scan.is_converted:
-                converted_count += 1
-        
-        return ScanListResponse(
-            scans=scans,
-            total_count=len(scans),
-            pending_count=pending_count,
-            converted_count=converted_count
-        )
-        
-    except Exception as e:
-        logger.error(f"Failed to list scanned cards: {str(e)}")
-        raise HTTPException(status_code=500, detail="Gescannte Karten konnten nicht geladen werden")
-
 # ============================================================================
 # PRINT EXPORT ENDPOINTS - GAME CHANGING FEATURE
 # ============================================================================
