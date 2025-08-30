@@ -89,7 +89,10 @@ class OCRService:
             scan.extracted_fields = structured_fields
             scan.overall_confidence = overall_confidence
             scan.raw_ocr_data = ocr_results
-            scan.status = "completed"
+            
+            # Import and use proper enum
+            from models.CardScanner import ScanProcessingStatus
+            scan.status = ScanProcessingStatus.COMPLETED  # Use enum instead of string
             scan.processing_completed_at = datetime.utcnow()
             
             # Generate smart field mapping suggestions
