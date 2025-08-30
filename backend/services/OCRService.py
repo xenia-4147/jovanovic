@@ -381,19 +381,29 @@ class OCRService:
         if any(domain in text_lower for domain in [".com", ".de", ".org", "www.", "http"]):
             return "website"
         
-        # Company indicators
-        if any(suffix in text for suffix in ["GmbH", "AG", "KG", "e.V.", "Inc.", "LLC"]):
+        # Company indicators (enhanced)
+        company_indicators = ["GmbH", "AG", "KG", "e.V.", "Inc.", "LLC", "Co.", "Ltd", "Corp", "Solutions", "Consulting", "Services"]
+        if any(suffix in text for suffix in company_indicators):
             return "company"
         
-        # Position/title indicators
-        position_keywords = ["manager", "director", "ceo", "cto", "founder", "geschäftsführer", "leiter"]
+        # Position/title indicators (enhanced German terms)
+        position_keywords = [
+            "manager", "director", "ceo", "cto", "cfo", "founder", 
+            "geschäftsführer", "leiter", "vorstand", "inhaber", "chef",
+            "projektleiter", "teamleiter", "senior", "junior", "head",
+            "entwickler", "berater", "consultant", "spezialist"
+        ]
         if any(keyword in text_lower for keyword in position_keywords):
             return "position"
         
-        # Name detection (capitalize first letters, moderate length)
-        if (text.replace(" ", "").replace(".", "").isalpha() and 
-            len(text.split()) <= 3 and 
-            2 <= len(text) <= 50):
+        # Enhanced name detection (more flexible)
+        # Check if it looks like a name: starts with capital, contains letters, reasonable length
+        words = text.split()
+        if (len(words) >= 1 and len(words) <= 4 and  # 1-4 words
+            all(word[0].isupper() if word else False for word in words) and  # Capitalized
+            any(char.isalpha() for char in text) and  # Contains letters
+            2 <= len(text) <= 50 and  # Reasonable length
+            not any(char.isdigit() for char in text)):  # No digits
             return "name"
         
         # Default to unknown
