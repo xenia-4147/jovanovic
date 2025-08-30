@@ -227,8 +227,8 @@ class OCRService:
         """
         Extract text using Tesseract OCR
         """
-        # Configure Tesseract for business cards
-        custom_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@.-+()/ '
+        # Enhanced Tesseract configuration for business cards
+        custom_config = r'--oem 3 --psm 6'  # Removed restrictive whitelist for better recognition
         
         # Extract text with confidence
         data = pytesseract.image_to_data(image, config=custom_config, output_type=pytesseract.Output.DICT)
@@ -239,12 +239,12 @@ class OCRService:
             "confidence": 0.0
         }
         
-        # Process OCR results
+        # Process OCR results with lower threshold
         confidences = []
         for i in range(len(data['text'])):
-            if int(data['conf'][i]) > 30:  # Filter low confidence
+            if int(data['conf'][i]) > 15:  # Lowered from 30 to 15 for more text detection
                 text = data['text'][i].strip()
-                if text:
+                if text and len(text) > 1:  # Accept text with at least 2 characters
                     text_block = {
                         "text": text,
                         "confidence": float(data['conf'][i]),
