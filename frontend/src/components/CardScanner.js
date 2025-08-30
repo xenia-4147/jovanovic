@@ -486,9 +486,12 @@ const CardScanner = ({ onCardCreated }) => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {/* Extracted Fields */}
+              {/* DEBUG: Always show fields if they exist */}
               {scanResult?.scanned_card?.extracted_fields?.length > 0 ? (
                 <div className="space-y-3">
+                  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded">
+                    <h4 className="font-medium text-green-800">✅ {scanResult.scanned_card.extracted_fields.length} Felder erkannt!</h4>
+                  </div>
                   {scanResult.scanned_card.extracted_fields.map(renderField)}
                 </div>
               ) : (
@@ -497,10 +500,12 @@ const CardScanner = ({ onCardCreated }) => {
                   <p>Keine Informationen erkannt. Bitte versuchen Sie es mit einem anderen Bild.</p>
                   
                   {/* DEBUG INFO - Show what we actually received */}
-                  {process.env.NODE_ENV === 'development' && scanResult && (
-                    <details className="mt-4 text-xs text-left">
-                      <summary className="cursor-pointer text-blue-600">Debug Info (Entwicklung)</summary>
-                      <pre className="mt-2 p-2 bg-gray-100 rounded text-black overflow-auto">
+                  {scanResult && (
+                    <details className="mt-4 text-xs text-left bg-gray-100 p-3 rounded">
+                      <summary className="cursor-pointer text-blue-600">🔍 Debug Info</summary>
+                      <pre className="mt-2 overflow-auto text-black">
+                        Fields: {scanResult?.scanned_card?.extracted_fields?.length || 0}
+                        Status: {scanResult?.status}
                         {JSON.stringify(scanResult, null, 2)}
                       </pre>
                     </details>
