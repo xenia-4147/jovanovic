@@ -3162,14 +3162,17 @@ async def scan_business_card(
             scan_method=scan_request.scan_method
         )
         
-        # Save scan to database
-        scan_dict = scan_result.dict(by_alias=True, exclude={"id"})
+        # Save scan to database with ORIGINAL UUID
+        scan_dict = scan_result.dict(by_alias=True, exclude={"id"})  
+        # Keep the original UUID from OCR service
+        scan_dict["id"] = str(scan_result.id)  # Use UUID, not ObjectId
+        scan_dict["_id"] = str(scan_result.id)  # Also set _id for MongoDB compatibility
+        
         result = await db.scannedcards.insert_one(scan_dict)
-        scan_result.id = str(result.inserted_id)
         
         return ScanResponse(
             success=True,
-            scan_id=str(scan_result.id),
+            scan_id=str(scan_result.id),  # Return original UUID
             status=scan_result.status,
             message="Visitenkarte erfolgreich gescannt! ✨",
             estimated_completion_seconds=3 if scan_result.status == "pending" else None
