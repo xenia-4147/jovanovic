@@ -3205,22 +3205,22 @@ async def get_scan_result(
             scan_id=scan.id,
             status=scan.status,
             scanned_card={
-                "overall_confidence": scan.overall_confidence,
-                "extraction_method": scan.extraction_method,
+                "overall_confidence": getattr(scan, 'overall_confidence', 0),
+                "extraction_method": getattr(scan, 'extraction_method', 'tesseract'),  # Safe fallback
                 "extracted_fields": [
                     {
                         "field_type": field.field_type,
                         "value": field.value,
-                        "confidence": field.confidence,
-                        "confidence_level": field.confidence_level,
-                        "position": field.position,
+                        "confidence": getattr(field, 'confidence', 0),
+                        "confidence_level": getattr(field, 'confidence_level', 'medium'),
+                        "position": getattr(field, 'position', None),
                         "manually_corrected": getattr(field, 'manually_corrected', False)
                     }
                     for field in scan.extracted_fields
-                ] if scan.extracted_fields else []
+                ] if hasattr(scan, 'extracted_fields') and scan.extracted_fields else []
             },
-            conversion_ready=len(scan.extracted_fields) > 0 if scan.extracted_fields else False,
-            created_at=scan.created_at
+            conversion_ready=len(scan.extracted_fields) > 0 if hasattr(scan, 'extracted_fields') and scan.extracted_fields else False,
+            created_at=getattr(scan, 'created_at', 'unknown')
         )
         conversion_ready = (
             scan.status == "completed" and 
