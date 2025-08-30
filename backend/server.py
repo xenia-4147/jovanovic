@@ -2754,10 +2754,9 @@ async def convert_scan_to_card(
 ):
     """Convert scanned card to digital business card"""
     try:
-        # Get scan
-        from bson import ObjectId
+        # Get scan by UUID scan_id (not ObjectId)
         scan_data = await db.scannedcards.find_one({
-            "_id": ObjectId(scan_id),
+            "id": scan_id,  # Use UUID field, not _id ObjectId
             "user_id": str(current_user.id)
         })
         
