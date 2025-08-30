@@ -2821,7 +2821,7 @@ async def convert_scan_to_card(
         
         # Update scan with conversion info
         await db.scannedcards.update_one(
-            {"_id": ObjectId(scan_id)},
+            {"id": scan_id},  # Use UUID field
             {
                 "$set": {
                     "converted_to_card_id": str(card.id),
