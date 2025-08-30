@@ -104,7 +104,10 @@ class OCRService:
             
         except Exception as e:
             logger.error(f"Business card scan failed for user {user_id}: {str(e)}")
-            scan.status = "failed"
+            
+            # Import and use proper enum
+            from models.CardScanner import ScanProcessingStatus
+            scan.status = ScanProcessingStatus.FAILED  # Use enum instead of string
             scan.error_message = str(e)
             scan.processing_completed_at = datetime.utcnow()
             return scan
